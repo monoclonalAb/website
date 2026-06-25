@@ -1,26 +1,241 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── Design tokens ───────────────────────────────────────────────────────
+   Palette + fonts from the original site (main.css :root + @font-face).
+   Exposed as Tailwind v4 theme tokens (also emitted as :root custom props,
+   so `var(--color-red)` works in global CSS and CSS Modules alike). */
+@theme {
+  --color-black: #161616;
+  --color-navy: #1c2129; /* source --color */
+  --color-dark-gray: #374151;
+  --color-gray: #666666;
+  --color-paper: #eff1f5; /* source --white */
+  --color-red: #ff4939; /* accent */
+
+  --font-body: var(--font-helvetica);
+  --font-display: var(--font-eiko);
+  --font-serif: var(--font-baskerville);
+  --font-mono: var(--font-inconsolata);
+
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base ────────────────────────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-dark-gray);
+  background-color: var(--color-paper);
+  font-family: var(--font-body), "Helvetica", sans-serif;
+  width: 100vw;
+  padding-bottom: 4vh;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: #ffd987;
+}
+
+/* ── Headings — Eiko, with red <span> accent ─────────────────────────────
+   Tailwind preflight strips heading size/weight; restore browser defaults
+   so the ported markup keeps its visual hierarchy. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display), serif;
+  color: var(--color-black);
+  font-weight: 700;
+  line-height: 1.1;
+}
+h1 {
+  font-size: 2em;
+}
+h2 {
+  font-size: 1.5em;
+}
+h3 {
+  font-size: 1.17em;
+}
+h4 {
+  font-size: 1em;
+}
+h5 {
+  font-size: 0.83em;
+}
+h6 {
+  font-size: 0.67em;
+}
+h1 > span,
+h2 > span,
+h3 > span,
+h4 > span,
+h5 > span,
+h6 > span {
+  color: var(--color-red);
+}
+
+/* ── Links + hover italic + animated underline ───────────────────────── */
+a {
+  color: var(--color-navy);
+}
+a:hover {
+  color: var(--color-red);
+  font-style: italic;
+}
+
+.underline-animation a,
+a.underline-animation {
+  display: inline-block;
+  position: relative;
+}
+.underline-animation a::after,
+a.underline-animation::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0) translateY(4px);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--color-red);
+  transition: transform 0.25s ease-out;
+  transform-origin: bottom center;
+}
+.underline-animation a:hover::after,
+a.underline-animation:hover::after {
+  transform: scaleX(1) translateY(4px);
+}
+
+/* ── Text ────────────────────────────────────────────────────────────── */
+p,
+li {
+  line-height: 1.4rem;
+}
+
+tt {
+  font-family: monospace;
+}
+cite {
+  font-style: italic;
+}
+sup {
+  vertical-align: top;
+}
+sub {
+  vertical-align: bottom;
+}
+
+time {
+  color: var(--color-gray);
+  font-style: italic;
+  font-family: var(--font-serif), serif;
+  font-size: 75%;
+  font-weight: normal;
+  white-space: nowrap;
+}
+
+.release {
+  color: var(--color-black);
+  font-family: var(--font-body), sans-serif;
+  font-weight: 700;
+  font-size: 125%;
+}
+
+code {
+  font-family: var(--font-mono), monospace;
+  font-size: 10pt;
+}
+
+.code {
+  color: var(--color-black);
+  font-family: monospace;
+  background-color: #cee1ff;
+  border-radius: 2px;
+  padding: 2px;
+  text-decoration: none;
+}
+
+/* ── Content container (about / contents / changelog / blog / leetcode) ── */
+.content {
+  max-width: 650px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  margin: 0 auto;
+  padding: 10px;
+}
+.content > :is(h1, h2, h3, h4, h5, h6) {
+  padding-top: 1em;
+}
+
+/* Restore list markers (preflight removes them) for prose lists only. */
+.content :is(ul, ol) {
+  padding-left: 25px;
+}
+.content ul {
+  list-style: disc;
+}
+.content ol {
+  list-style: decimal;
+}
+dt > a {
+  color: inherit;
+  font-weight: bold;
+}
+
+/* ── Sidebar / important callouts ────────────────────────────────────── */
+.sidebar {
+  border-left: 3px solid var(--color-red);
+  border-radius: 0;
+  row-gap: 10px;
+}
+.sidebar:not(.row):not(:has(row)):not(ol):not(:has(ol)):not(ul):not(:has(ul)) {
+  padding-left: 15px;
+}
+
+.important {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  background-color: rgb(255 48 0 / 20%);
+  border-left: 3px solid #ff3000;
+  border-radius: 0;
+  padding: 20px 20px 20px 15px;
+}
+
+/* ── Figures + horizontal rule ───────────────────────────────────────── */
+figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 1em 0;
+}
+figure img {
+  padding-bottom: 0.5em;
+  max-width: 100%;
+  height: auto;
+  align-self: center;
+}
+figure figcaption,
+figure figcaption a {
+  color: gray;
+  font-family: var(--font-display), serif;
+}
+
+hr {
+  border: none;
+  border-top: 2px solid black;
+  margin: 10px 0;
+  width: 102%;
+  align-self: center;
 }
