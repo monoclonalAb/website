@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Splash from "./Splash";
+import HomePage from "./HomePage";
 
 export const metadata: Metadata = {
   // Exact "Eric Zheng" (the root template would otherwise append "| Eric Zheng").
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <Splash />;
+  return <HomePage />;
 }

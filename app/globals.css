@@ -5,12 +5,13 @@
    Exposed as Tailwind v4 theme tokens (also emitted as :root custom props,
    so `var(--color-red)` works in global CSS and CSS Modules alike). */
 @theme {
-  --color-black: #161616;
+  --color-black: #16171b; /* nav links — sampled from reference image */
   --color-navy: #1c2129; /* source --color */
   --color-dark-gray: #374151;
   --color-gray: #666666;
-  --color-paper: #eff1f5; /* source --white */
-  --color-red: #ff4939; /* accent */
+  --color-light-gray: #c8c5bc; /* alphabet speckle — sampled from reference image */
+  --color-paper: #f0eee8; /* page background — sampled from reference image */
+  --color-red: #d91620; /* ERIC/ZHENG accent — sampled from reference image */
 
   --font-body: var(--font-helvetica);
   --font-display: var(--font-eiko);
@@ -34,7 +35,6 @@ body {
   background-color: var(--color-paper);
   font-family: var(--font-body), "Helvetica", sans-serif;
   width: 100vw;
-  padding-bottom: 4vh;
   overflow-x: hidden;
 }
 
@@ -83,36 +83,13 @@ h6 > span {
   color: var(--color-red);
 }
 
-/* ── Links + hover italic + animated underline ───────────────────────── */
+/* ── Links + hover italic ────────────────────────────────────────────── */
 a {
   color: var(--color-navy);
 }
 a:hover {
   color: var(--color-red);
   font-style: italic;
-}
-
-.underline-animation a,
-a.underline-animation {
-  display: inline-block;
-  position: relative;
-}
-.underline-animation a::after,
-a.underline-animation::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  transform: scaleX(0) translateY(4px);
-  height: 2px;
-  bottom: 0;
-  left: 0;
-  background-color: var(--color-red);
-  transition: transform 0.25s ease-out;
-  transform-origin: bottom center;
-}
-.underline-animation a:hover::after,
-a.underline-animation:hover::after {
-  transform: scaleX(1) translateY(4px);
 }
 
 /* ── Text ────────────────────────────────────────────────────────────── */
@@ -172,6 +149,10 @@ code {
   row-gap: 10px;
   margin: 0 auto;
   padding: 10px;
+  /* Bottom breathing room for the scrolling prose routes. Lives here rather
+     than on `body` so it doesn't add a phantom 4vh to the full-viewport home
+     page (which would make that otherwise fixed splash scroll). */
+  padding-bottom: 4vh;
 }
 .content > :is(h1, h2, h3, h4, h5, h6) {
   padding-top: 1em;
@@ -206,8 +187,8 @@ dt > a {
   display: flex;
   flex-direction: column;
   row-gap: 10px;
-  background-color: rgb(255 48 0 / 20%);
-  border-left: 3px solid #ff3000;
+  background-color: color-mix(in srgb, var(--color-red) 20%, transparent);
+  border-left: 3px solid var(--color-red);
   border-radius: 0;
   padding: 20px 20px 20px 15px;
 }
@@ -234,7 +215,7 @@ figure figcaption a {
 
 hr {
   border: none;
-  border-top: 2px solid black;
+  border-top: 2px solid var(--color-black);
   margin: 10px 0;
   width: 102%;
   align-self: center;

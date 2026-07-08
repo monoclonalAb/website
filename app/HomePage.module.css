@@ -1,0 +1,122 @@
+/* Home page — scoped port of the source index.css.
+   Kept in a CSS Module so its full-viewport sizing / overflow / selection
+   colour cannot leak onto the scrolling content routes. */
+
+.siteContainer {
+  position: relative;
+  z-index: 2;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-paper);
+  overflow: hidden;
+}
+
+.siteContainer ::selection {
+  background-color: #f47142;
+}
+
+.title {
+  position: absolute;
+  top: 50vh;
+  left: 0;
+  width: 100%;
+  transform: translateY(-50%);
+  font-family: var(--font-helvetica), "Helvetica", sans-serif;
+  line-height: 1.1;
+  color: var(--color-light-gray);
+  --expand: 0.2em; /* hover tracking-expand: per-gap spacing (single tunable knob) */
+}
+
+.leftSeg,
+.rightSeg {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+.leftSeg {
+  text-align: right;
+}
+.rightSeg {
+  text-align: left;
+}
+
+.title .letter {
+  display: inline-block;
+  color: inherit;
+  will-change: transform;
+}
+.title :global(a) .letter {
+  pointer-events: none;
+}
+
+.glyph {
+  display: inline-block;
+  will-change: transform;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.title .line:has(:global(a):hover) .glyph {
+  transform: translateX(var(--spread-x, 0));
+}
+
+.title .line {
+  display: flex;
+  color: inherit;
+}
+
+.title .name {
+  color: var(--color-red);
+}
+
+.title .name,
+.title :global(a) {
+  position: relative;
+  z-index: 1;
+}
+
+.title :global(a) {
+  color: var(--color-black);
+}
+.title :global(a):hover {
+  color: var(--color-black);
+  font-style: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glyph {
+    transition: none;
+  }
+  .title .line:has(:global(a):hover) .glyph {
+    transform: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 2rem;
+  }
+}
+@media (min-width: 600px) and (min-height: 480px) {
+  .title {
+    font-size: 3rem;
+  }
+}
+@media (min-width: 768px) and (min-height: 600px) {
+  .title {
+    font-size: 4rem;
+  }
+}
+@media (min-width: 992px) and (min-height: 768px) {
+  .title {
+    font-size: 5rem;
+  }
+}
+@media (min-width: 1200px) and (min-height: 992px) {
+  .title {
+    font-size: 6rem;
+  }
+}
