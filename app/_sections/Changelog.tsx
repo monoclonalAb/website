@@ -1,11 +1,6 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Changelog",
-};
-
-export default function ChangelogPage() {
+export default function Changelog() {
   return (
     <>
       <h1>

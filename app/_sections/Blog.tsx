@@ -1,15 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
-import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Blog",
-};
-
-export default function BlogPage() {
+export default function Blog() {
   return (
     <>
-      <h1 id="blog">
+      <h1>
         blog<span>:</span>
       </h1>
       <p>

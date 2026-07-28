@@ -1,7 +1,6 @@
 "use client";
 
 import { Fragment, type CSSProperties, type ReactNode } from "react";
-import Link from "next/link";
 import styles from "./HomePage.module.css";
 import { useCursorRepel } from "./useCursorRepel";
 
@@ -66,11 +65,11 @@ export default function HomePage() {
     ...Array.from(tok.before).map((ch, i) =>
       letter(ch, `b${i}`, { spread: step(-c) }),
     ),
-    <Link href={tok.href} aria-label={tok.text} key="link">
+    <a href={tok.href} aria-label={tok.text} key="link">
       {Array.from(tok.text).map((ch, i) =>
         letter(ch, i, { repel: false, spread: step(i - c) }),
       )}
-    </Link>,
+    </a>,
     ...Array.from(tok.after).map((ch, i) =>
       letter(ch, `a${i}`, { spread: step(c) }),
     ),
@@ -123,18 +122,18 @@ export default function HomePage() {
   };
 
   return (
-    <div className={styles.siteContainer} {...containerProps}>
+    <div id="top" className={styles.siteContainer} {...containerProps}>
       <h1 className={styles.title} aria-label="Eric Zheng">
         {line([letters("ABCDEF"), letters("abcdefg")])}
-        {line([letters("GHIJKL"), link("h", "about", "/about", "ij")])}
+        {line([letters("GHIJKL"), link("h", "about", "#about", "ij")])}
         {line([
           letters("M"),
           name("ERIC"),
           letters("N"),
-          link("klm", "blog", "/blog", "n"),
+          link("klm", "blog", "#blog", "n"),
         ])}
-        {line([letters("O"), name("ZHENG"), link("o", "contents", "/contents")])}
-        {line([letters("PQRSTU"), link("p", "changelog", "/changelog")])}
+        {line([letters("O"), name("ZHENG"), link("o", "contents", "#contents")])}
+        {line([letters("PQRSTU"), link("p", "changelog", "#changelog")])}
         {line([letters("VWXYZ"), letters("qrstuvwxyz")])}
       </h1>
     </div>

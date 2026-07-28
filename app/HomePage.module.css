@@ -5,7 +5,7 @@
 .siteContainer {
   position: relative;
   z-index: 2;
-  height: 100vh;
+  min-height: 100svh; /* full-height tile, parity with the section panels below */
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -14,6 +14,8 @@
   align-items: center;
   background-color: var(--color-paper);
   overflow: hidden;
+  scroll-snap-align: start; /* first snap point (#top splash), parity with the section tiles */
+  scroll-snap-stop: always;
 }
 
 .siteContainer ::selection {
@@ -22,7 +24,7 @@
 
 .title {
   position: absolute;
-  top: 50vh;
+  top: 50%; /* centre within the (svh) container rather than the vh viewport */
   left: 0;
   width: 100%;
   transform: translateY(-50%);

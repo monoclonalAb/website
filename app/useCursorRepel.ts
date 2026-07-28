@@ -72,7 +72,13 @@ export function useCursorRepel(active: boolean) {
       sizes.current = new Array(n);
       for (let i = 0; i < n; i++) {
         const r = els.current[i].getBoundingClientRect();
-        centers.current[i] = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+        // Store centers in DOCUMENT coords (add scroll offset) so they stay valid
+        // once the splash is scrolled — the pointer is captured in the same frame
+        // via pageX/pageY below, so no re-measure on scroll is needed.
+        centers.current[i] = {
+          x: r.left + window.scrollX + r.width / 2,
+          y: r.top + window.scrollY + r.height / 2,
+        };
         sizes.current[i] = {
           hw: Math.max(r.width / 2 - PAD_X, 1),
           hh: Math.max(r.height / 2 - PAD_Y, 1),
@@ -189,7 +195,7 @@ export function useCursorRepel(active: boolean) {
       cursor.current = { x: -99999, y: -99999 };
       return;
     }
-    cursor.current = { x: e.clientX, y: e.clientY };
+    cursor.current = { x: e.pageX, y: e.pageY }; // document coords (see measure())
   };
   const onPointerLeave = () => {
     cursor.current = { x: -99999, y: -99999 };

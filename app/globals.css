@@ -38,6 +38,33 @@ body {
   overflow-x: hidden;
 }
 
+/* ── Single-page scroll: in-page anchors clear the sticky navbar ──────────
+   --nav-h approximates the sticky navbar height so anchored sections land
+   below it rather than hidden underneath. Smooth scroll is motion-safe. */
+:root {
+  --nav-h: 4.5rem;
+}
+@media (max-width: 600px) {
+  :root {
+    --nav-h: 3rem;
+  }
+}
+html {
+  scroll-padding-top: var(--nav-h);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    /* Eases the in-page anchor jumps from the navbar and the hero's links. */
+    scroll-behavior: smooth;
+    /* The whole paging feel, done natively — no scroll library, no JS handler.
+       proximity, never mandatory: About and Contents are taller than the viewport,
+       and mandatory snap would drag the reader back to a tile edge mid-paragraph.
+       proximity only engages near an edge, so a long section scrolls normally and
+       the one-screen tiles still land flush. */
+    scroll-snap-type: y proximity;
+  }
+}
+
 ::selection {
   background-color: #ffd987;
 }
@@ -149,13 +176,34 @@ code {
   row-gap: 10px;
   margin: 0 auto;
   padding: 10px;
-  /* Bottom breathing room for the scrolling prose routes. Lives here rather
-     than on `body` so it doesn't add a phantom 4vh to the full-viewport home
-     page (which would make that otherwise fixed splash scroll). */
+  /* Bottom breathing room below the last section of the single scroll page
+     (and the standalone /leetcode route). */
   padding-bottom: 4vh;
 }
-.content > :is(h1, h2, h3, h4, h5, h6) {
+/* Each page's content is now a <section> child of .content, tiled into a
+   full-height panel with a snap point (see the html rule above).
+   Re-declare the flex column so intra-section spacing survives (the reset zeroes
+   element margins), and keep the heading padding one level deeper as a direct
+   child so nested callout headings (.important > h2) are still excluded.
+   min-height (never fixed height) lets the tall About tile grow past one screen. */
+.content > section {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  min-height: 100svh; /* full-height tile; svh avoids mobile URL-bar reflow */
+  justify-content: center; /* short tiles (blog) centre → look intentional */
+  /* Nav clearance for anchored landings comes from html { scroll-padding-top }
+     alone. Do NOT also set scroll-margin-top here — the two stack and would
+     double the offset. */
+  scroll-snap-align: start; /* snap point = section top, offset by scroll-padding-top */
+  scroll-snap-stop: always; /* fast native scroll / touch can't skip a section */
+}
+.content > section > :is(h1, h2, h3, h4, h5, h6) {
   padding-top: 1em;
+}
+/* Tiles fill the viewport, so drop the old 3vh inter-section gap. */
+.content > section + section {
+  margin-top: 0;
 }
 
 /* Restore list markers (preflight removes them) for prose lists only. */

@@ -4,6 +4,13 @@
   grid-template-columns: 1fr 5fr 1fr;
   justify-items: center;
   margin-bottom: 20px;
+  /* Pins to the top once the scroll passes the hero (the nav sits after the
+     100vh splash in the document). Opaque background + z-index above the hero
+     (z-index:2) so scrolled content doesn't bleed through. */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--color-paper);
 }
 
 .nav,
