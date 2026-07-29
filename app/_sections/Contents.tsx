@@ -1,11 +1,6 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Contents",
-};
-
-export default function ContentsPage() {
+export default function Contents() {
   return (
     <>
       <h1>
@@ -21,29 +16,29 @@ export default function ContentsPage() {
       </h2>
       <dl className="sidebar">
         <dt>
-          <Link href="/">/index.html</Link>
+          <a href="#top">/index.html</a>
         </dt>
         <dd>cause every website needs a fancy welcome page</dd>
         <br />
         <dt>
-          <Link href="/about">/about.html</Link>
+          <a href="#about">/about.html</a>
         </dt>
         <dd>everything you need to know about the site</dd>
         <br />
         <dt>
-          <Link href="/blog">/blog.html</Link>
+          <a href="#blog">/blog.html</a>
         </dt>
         <dd>
           the page <b>everyone</b> is here for
         </dd>
         <br />
         <dt>
-          <Link href="/contents">/contents.html</Link>
+          <a href="#contents">/contents.html</a>
         </dt>
         <dd>this page (riveting)</dd>
         <br />
         <dt>
-          <Link href="/changelog">/changelog.html</Link>
+          <a href="#changelog">/changelog.html</a>
         </dt>
         <dd>
           for long time fans of the page who want to know what has <b>changed</b>

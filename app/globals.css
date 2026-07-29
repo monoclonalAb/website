@@ -38,6 +38,36 @@ body {
   overflow-x: hidden;
 }
 
+/* ── Single-page scroll: every tile lands flush with the viewport ─────────
+   Navbar clearance is padding INSIDE each tile (see `.content > section`), not
+   a scroll offset. A tile's top edge therefore lands exactly on the viewport's
+   top edge and no neighbouring tile can appear above or below it.
+
+   This also makes --nav-h forgiving. As a scroll-padding-top it had to equal
+   the real navbar height exactly: 4.5rem against a 46px navbar parked the
+   viewport 26px too high and leaked a strip of the previous tile out from under
+   the bar. As interior padding it only has to be >= the navbar height. */
+:root {
+  --nav-h: 4.5rem;
+}
+@media (max-width: 600px) {
+  :root {
+    --nav-h: 3rem;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    /* Eases the in-page anchor jumps from the navbar and the hero's links. */
+    scroll-behavior: smooth;
+    /* The whole paging feel, done natively — no scroll library, no JS handler.
+       proximity, never mandatory: About and Contents are taller than the viewport,
+       and mandatory snap would drag the reader back to a tile edge mid-paragraph.
+       proximity only engages near an edge, so a long section scrolls normally and
+       the one-screen tiles still land flush. */
+    scroll-snap-type: y proximity;
+  }
+}
+
 ::selection {
   background-color: #ffd987;
 }
@@ -149,13 +179,47 @@ code {
   row-gap: 10px;
   margin: 0 auto;
   padding: 10px;
-  /* Bottom breathing room for the scrolling prose routes. Lives here rather
-     than on `body` so it doesn't add a phantom 4vh to the full-viewport home
-     page (which would make that otherwise fixed splash scroll). */
+  /* Bottom breathing room for the standalone /leetcode route. The tiled home
+     page zeroes this below — there, trailing padding would show under the last
+     tile once it is scrolled flush. */
   padding-bottom: 4vh;
 }
-.content > :is(h1, h2, h3, h4, h5, h6) {
+/* Each page's content is now a <section> child of .content, tiled into a
+   full-height panel and given a snap point (see the html rule above).
+   Re-declare the flex column so intra-section spacing survives (the reset zeroes
+   element margins), and keep the heading padding one level deeper as a direct
+   child so nested callout headings (.important > h2) are still excluded.
+   min-height (never fixed height) lets the tall About tile grow past one screen. */
+.content > section {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  min-height: 100svh; /* full-height tile; svh avoids mobile URL-bar reflow */
+  justify-content: center; /* short tiles (blog) centre → look intentional */
+  /* Navbar clearance, applied inside the tile. border-box (the Tailwind reset
+     default) keeps it within the 100svh, so the tile stays exactly one viewport
+     tall and its top edge can sit flush at scroll-top. Do NOT move this back out
+     to scroll-padding-top / scroll-margin-top — an offset landing is precisely
+     what let the previous tile show above the navbar. */
+  padding-top: var(--nav-h);
+  scroll-snap-align: start; /* snap point = tile top = viewport top */
+  scroll-snap-stop: always; /* fast native scroll / touch can't skip a section */
+}
+.content > section > :is(h1, h2, h3, h4, h5, h6) {
   padding-top: 1em;
+}
+/* The tiled home column. Tiles have to butt directly against each other and
+   against the ends of the document: `.content`'s own row-gap and block padding
+   would otherwise sit inside the viewport at a tile's scroll limit, showing a
+   strip of the neighbouring tile past the gap. `:has(> section)` scopes this to
+   the home page, so the standalone /leetcode route keeps the normal prose gap
+   and bottom padding. */
+.content:has(> section) {
+  row-gap: 0;
+  padding-block: 0;
+}
+.content > section + section {
+  margin-top: 0;
 }
 
 /* Restore list markers (preflight removes them) for prose lists only. */

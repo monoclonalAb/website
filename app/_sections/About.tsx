@@ -1,14 +1,9 @@
 /* eslint-disable react/no-unescaped-entities */
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import ericPhoto from "@/public/images/eric_photo_2.jpg";
 
-export const metadata: Metadata = {
-  title: "About Me",
-};
-
-export default function AboutPage() {
+export default function About() {
   return (
     <>
       <figure>
@@ -98,7 +93,7 @@ export default function AboutPage() {
         </li>
         <li>
           hopes to maintain a semi-active semi-academic{" "}
-          <Link href="/blog">blog</Link>
+          <a href="#blog">blog</a>
         </li>
       </ul>
 

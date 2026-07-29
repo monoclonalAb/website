@@ -2,9 +2,11 @@ import Link from "next/link";
 import styles from "./Navbar.module.css";
 
 /**
- * Site navigation: logo · links · socials in a 1fr/5fr/1fr grid.
- * Rendered by the (site) layout, so it appears on every page except the
- * home splash. Plain <img> is used for the social SVG icons (no next/image
+ * Site navigation: logo · links · socials in a 1fr/5fr/1fr grid. Rendered on the
+ * single-scroll home page (where it pins as a sticky bar once you scroll past
+ * the hero) and on the standalone /leetcode route. Links are root-relative
+ * anchors (/#about) so they scroll in place on `/` and navigate-then-scroll from
+ * /leetcode. Plain <img> is used for the social SVG icons (no next/image
  * optimization needed, and it keeps the CSS-driven sizing + hover filter).
  */
 export default function Navbar() {
@@ -12,7 +14,7 @@ export default function Navbar() {
     <nav className={styles.nav}>
       <div className={styles.logo}>
         <h1>
-          <Link href="/">
+          <Link href="/#top">
             ez<span>._</span>
           </Link>
         </h1>
@@ -20,16 +22,16 @@ export default function Navbar() {
 
       <ul className={`${styles.links} underline-animation`}>
         <li>
-          <Link href="/about">about</Link>
+          <Link href="/#about">about</Link>
         </li>
         <li>
-          <Link href="/blog">blog</Link>
+          <Link href="/#blog">blog</Link>
         </li>
         <li>
-          <Link href="/contents">contents</Link>
+          <Link href="/#contents">contents</Link>
         </li>
         <li>
-          <Link href="/changelog">changelog</Link>
+          <Link href="/#changelog">changelog</Link>
         </li>
       </ul>
 

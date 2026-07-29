@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SiteChrome from "@/components/SiteChrome";
 
 export const metadata: Metadata = {
   title: "Leetcode",
@@ -6,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function LeetcodePage() {
   return (
-    <>
+    <SiteChrome>
       <h1 id="leetcode">
         leetcode<span>:</span>
       </h1>
@@ -20,6 +21,6 @@ export default function LeetcodePage() {
           <i>daily solutions coming soon.</i>
         </p>
       </div>
-    </>
+    </SiteChrome>
   );
 }
