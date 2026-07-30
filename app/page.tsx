@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomePage from "./HomePage";
+import SmoothScroll from "./SmoothScroll";
 import SiteChrome from "@/components/SiteChrome";
 import About from "./_sections/About";
 import Blog from "./_sections/Blog";
@@ -14,14 +15,13 @@ export const metadata: Metadata = {
 /**
  * The whole site on one scroll: the interactive splash hero, then the shared
  * chrome (sticky navbar + centred content column) wrapping every prose section,
- * tiled into full-height panels. Scrolling is the browser's own — CSS scroll-snap
- * aligns each tile and `scroll-behavior: smooth` eases the anchor jumps (both in
- * app/globals.css); there is no scroll library and no JS scroll handler.
- * <HomePage/> is the only client island; the navbar and sections are server-rendered.
+ * tiled into full-height panels you glide between via <SmoothScroll/> (Lenis).
+ * <HomePage/> and <SmoothScroll/> are the client islands; the navbar and sections
+ * stay server-rendered, passed through <SmoothScroll/> as children.
  */
 export default function Home() {
   return (
-    <>
+    <SmoothScroll>
       <HomePage />
       <SiteChrome>
         <section id="about">
@@ -37,6 +37,6 @@ export default function Home() {
           <Changelog />
         </section>
       </SiteChrome>
-    </>
+    </SmoothScroll>
   );
 }
