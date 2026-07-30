@@ -61,6 +61,11 @@ export default function SmoothScroll({
         // Unset until PagerScroll's effect runs, and again after it tears down; `true`
         // means "not handled", so events simply pass through to Lenis untouched.
         virtualScroll: (data) => vsRef.current?.(data) ?? true,
+        // The pager owns remeasurement: it already rebuilds its tile model from a
+        // ResizeObserver, and Lenis' own observer debounces 250ms and resets
+        // targetScroll mid-glide without stopping the animation. PagerScroll calls
+        // lenis.resize() itself, so there is exactly one authority.
+        autoResize: false,
       }}
     >
       {children}

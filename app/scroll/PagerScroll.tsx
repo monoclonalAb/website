@@ -48,6 +48,8 @@ const LONG_GAP = 140; // ms — a pause this long definitely does: no momentum s
 // stalls for that long mid-flight, so no magnitude test is needed.
 const TAIL_FRACTION = 0.5; // a gesture is "in its tail" once |delta| drops this far below its peak
 const RISE_FACTOR = 1.7; // ...and a new push is |delta| climbing back by this much
+const HOLD_FACTOR = 0.95; // after a borderline pause, |delta| must still be this much
+// of the recent trend to count as a push rather than a straggling momentum frame
 const RISE_FLOOR = 12; // px — ignore rising edges among noise-sized deltas
 const LANDING_BEAT = 60; // ms of quiet after landing on a SHORT tile, so a jittery
 // momentum tail can never be mistaken for a push and double-page. Tall tiles get
@@ -150,10 +152,11 @@ export default function PagerScroll({
     // "up" (used by anchors: "go to About" means its start, not its bottom screen).
     // force re-runs a transport to the tile we are already on, which is what an
     // anchor click to the current section means.
+    // toBottom lands on the very end of the document rather than a tile edge (End).
     const transport = (
       target: number,
       dir: "up" | "down",
-      { toTop = false, force = false } = {},
+      { toTop = false, force = false, toBottom = false } = {},
     ) => {
       const tiles = tilesRef.current;
       const k = Math.max(0, Math.min(tiles.length - 1, target));
@@ -189,7 +192,13 @@ export default function PagerScroll({
         },
       };
 
-      if (t.isFree && dir === "up" && !toTop) {
+      if (toBottom) {
+        // End: the end of the document, not the last tile's top — otherwise a final
+        // tile taller than the viewport is impossible to reach the bottom of. Routed
+        // through transport (rather than a bare scrollTo at the key handler) so the
+        // streak, `claimed` and landing-beat bookkeeping above still runs.
+        lenis.scrollTo(lenis.limit, opts);
+      } else if (t.isFree && dir === "up" && !toTop) {
         // Enter a tall tile from below at its bottom screen (numeric → no nav pad).
         const bottom = Math.max(t.top - scrollPadTop(), nextTop(k) - window.innerHeight);
         lenis.scrollTo(bottom, opts);
@@ -201,6 +210,26 @@ export default function PagerScroll({
 
     const absorb = (e: Event) => {
       if (e.cancelable) e.preventDefault();
+    };
+
+    /**
+     * Point the URL at the tile a *destination* just headed for, so the address bar,
+     * a refresh and the back button all agree with what is on screen.
+     *
+     * replaceState, never `location.hash = …`: assigning the hash performs a fragment
+     * navigation, which natively scrolls the target into view mid-glide. Lenis will not
+     * absorb that (onNativeScroll re-syncs only when it is not already smooth-scrolling)
+     * so the two animators fight and the page visibly yo-yos — and it fires hashchange,
+     * which would re-enter the listener below. replaceState does neither, so no
+     * suppression flag is needed.
+     *
+     * Only destinations call this — anchor clicks, Home and End. Not per-hop: a hot
+     * wheel chain fires up to four transports in a second, and each would be a
+     * replaceState plus a Next router sync for a hash the reader is already leaving.
+     */
+    const syncHash = (id: string | undefined) => {
+      if (!id || location.hash === `#${id}`) return;
+      history.replaceState(null, "", `#${id}`);
     };
 
     // ── wheel hook (live-swapped onto lenis.options) ──────────────────────
@@ -224,7 +253,8 @@ export default function PagerScroll({
       // magnitude is holding up: momentum only ever decays, so a delayed event that is
       // *smaller* than the recent trend is a dropped frame, not a push — whereas a
       // mouse wheel spun fast delivers identical clicks and does pass this.
-      let fresh = gap >= LONG_GAP || (gap >= REARM_GAP && mag >= recent * 0.95);
+      let fresh =
+        gap >= LONG_GAP || (gap >= REARM_GAP && mag >= recent * HOLD_FACTOR);
       if (!fresh) {
         // No pause at all: the shape has to give it away. Once the stream has decayed
         // past its peak, a magnitude climbing back up is the user pushing again.
@@ -274,7 +304,15 @@ export default function PagerScroll({
         // flick would read out a long section AND launch into the next one, and a
         // section's far edge would be impossible to stop at.
         absorb(event);
-        lenis.scrollTo(Math.max(iMin, Math.min(iMax, dest)));
+        // programmatic:false so targetScroll holds the clamped edge immediately and
+        // currentIndex() below reads the tile we actually stopped on. lerp is passed
+        // explicitly because the flag also governs whether lerp/duration/easing fall
+        // back to the instance options — omit all three and Lenis has no motion law
+        // left, so it jumps straight to the target instead of easing.
+        lenis.scrollTo(Math.max(iMin, Math.min(iMax, dest)), {
+          programmatic: false,
+          lerp: lenis.options.lerp,
+        });
         if (spentRef.current || mag < TRANSPORT_THRESHOLD) return false;
         transport(dest > iMax ? i + 1 : i - 1, dest > iMax ? "down" : "up");
         return false;
@@ -334,10 +372,15 @@ export default function PagerScroll({
       if (jump !== null) {
         streakRef.current = 0; // a destination, not a nudge — glide at full length
         lastTransportRef.current = 0;
+        const toBottom = e.key === "End";
         transport(jump, jump >= currentIndex() ? "down" : "up", {
           toTop: true,
           force: true,
+          toBottom,
         });
+        // Home/End are destinations, so they own the URL the same way a click does.
+        // End names the tile it lands *in* (the last one) — there is no "bottom" id.
+        syncHash(tilesRef.current[jump]?.id);
         return;
       }
 
@@ -395,22 +438,104 @@ export default function PagerScroll({
       // section is the one already being read.
       streakRef.current = 0;
       lastTransportRef.current = 0;
-      if (k >= 0)
+      if (k >= 0) {
         transport(k, k >= currentIndex() ? "down" : "up", { toTop: true, force: true });
-      else lenis.scrollTo(target as HTMLElement);
+        syncHash(tilesRef.current[k].id);
+      } else {
+        // A hash that is not a tile. Unreachable from the shipped markup (every
+        // in-page href targets a tile id) but cheap to keep honest: pass the motion
+        // law explicitly, since programmatic:false also stops lerp/duration/easing
+        // falling back to the instance options, and with none of them set Lenis
+        // teleports rather than glides.
+        lenis.scrollTo(target as HTMLElement, {
+          programmatic: false,
+          duration: GLIDE_DURATION,
+          easing: easeInOutCubic,
+        });
+        syncHash(hashId);
+      }
+    };
+
+    /**
+     * Land a hash the page was *opened* on. next.config.ts serves permanent (308)
+     * redirects from the old /about, /blog, /contents and /changelog routes to the
+     * matching /#anchor, and browsers cache those indefinitely — so this is the normal
+     * arrival path for every legacy inbound link, not an edge case. Cross-route navbar
+     * links (/leetcode -> /#about) land here too, since the click handler declines
+     * those and lets the router move first.
+     *
+     * Skipped when the browser has already put us within a couple of pixels of the
+     * tile, so a cold load does not replay a gratuitous 0.55s glide over a page that
+     * is already in the right place.
+     */
+    const landInitialHash = () => {
+      const id = location.hash.slice(1);
+      if (!id) return;
+      const k = tilesRef.current.findIndex((t) => t.id === id);
+      if (k < 0) return;
+      if (Math.abs(lenis.targetScroll - tilesRef.current[k].top) <= 2) return;
+      streakRef.current = 0;
+      lastTransportRef.current = 0;
+      transport(k, "down", { toTop: true, force: true });
     };
 
     // ── wiring ────────────────────────────────────────────────────────────
     measure();
 
-    const onResize = () => measure();
+    /**
+     * Remeasure whenever a tile's box changes — a <details> opening, an image
+     * arriving, a font swap. Cheap: measure() only reads geometry, so there is no
+     * observer feedback loop. A ResizeObserver is enough on its own; the sections are
+     * static server components, so nothing is ever inserted for a MutationObserver to
+     * catch, and one watching attributes would wake on Lenis' own lenis-scrolling /
+     * lenis-smooth class churn for no benefit.
+     *
+     * Deferred while a glide is in flight. Lenis resolves an element target to a
+     * number when scrollTo is called, so an in-flight glide will not follow a tile
+     * that moves — and remeasuring under it leaves targetScroll pointing at a stale
+     * offset, which is exactly what currentIndex() trusts.
+     *
+     * This also owns lenis.resize(): the instance runs with autoResize disabled,
+     * because its own observer debounces 250ms and resets targetScroll mid-glide
+     * without stopping the animation. One authority over remeasurement, and
+     * lenis.limit stays fresh for End.
+     */
+    let pendingMeasure = false;
+    const remeasure = () => {
+      if (lenis.isScrolling === "smooth") {
+        pendingMeasure = true;
+        return;
+      }
+      measure();
+      lenis.resize();
+    };
+    // Lenis 1.3 has no "scrollend" event, so watch "scroll" and flush on the first
+    // frame the glide is no longer smooth.
+    const onScroll = () => {
+      if (!pendingMeasure || lenis.isScrolling === "smooth") return;
+      pendingMeasure = false;
+      measure();
+      lenis.resize();
+    };
+    lenis.on("scroll", onScroll);
+
+    const ro = new ResizeObserver(remeasure);
+    for (const t of tilesRef.current) ro.observe(t.el);
+
+    const onResize = () => remeasure();
     window.addEventListener("resize", onResize);
 
     let cancelled = false;
     document.fonts?.ready.then(() => {
       if (cancelled) return;
       requestAnimationFrame(() => {
-        if (!cancelled) measure();
+        if (cancelled) return;
+        measure();
+        lenis.resize();
+        // After the font swap, not before: a swap moves every tile's top, and landing
+        // on a pre-swap offset would leave the section a few px off with nothing to
+        // re-land it.
+        landInitialHash();
       });
     });
 
@@ -427,6 +552,8 @@ export default function PagerScroll({
       // before this cleanup runs, and clearing unconditionally would clobber it.
       // Null → events pass through to Lenis untouched (native/free scroll).
       if (vsRef.current === onVirtualScroll) vsRef.current = null;
+      ro.disconnect();
+      lenis.off("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("keydown", onKeyDown);
       document.removeEventListener("click", onClick, true);
