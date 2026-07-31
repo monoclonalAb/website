@@ -34,8 +34,8 @@ import { TILE_IDS } from "./tiles";
 
 // Tuning knobs (px / ms / s / fraction).
 const GLIDE_DURATION = 0.55; // s — one unhurried transport, starting from rest
-const MIN_GLIDE = 0.2; // s — floor once a chain is running hot
-const GLIDE_DECAY = 0.6; // each chained transport lasts this fraction of the last
+const MIN_GLIDE = 0.3; // s — floor once a chain is running hot
+const GLIDE_DECAY = 0.82; // each chained transport lasts this fraction of the last
 const STREAK_WINDOW = 1100; // ms since the last transport that still counts as a chain
 const MAX_STREAK = 4; // bound on the streak exponent
 const FREE_MARGIN = 4; // px — a tile is "free" only if taller than the viewport by this
@@ -51,16 +51,32 @@ const RISE_FACTOR = 1.7; // ...and a new push is |delta| climbing back by this m
 const HOLD_FACTOR = 0.95; // after a borderline pause, |delta| must still be this much
 // of the recent trend to count as a push rather than a straggling momentum frame
 const RISE_FLOOR = 12; // px — ignore rising edges among noise-sized deltas
+const NEW_PUSH_FRACTION = 0.25; // a new push must still be this much of the gesture's
+// own peak. Binds hard early in a tail, where false positives live; late in one it is
+// redundant with RISE_FACTOR, which is where false negatives would hurt instead.
+const PEAK_RELEASE = 0.97; // per event — the peak bleeds off (~370ms half-life at a
+// 16ms cadence) so a hard flick cannot lock out every softer push after it.
+const CHAIN_MIN_GAP = 180; // ms between transports driven by the *heuristic* arm. Sits
+// well above the ~80ms at which a jittery tail's dropouts recur, and below the shortest
+// glide, so a deferred push is never visible as a stutter.
 const LANDING_BEAT = 60; // ms of quiet after landing on a SHORT tile, so a jittery
 // momentum tail can never be mistaken for a push and double-page. Tall tiles get
 // none: landing on one means you are there to read, and reading starts at once.
+// Note this only ever arms on the LAST hop of a chain: an interrupted lenis.scrollTo
+// never fires its onComplete, so mid-chain it does nothing. CHAIN_MIN_GAP is what
+// actually bounds a chain.
 const KEY_STEP = 0.85; // fraction of the viewport a key press scrolls inside a free tile
+const KEY_REPEAT_GAP = 250; // ms — throttle for OS auto-repeat only (~30ms native)
 
 type Tile = { id: string; el: HTMLElement; top: number; isFree: boolean };
 
 const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+// Chained hops use the quad, not the cubic: both start at their maximum speed, but the
+// cubic's is 3x the average and the quad's is 2x. Against a 0.451s second hop that puts
+// its opening speed just under the first hop's *peak*, so the chain reads as one
+// continuous acceleration instead of a step change on the second gesture.
+const easeOutQuad = (t: number) => 1 - Math.pow(1 - t, 2);
 
 /**
  * html's scroll-padding-top, which Lenis subtracts from element scroll targets.
@@ -97,9 +113,16 @@ export default function PagerScroll({
   // events, which one long decaying average would not.
   const mag1Ref = useRef(0);
   const mag2Ref = useRef(0);
+  // A rise waiting to be confirmed by the next event, and the previous event's sign.
+  const riseCandidateRef = useRef(0);
+  const lastSignRef = useRef(0);
   // Transport chaining.
   const streakRef = useRef(0);
   const lastTransportRef = useRef(0);
+  // A push that arrived inside the rate-limit window, owed a response once it closes.
+  const pendingFreshRef = useRef(false);
+  // Auto-repeat throttle, separate from lastTransportRef (which is the streak clock).
+  const lastKeyRef = useRef(0);
 
   useEffect(() => {
     if (!lenis) return;
@@ -153,21 +176,36 @@ export default function PagerScroll({
     // force re-runs a transport to the tile we are already on, which is what an
     // anchor click to the current section means.
     // toBottom lands on the very end of the document rather than a tile edge (End).
+    // trusted=false marks a transport the shape heuristic asked for, which is the only
+    // one that can be a misread momentum tail; those are rate limited below.
     const transport = (
       target: number,
       dir: "up" | "down",
-      { toTop = false, force = false, toBottom = false } = {},
+      { toTop = false, force = false, toBottom = false, trusted = true } = {},
     ) => {
       const tiles = tilesRef.current;
       const k = Math.max(0, Math.min(tiles.length - 1, target));
-      if (!force && k === currentIndex()) return;
+      const now = performance.now();
+      if (!force && k === currentIndex()) {
+        // Nowhere to go (already there, or clamped at a document end). Consume the
+        // gesture so the rest of its tail stops asking — but a reversal still re-arms
+        // it, since that reads as fresh.
+        claimedRef.current = true;
+        return;
+      }
+      if (!force && !trusted && now - lastTransportRef.current < CHAIN_MIN_GAP) {
+        // Defer, never drop. Clearing `claimed` here instead would destroy the push:
+        // it only clears on a fresh, and the shape arm cannot re-arm inside a push's
+        // own monotone ramp, so the rest of that gesture would be swallowed whole.
+        pendingFreshRef.current = true;
+        return;
+      }
       const t = tiles[k];
       if (!t) return;
 
       // Streak: transports fired in quick succession get progressively shorter
       // glides, so leaning on the wheel accelerates instead of queueing behind a
       // fixed 0.55s each time. A pause longer than STREAK_WINDOW resets it.
-      const now = performance.now();
       streakRef.current =
         now - lastTransportRef.current > STREAK_WINDOW
           ? 0
@@ -181,7 +219,7 @@ export default function PagerScroll({
         duration: Math.max(MIN_GLIDE, GLIDE_DURATION * GLIDE_DECAY ** streak),
         // Mid-chain the page is already moving, so an ease-in would stall it on every
         // hop; only a transport that starts from rest gets one.
-        easing: streak > 0 ? easeOutCubic : easeInOutCubic,
+        easing: streak > 0 ? easeOutQuad : easeInOutCubic,
         // Not "programmatic": this glide continues a wheel gesture, and the flag is
         // what makes lenis.targetScroll hold the destination for currentIndex() to
         // read (see above). duration + easing are passed explicitly, which is all the
@@ -249,28 +287,79 @@ export default function PagerScroll({
       // instead: once the stream has decayed past its peak, a magnitude climbing back
       // up is the user pushing again. A decaying tail can never trigger it.
       const recent = Math.max(mag1Ref.current, mag2Ref.current);
-      // A clear pause is always a new gesture. A borderline one only counts if the
-      // magnitude is holding up: momentum only ever decays, so a delayed event that is
-      // *smaller* than the recent trend is a dropped frame, not a push — whereas a
-      // mouse wheel spun fast delivers identical clicks and does pass this.
-      let fresh =
-        gap >= LONG_GAP || (gap >= REARM_GAP && mag >= recent * HOLD_FACTOR);
+      const sign = Math.sign(deltaY);
+      // Whatever counts as a new push has to be a real one rather than a straggler:
+      // momentum only decays, so anything worth acting on is still a decent fraction of
+      // what this gesture has been doing. RISE_FLOOR is the absolute floor beneath it.
+      const pushBar = Math.max(RISE_FLOOR, peakMagRef.current * NEW_PUSH_FRACTION);
+
+      // A clear pause is always a new gesture, and so is a reversal — a momentum tail
+      // never changes sign. A borderline pause additionally has to clear the bar:
+      // HOLD_FACTOR was set against geometric decay (0.92 < 0.95, correctly rejected),
+      // but a late tail quantises to whole pixels and flattens to a ratio of exactly 1,
+      // so without it every main-thread stall would read as a deliberate push.
+      const reversed =
+        sign !== 0 && lastSignRef.current !== 0 && sign !== lastSignRef.current;
+      const gapFresh =
+        gap >= LONG_GAP ||
+        reversed ||
+        (gap >= REARM_GAP && mag >= recent * HOLD_FACTOR && mag >= pushBar);
+
+      let fresh = gapFresh;
       if (!fresh) {
         // No pause at all: the shape has to give it away. Once the stream has decayed
         // past its peak, a magnitude climbing back up is the user pushing again.
         if (mag < peakMagRef.current * TAIL_FRACTION) inTailRef.current = true;
-        fresh = inTailRef.current && mag >= RISE_FLOOR && mag > recent * RISE_FACTOR;
+        const rising =
+          inTailRef.current && mag >= pushBar && mag > recent * RISE_FACTOR;
+        // ...but only once the NEXT event is larger still. A real push ramps over
+        // several frames; a pair of dropped frames followed by the tail resuming is a
+        // single step back onto a curve that is still decaying, and the event after it
+        // is smaller again. One frame of latency buys immunity to any number of
+        // consecutive dropouts, which a wider comparison window cannot give.
+        if (riseCandidateRef.current > 0 && mag > riseCandidateRef.current) {
+          fresh = true;
+          riseCandidateRef.current = 0; // consumed — a further push must re-arm
+        } else {
+          riseCandidateRef.current = rising ? mag : 0;
+        }
+      } else {
+        riseCandidateRef.current = 0;
       }
+
       if (fresh) {
-        peakMagRef.current = mag;
+        // Only a genuine gesture boundary restarts the shape model. A push spotted
+        // inside an unbroken stream is that same stream continuing, so the peak is kept:
+        // resetting it to a tail-sized value is what let one false positive lower the
+        // bar for the next one.
+        if (gapFresh) peakMagRef.current = mag;
         inTailRef.current = false;
         claimedRef.current = false; // a new gesture is owed a response
         spentRef.current = false;
-      } else {
-        peakMagRef.current = Math.max(peakMagRef.current, mag);
       }
+      // Envelope follower with slow release. The bar has to come down as a tail decays,
+      // or one hard flick would lock out every softer push for the rest of the gesture.
+      peakMagRef.current = Math.max(mag, peakMagRef.current * PEAK_RELEASE);
       mag2Ref.current = mag1Ref.current;
       mag1Ref.current = mag;
+      if (sign !== 0) lastSignRef.current = sign;
+
+      // A push gated by CHAIN_MIN_GAP was deferred, not dropped: honour it as soon as
+      // the window closes, so a fast repeated gesture is delayed at most once.
+      let deferHonoured = false;
+      if (
+        pendingFreshRef.current &&
+        now - lastTransportRef.current >= CHAIN_MIN_GAP
+      ) {
+        pendingFreshRef.current = false;
+        claimedRef.current = false;
+        spentRef.current = false;
+        deferHonoured = true;
+      }
+      // Heuristic freshness is the arm that can misfire, so it is the only one rate
+      // limited. A discrete gesture — a wheel click, or a flick after a real pause —
+      // is trusted and paces itself.
+      const trusted = gapFresh || deferHonoured;
 
       // The remainder of a gesture that already transported, or the beat after
       // landing on a short tile. Everything else gets acted on.
@@ -314,7 +403,9 @@ export default function PagerScroll({
           lerp: lenis.options.lerp,
         });
         if (spentRef.current || mag < TRANSPORT_THRESHOLD) return false;
-        transport(dest > iMax ? i + 1 : i - 1, dest > iMax ? "down" : "up");
+        transport(dest > iMax ? i + 1 : i - 1, dest > iMax ? "down" : "up", {
+          trusted,
+        });
         return false;
       }
 
@@ -324,7 +415,7 @@ export default function PagerScroll({
       // the neighbour, and without this the same gesture would then page off it.
       absorb(event);
       if (spentRef.current || mag < TRANSPORT_THRESHOLD) return false;
-      transport(deltaY > 0 ? i + 1 : i - 1, deltaY > 0 ? "down" : "up");
+      transport(deltaY > 0 ? i + 1 : i - 1, deltaY > 0 ? "down" : "up", { trusted });
       return false;
     };
 
@@ -368,6 +459,14 @@ export default function PagerScroll({
           return; // Tab, typing keys, etc. untouched
       }
       e.preventDefault();
+
+      // OS auto-repeat fires every ~30ms, which ungated races the whole document in a
+      // moment. Only repeats are throttled — deliberate tapping sets repeat:false and
+      // stays instant. Placed above both branches, so it covers stepping inside a tall
+      // tile as well as transports. Its own clock: lastTransportRef is the streak's.
+      const nowKey = performance.now();
+      if (e.repeat && nowKey - lastKeyRef.current < KEY_REPEAT_GAP) return;
+      lastKeyRef.current = nowKey;
 
       if (jump !== null) {
         streakRef.current = 0; // a destination, not a nudge — glide at full length
