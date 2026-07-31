@@ -57,14 +57,29 @@ body {
 }
 @media (prefers-reduced-motion: no-preference) {
   html {
-    /* Eases the in-page anchor jumps from the navbar and the hero's links. */
-    scroll-behavior: smooth;
-    /* The whole paging feel, done natively — no scroll library, no JS handler.
-       proximity, never mandatory: About and Contents are taller than the viewport,
-       and mandatory snap would drag the reader back to a tile edge mid-paragraph.
-       proximity only engages near an edge, so a long section scrolls normally and
-       the one-screen tiles still land flush. */
+    /* Native snap backstop for input the JS pager doesn't drive (scrollbar, touch,
+       zoom/resize reflow). proximity — never mandatory — so it can't fight Lenis'
+       per-frame scrollTo and can't trap the reader inside the tall About/Contents
+       tiles. The JS pager (app/scroll/PagerScroll.tsx) still provides the hard
+       one-gesture-per-section feel for wheel + keyboard.
+
+       Deliberately NO `scroll-behavior: smooth` here. Lenis owns anchor easing, and
+       lenis 1.3 dropped the `.lenis-smooth { scroll-behavior: auto }` reset that older
+       versions shipped — so declaring it would leave the browser's own smooth-scroll
+       animator running alongside Lenis, two authorities on the same scroll position.
+       /leetcode loses nothing: it renders no <section> children and has no in-page
+       anchors, and mobile taps still glide through the pager's click handler. */
     scroll-snap-type: y proximity;
+  }
+  /* While Lenis is actively scrolling it sets `lenis-scrolling` on <html> (its root
+     element in `root` mode); disable native snap for that window so it never
+     contends with an in-flight pager glide. The class is added synchronously inside
+     scrollTo (Animate.fromTo calls onStart before the first frame), so there is no
+     window in which a glide runs with snap still armed. This matters beyond feel:
+     Lenis resolves element targets against its own animatedScroll, so a native snap
+     correction landing mid-glide would desync the two and skew every later target. */
+  html.lenis-scrolling {
+    scroll-snap-type: none;
   }
 }
 
@@ -185,7 +200,7 @@ code {
   padding-bottom: 4vh;
 }
 /* Each page's content is now a <section> child of .content, tiled into a
-   full-height panel and given a snap point (see the html rule above).
+   full-height panel for the Lenis transport pager (app/scroll/PagerScroll.tsx).
    Re-declare the flex column so intra-section spacing survives (the reset zeroes
    element margins), and keep the heading padding one level deeper as a direct
    child so nested callout headings (.important > h2) are still excluded.
