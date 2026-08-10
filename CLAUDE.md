@@ -86,6 +86,126 @@ Things that will bite you here:
   motion law left, so it jumps instead of gliding.
 - **A superseded `scrollTo` never fires its `onComplete`.** Chaining depends on that; don't
   add bookkeeping that assumes every transport finishes.
+- **A gap in the wheel stream is not a gap in the gesture.** A busy frame doesn't lose that
+  scroll — the browser coalesces it and delivers the backlog as one fat delta, so a stalled
+  momentum tail is indistinguishable by magnitude from a deliberate new flick. Judging a
+  gesture boundary on elapsed time alone is what made one flick cross two tiles; the pager's
+  `continuation` test compares the delta against the rate the stream was already running at.
+- **One gesture, one answer.** A gesture that has paged (`claimed`) or scrolled a tall tile
+  (`spent`) is finished; nothing it does afterwards acts, and only `fresh` starts a new one.
+  A momentum tail is the same gesture still arriving, so a flick moves exactly one tile
+  structurally rather than by threshold. Do NOT reintroduce a "this stream still looks
+  live, let it page again" licence keyed on travel or elapsed time — momentum looks live
+  for a few hundred ms after the reader lets go, which is precisely when such a licence is
+  cheapest, and one flick then walks several tiles.
+- **Everything therefore rests on finding gesture boundaries**, via three readings that
+  answer three different input shapes: `gapFresh` (the stream stopped — the main path,
+  since continuing during a glide means lifting and swiping again), the restart arm (it
+  collapsed and climbed back with no gap), and `continuation` guarding both against a
+  stalled main thread. Never put a magnitude test on top of the pause: a follow-up swipe
+  starts gently, and demanding its first frames match the tail they interrupt rejects
+  exactly what it must catch.
+- **The collapse is the signal, not the climb** (`RESTART_DROP`, the load-bearing constant
+  of the file). Fingers landing on the glass cancel macOS momentum outright, so a second
+  swipe always starts from a standstill — however hard it ends up being. Watching for a
+  *climb* instead cannot tell that apart from one unbroken contact that eased off and
+  pushed again, and that confusion is what made a single stroke read a whole section: an
+  ease-off bottoms out around 0.6–0.8 of its own peak, a reland collapses to nothing.
+  Three further rules keep it honest, and each of them cost a false positive to find.
+  Arm it as a **one-shot latch**, never a per-event test — a gentle swipe's entire ramp
+  sits below the collapse line, and re-testing every event drags the floor up underneath
+  the ramp so nothing ever reads as a climb. Measure the climb as a **step against the
+  previous event**, not merely as being above the floor: a coalesced stall lands well above
+  the floor and then decays, which is two events above it in a row. And require the floor
+  to be held for `RESTART_QUIET` events — **one isolated near-zero delta is a phase marker,
+  not a stream at rest.** Chrome emits one at the boundary between a trackpad gesture and
+  its momentum, and momentum then *ramps up* to the release velocity over its first frames,
+  so an unguarded arm reads every ordinary lift as a second swipe. Coming to rest takes
+  more than one frame and so does leaving it.
+- **But a lift produces no events at all, so counting quiet ones cannot see one**
+  (`RESTART_LIFT_GAP` + `RESTART_RESUME`). Silence is the deepest collapse there is, and it
+  is the *only* trace a fast reland leaves: the steeper the second swipe, the fewer of its
+  frames sit under the floor — a hard one leaves exactly one, and fingers that land already
+  moving leave none. `RESTART_QUIET` then never latches and the swipe goes unanswered, which
+  is precisely how the reader is expected to continue during a glide. So a gap the stream
+  cannot itself have produced, **resuming below what its own rate would have delivered
+  across it**, arms the restart on its own. Both halves are load-bearing: without the resume
+  test a jittered frame (which comes back at about half the rate) arms on every hiccup;
+  without the gap test the seamless gesture→momentum handoff arms on every flick. The band
+  between `RESTART_LIFT_GAP` and `STREAM_GAP` is where a reland used to fall through
+  entirely — too long to be a stumble, too short to be a pause.
+- **`RESTART_LIFT_GAP` encodes a claim about hands and about Chrome**, and it is the
+  assumption in this file most worth checking against a recorded trace: below it nothing has
+  left the glass (no hand lifts and re-lands in ~45ms, and macOS hands momentum over on the
+  next display refresh), above it nothing but a hand can be responsible. Push it down and
+  the handoff starts reading as a second swipe; push it up and a fast reland goes dead
+  again. `.context/wheel.mjs` splits its cases on exactly this line.
+- **A reversal must be a real one.** `reversed` is an unconditional boundary — it bypasses
+  `continuation` and both gap thresholds. But `deltaY` is fractional and no swipe is
+  perfectly vertical, so stray opposite-sign frames are ordinary. Unqualified, one stray
+  pixel cleared `claimed` mid-tail and the swing back did it again: two phantom gestures
+  from noise. It now has to carry a real share of the running rate (`REVERSAL_FRACTION`) —
+  and, just as important, **a flip that fails that test must not update `lastSign` either**.
+  Qualifying only the test leaves the noise frame harmless but makes the swing back off it
+  look like a full-sized reversal, which is the same bug one event later.
+- **A transport refused by the pace must be queued, not dropped** (`schedulePending`), and
+  queued on a *timer* — the input most likely to be refused is the last event of a stream,
+  so anything that waits for a following wheel event to flush it will silently lose it.
+- **The edge band overshoots the tile, so `currentIndex()` lies while it is held.** Pushing
+  up at a tall tile's top puts `targetScroll` above that tile, which reads as the tile
+  *above* — so "go to the previous tile" resolves to the one we are already deemed to be
+  on and does nothing. `bandTileRef` is the answer to "which tile are we on" while a band
+  is stretched, and `transport`'s `from` carries it through. Any new state derived from
+  scroll position near a boundary needs the same treatment.
+- **Edge push is banked separately from gesture travel** (`edgeChargeRef` + `EDGE_MEMORY`),
+  because a mouse starts a fresh gesture on every detent: an edge that only counted travel
+  within one gesture cannot be left by a mouse at all, however long the reader rolls it.
+- **The edge band's give must be linear in what has been paid, not asymptotic**
+  (`EDGE_GIVE` over `EDGE_COMMIT`). The band exists so the reader can *see* the end of a
+  section arrive; an asymptote spends its whole budget in the opening events and then looks
+  identical to a wall — the old curve had moved 22px by 44px of push and only 35px by 180px,
+  so the back two-thirds of the price bought 13px of motion and read as the page refusing.
+  Linear makes it a progress bar: the page is at full stretch exactly when it lets go.
+  `EDGE_COMMIT` is the price of one ordinary swipe, not of a shove; at 180 an unhurried
+  swipe stopped short, sprang back, and left the reader shoving at a section that would not
+  let go — which is the same "nothing happened" as being ignored. **But it is floored by a
+  mouse, not by a trackpad**: Chrome's detent is exactly 100px, so the commit has to sit
+  strictly between one detent and two, or the end of a section arriving under a single click
+  of the wheel walks straight out of it — and a roll walks out of two. That window (100 to
+  ~one swipe) is the whole range this constant may live in.
+- **A mouse is not a slow trackpad, and every gate has to be checked against both.** Its
+  detents are identical in size (so nothing about them can ever look like a fresh push),
+  arrive as little as ~25–30ms apart (so a boundary threshold set for a 60Hz stream misses
+  them), and have no momentum at all. `continuation` is the subtle one: consecutive
+  same-size detents look like "the previous rate continued" across a short gap, so its bar
+  tightens below `REARM_GAP` (`CARRY_TIGHT`) — a real coalesced backlog arrives at nearly
+  the full rate over one or two frames, a detent stream at about half of it.
+- **How big a pause ends a gesture depends on whether a stream is running** (`dense` →
+  `STREAM_GAP`, else `DISCRETE_GAP`). Frame delivery jitters well past 25ms under the load
+  a glide itself creates, and one late frame read as a boundary releases the rest of a tail
+  to free-scroll whatever it just landed on — a full screen of unasked-for scrolling from a
+  single jittered frame. "Running" is recent frame-rate cadence OR a **sustained** decay
+  (`DECAY_RUN` falls in a row reaching `DECAY_DEPTH` below where the run started). Both
+  bars on the decay arm are there to keep a mouse out — a wheel eased off over a few
+  detents falls, but never that far or that consistently — and a *single* step down will
+  not do, because that is exactly what quantisation gives you (a late tail sits on plateaus
+  like 12, 11, 11, 10).
+  Neither reading may be reset by a `fresh`: they are properties of the *stream*, and the
+  gesture boundary is a property of the *reader*. Keying this off `peaked` conflated them,
+  so the event after any misread lost half its protection and fell back to `DISCRETE_GAP` —
+  one false boundary bought the next, and a tail could machine-gun through the page.
+- **Skipping a section and reading as dead are the same dial**, so never tune one without
+  re-running the other's cases. The measurement that matters for the dead side is the
+  longest window in which the page is stationary *while wheel events are still arriving*;
+  keep it under ~150ms. The harness reports it per case, and it is only meaningful with two
+  exclusions, both of which will otherwise swamp it: input the pager has deliberately
+  already answered (a swallowed tail is stationary for ~600ms after every flick, correctly),
+  and silence (a reader who has stopped asking is not being ignored). Landing position
+  (`+0` = flush) is the measurement for the other side.
+- **Don't divide a delta by its own frame gap at ordinary cadence.** Frames arrive 14–20ms
+  apart, so per-frame normalisation injects ±15% noise into the exact signal the restart
+  test reads — enough on its own to manufacture "the reader pushed again". It is only
+  correct across a real stall (`gap >= REARM_GAP`), where the delta really is a backlog.
 - `globals.css` keeps CSS scroll-snap as a `proximity` backstop for input the pager doesn't
   drive, switched off via `html.lenis-scrolling` while a glide runs. It deliberately does
   NOT set `scroll-behavior: smooth` — see the comment there.
@@ -95,6 +215,16 @@ Things that will bite you here:
 There is no test suite and none of this shows up in lint or typecheck, so changes here have
 to be driven in a real browser — synthetic `WheelEvent`s dispatched *inside* the page
 (`page.mouse.wheel()` can't pace a ~1s momentum tail) at a `setTimeout(16)` cadence.
+`.context/wheel.mjs` (gitignored) is that harness: it carries the whole case matrix — flick
+shapes, drags, relands at every pause and every speed, mouse detents, the edge band —
+reports tiles crossed, landing offset and the dead window, and replays real recorded traces
+from `.context/traces/`. Run it **before and after** any change here; the before-run is not
+optional, because half the value is finding out that the case you were about to "fix" was
+already passing. It also depends on the pager's per-event decision log, which is why that
+log stays in the file (dev-only, opt-in via `window.__pagerDebug`, dead code in a production
+build) rather than being stripped each time. `.context/RECORDING.md` says how to capture a
+real trace; do that rather than tune against a modelled tail, which is how the last three
+regressions happened.
 
 ### Styling
 

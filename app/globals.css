@@ -49,10 +49,15 @@ body {
    the bar. As interior padding it only has to be >= the navbar height. */
 :root {
   --nav-h: 4.5rem;
+  /* Closing space at the foot of every tile — see `.content > section`. Scales with
+     the viewport so it stays a visible share of the screen on a laptop and doesn't
+     eat a short tile on a small one, with a floor of a few lines of prose. */
+  --tile-end: clamp(4.5rem, 16vh, 11rem);
 }
 @media (max-width: 600px) {
   :root {
     --nav-h: 3rem;
+    --tile-end: clamp(3rem, 12vh, 6rem);
   }
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -217,6 +222,17 @@ code {
      to scroll-padding-top / scroll-margin-top — an offset landing is precisely
      what let the previous tile show above the navbar. */
   padding-top: var(--nav-h);
+  /* Closing space, so the end of a section reads as an end. Without it a tall
+     tile's last line sits hard against the bottom of the viewport, which looks
+     exactly like text that carries on below the fold — the reader can't tell
+     they have reached the bottom of the section and the pager is waiting.
+
+     INSIDE the tile, not between tiles: the tiles have to keep butting directly
+     against each other (see `.content:has(> section)` below), and border-box
+     keeps this within the 100svh so a short tile is still exactly one viewport
+     tall and still lands flush. On a tall tile it simply extends the tile, so
+     its last screen ends in blank rather than in a cropped line. */
+  padding-bottom: var(--tile-end);
   scroll-snap-align: start; /* snap point = tile top = viewport top */
   scroll-snap-stop: always; /* fast native scroll / touch can't skip a section */
 }
