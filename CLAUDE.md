@@ -72,7 +72,8 @@ progressively shorter glides instead of queueing. Tiles taller than the viewport
 internally; whether a tile is "tall" is measured at runtime, never hard-coded.
 `app/scroll/tiles.ts` holds the id list the pager, the navbar anchors and the
 `next.config.ts` redirects all agree on. Mounted from the page, NOT the root layout, so
-`/leetcode` keeps plain native scrolling.
+`/leetcode` keeps plain native scrolling. `app/scroll/ZoomRealign.tsx` is the third file, and
+the only one that runs in BOTH branches of `SmoothScroll` — see the zoom bullet below.
 
 Things that will bite you here:
 
@@ -209,6 +210,39 @@ Things that will bite you here:
 - `globals.css` keeps CSS scroll-snap as a `proximity` backstop for input the pager doesn't
   drive, switched off via `html.lenis-scrolling` while a glide runs. It deliberately does
   NOT set `scroll-behavior: smooth` — see the comment there.
+- **Browser zoom resizes the viewport, and the tiles follow it but the scroll offset does
+  not** (`app/scroll/ZoomRealign.tsx`). Ctrl +/− is layout-equivalent to the viewport growing
+  or shrinking in CSS px, so `100svh` tiles stay exactly one screen — but every tile's
+  document top moves while `window.scrollY` stays put, which leaves the reader parked across
+  a boundary looking at two sections at once. Nothing else corrects it: `proximity` snap does
+  not re-snap on a resize, `mandatory` is not available to us, and the defect is *identical*
+  with Lenis and the pager removed entirely — which is why ZoomRealign is the one piece of
+  the engine mounted in both `SmoothScroll` branches, scrolling through Lenis when it is
+  there and natively when it is not. Three things it has to get right, each of which cost a
+  wrong landing to find:
+  - **`window.scrollY` is already wrong inside the `resize` handler.** When the document
+    shrinks (Ctrl+plus) the browser clamps the offset *before* the handler runs, so "which
+    tile were we on" cannot be derived there — it has to be tracked continuously from before
+    the resize. Deriving it in the handler sends the reader to a different section.
+  - **The correction has to be SYNCHRONOUS, inside the `resize` handler.** `resize` runs in
+    the rendering task ahead of animation-frame callbacks and paint, and Lenis' `immediate`
+    is synchronous (it assigns animatedScroll/targetScroll and calls setScroll in the same
+    tick), so a scroll applied there lands in the same frame the new zoom does. Correcting on
+    a debounce instead is what made Ctrl+/− *flash* the neighbouring tiles — the page painted
+    at the new zoom with the old offset and sat there until the timer fired, and since every
+    press restarted the timer, holding the keys held the straddle on screen. This is the
+    whole payoff of tracking the anchor continuously: there is nothing left to look up at
+    resize time, so there is nothing to wait for. The debounced pass still exists, but only
+    as a follow-up for what the synchronous one must decline.
+  - **An in-flight glide overrides anything you jump to.** Lenis resolves an element target
+    to a number when `scrollTo` is called, so a glide started before the zoom keeps writing a
+    now-meaningless offset every frame. That is the one case the synchronous pass declines;
+    the follow-up waits it out (`GLIDE_WAIT`), the way PagerScroll defers its own remeasure.
+  - **Realign on tile geometry moving, never on `innerHeight` alone.** A mobile URL bar
+    resizes the viewport constantly and the sections are sized in `svh` precisely so they do
+    not reflow for it; yanking the page on every one of those is worse than the defect.
+  It listens to `resize` only, NOT a ResizeObserver — a `<details>` opening moves tile tops
+  too, and the page must not jump for that.
 - `prefers-reduced-motion` drops Lenis and the pager entirely. Both branches must render
   identical DOM, so don't give either one a sibling that renders anything.
 

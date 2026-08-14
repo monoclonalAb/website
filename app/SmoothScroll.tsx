@@ -6,6 +6,7 @@ import { useRef } from "react";
 import { useReducedMotion } from "motion/react";
 import "lenis/dist/lenis.css";
 import PagerScroll from "./scroll/PagerScroll";
+import ZoomRealign from "./scroll/ZoomRealign";
 
 /**
  * Home-page scroll: the Lenis inertial engine with the transport pager
@@ -23,8 +24,8 @@ import PagerScroll from "./scroll/PagerScroll";
  *
  * Hydration invariant: `useReducedMotion` returns null on the server and a boolean on
  * the client, so both branches below have to produce identical DOM. They do, but only
- * because `<ReactLenis root>` renders no wrapper element and <PagerScroll/> returns
- * null — so never give either branch a sibling that renders DOM.
+ * because `<ReactLenis root>` renders no wrapper element and <PagerScroll/> and
+ * <ZoomRealign/> both return null — so never give either branch a sibling that renders DOM.
  */
 
 /**
@@ -50,7 +51,15 @@ export default function SmoothScroll({
 
   // Reduced motion: no Lenis, no pager — native scroll. `<ReactLenis root>` and this
   // fragment both render children directly, so the DOM is identical either way.
-  if (reduced) return <>{children}</>;
+  // <ZoomRealign/> is mounted in both branches: nothing here re-aligns the tiles when the
+  // viewport changes size, and without Lenis there is even less that could (see that file).
+  if (reduced)
+    return (
+      <>
+        {children}
+        <ZoomRealign />
+      </>
+    );
 
   return (
     <ReactLenis
@@ -70,6 +79,7 @@ export default function SmoothScroll({
     >
       {children}
       <PagerScroll vsRef={vsRef} />
+      <ZoomRealign />
     </ReactLenis>
   );
 }
