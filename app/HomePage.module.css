@@ -29,7 +29,8 @@
   width: 100%;
   transform: translateY(-50%);
   font-family: var(--font-helvetica), "Helvetica", sans-serif;
-  font-weight: 700; /* overrides the h1 default of 900 — Helvetica has no Black */
+  font-weight: 700; /* keeps Helvetica Bold — Helvetica is 400/700, so inheriting
+                       the h1 default of 500 would match *down* to Regular */
   line-height: 1.1;
   color: var(--color-light-gray);
   --expand: 0.2em; /* hover tracking-expand: per-gap spacing (single tunable knob) */

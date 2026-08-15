@@ -103,7 +103,7 @@ h5,
 h6 {
   font-family: var(--font-display), serif;
   color: var(--color-black);
-  font-weight: 900; /* Eiko Heavy — the file's own weight, see fonts.ts */
+  font-weight: 500; /* Eiko Medium — the file's own weight, see fonts.ts */
   line-height: 1.1;
 }
 h1 {
