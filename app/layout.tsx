@@ -1,14 +1,34 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { helvetica, eiko, baskerville, inconsolata, menlo } from "./fonts";
+import { OPEN_GRAPH_BASE, TWITTER_BASE } from "./shared-metadata";
+
+const DESCRIPTION =
+  "Personal site of Eric Zheng, an undergraduate studying Mathematics and " +
+  "Computer Science in Auckland, New Zealand.";
 
 export const metadata: Metadata = {
+  // Every URL-based metadata field below is relative; without metadataBase that
+  // is a build error, not a silent fallback.
+  metadataBase: new URL("https://ericzheng.nz"),
   title: {
     default: "Eric Zheng",
     template: "%s | Eric Zheng",
   },
-  description: "Eric Zheng's personal website",
+  description: DESCRIPTION,
   authors: [{ name: "Eric Zheng" }],
+  alternates: { canonical: "/" },
+  openGraph: {
+    ...OPEN_GRAPH_BASE,
+    url: "/",
+    title: "Eric Zheng",
+    description: DESCRIPTION,
+  },
+  twitter: {
+    ...TWITTER_BASE,
+    title: "Eric Zheng",
+    description: DESCRIPTION,
+  },
 };
 
 // Zoom is deliberately left unrestricted (WCAG 1.4.4): the home page now carries
