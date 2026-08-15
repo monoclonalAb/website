@@ -32,7 +32,8 @@
 }
 .logo > h1 > a {
   font-family: var(--font-helvetica), "Helvetica", sans-serif;
-  font-weight: 700; /* overrides the h1 default of 900 — Helvetica has no Black */
+  font-weight: 700; /* keeps Helvetica Bold — Helvetica is 400/700, so inheriting
+                       the h1 default of 500 would match *down* to Regular */
   color: var(--color-black);
   text-align: left;
   padding: 5px;
