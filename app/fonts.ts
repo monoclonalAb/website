@@ -1,9 +1,8 @@
 import localFont from "next/font/local";
 
 // Body font — Helvetica (normal / italic × 400 / 700).
-// The slanted cuts are declared `italic`, matching the name table after
-// scripts/fix-font-names.py — the files ship subfamily "Italic"/"Bold Italic",
-// so `font-style: italic` on <em>/<i>/a:hover is an exact match, not a fallback.
+// The slanted cuts ship subfamily "Italic"/"Bold Italic", so `font-style: italic`
+// on <em>/<i>/a:hover is an exact match, not a fallback.
 export const helvetica = localFont({
   variable: "--font-helvetica",
   display: "swap",
