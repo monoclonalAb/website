@@ -26,7 +26,8 @@ export default function About() {
         </figcaption>
       </figure>
 
-      <h1>
+      {/* The four ids below are rail rows — see app/scroll/outline.ts. */}
+      <h1 id="about-me">
         about me<span>:</span>
       </h1>
       <p>
@@ -98,7 +99,7 @@ export default function About() {
       </ul>
 
       <div className="important">
-        <h2>
+        <h2 id="fun-fact">
           fun fact<span>:</span>
         </h2>
         <p>
@@ -110,7 +111,7 @@ export default function About() {
 
       <hr />
 
-      <h1>
+      <h1 id="about-this-site">
         about this site<span>:</span>
       </h1>
       <p>
@@ -144,7 +145,7 @@ export default function About() {
 
       <hr />
 
-      <h1>
+      <h1 id="footnote">
         footnote<span>:</span>
       </h1>
       <p>

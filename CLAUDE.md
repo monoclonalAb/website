@@ -269,7 +269,7 @@ regressions happened.
 - Component-scoped styles use CSS Modules; JSX rarely uses Tailwind utility classes — most
   styling is semantic/element CSS in `globals.css` ported from the prior static site.
 - Fonts are self-hosted via `next/font/local` in `app/fonts.ts` (Helvetica body — oblique
-  variants stand in for italic; PPEiko display; Libre Baskerville serif; Inconsolata/Menlo mono).
+  variants stand in for italic; PPEiko display; Libre Baskerville serif; Fira Code/Menlo mono).
 
 ### Components
 

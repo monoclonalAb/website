@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { helvetica, eiko, baskerville, inconsolata, menlo } from "./fonts";
+import { helvetica, eiko, baskerville, firaCode, menlo } from "./fonts";
 import { OPEN_GRAPH_BASE, TWITTER_BASE } from "./shared-metadata";
 
 const DESCRIPTION =
@@ -47,7 +47,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-NZ"
-      className={`${helvetica.variable} ${eiko.variable} ${baskerville.variable} ${inconsolata.variable} ${menlo.variable}`}
+      className={`${helvetica.variable} ${eiko.variable} ${baskerville.variable} ${firaCode.variable} ${menlo.variable}`}
     >
       <body>{children}</body>
     </html>

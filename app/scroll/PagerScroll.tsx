@@ -204,7 +204,7 @@ const RAMP = 0.15; // fraction of a from-rest glide spent getting up to speed
  * where this has covered 3% — and that dead beat is what reads as the page not having
  * heard the gesture at all.
  */
-const easeGlide = (t: number) =>
+export const easeGlide = (t: number) =>
   t < RAMP
     ? (t * t) / RAMP
     : RAMP + 2 * (t - RAMP) - (t - RAMP) ** 2 / (1 - RAMP);

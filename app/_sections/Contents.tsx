@@ -11,7 +11,8 @@ export default function Contents() {
         <b>contents</b> page would be helpful to navigate the site.
       </p>
 
-      <h2>
+      {/* The four ids below are rail rows — see app/scroll/outline.ts. */}
+      <h2 id="internal-links">
         internal links<span>:</span>
       </h2>
       <dl className="sidebar">
@@ -50,7 +51,7 @@ export default function Contents() {
         <dd>to keep track of my daily records</dd>
       </dl>
 
-      <h2>
+      <h2 id="external-links">
         external links<span>:</span>
       </h2>
       <p>
@@ -58,7 +59,7 @@ export default function Contents() {
         where else I am housed on the internet
       </p>
 
-      <h3>emails:</h3>
+      <h3 id="emails">emails:</h3>
       <dl className="sidebar">
         <dt>
           <a href="mailto:theericzheng@gmail.com">theericzheng@gmail.com</a>
@@ -82,7 +83,7 @@ export default function Contents() {
         </dd>
       </dl>
 
-      <h3>social media:</h3>
+      <h3 id="social-media">social media:</h3>
       <dl className="sidebar">
         <dt>
           <a
