@@ -37,11 +37,14 @@ export const baskerville = localFont({
   ],
 });
 
-// Monospace — Inconsolata (primary) and Menlo (secondary).
-export const inconsolata = localFont({
-  variable: "--font-inconsolata",
+// Monospace — Fira Code (primary) and Menlo (secondary). Regular only: the chrome and
+// prose both draw it at one weight. Shipped as woff2 rather than the ttf the other
+// families use — it is the same glyphs at a third of the bytes, and Fira Code is the
+// only family here that offers the choice.
+export const firaCode = localFont({
+  variable: "--font-fira-code",
   display: "swap",
-  src: "./fonts/inconsolata/Inconsolata-Regular.ttf",
+  src: "./fonts/fira-code/FiraCode-Regular.woff2",
 });
 
 export const menlo = localFont({

@@ -1,0 +1,74 @@
+/* Transcribed from `site-crumb` on the Penpot boards (page `05 · Nav & chrome`):
+   Fira Code 13, inset 40/24 on desktop and 16/16 on mobile, `ez` black, the separator
+   stone, the filename black with a red extension, and a red terminal cursor. */
+
+.crumb {
+  position: fixed;
+  top: 24px;
+  right: 40px;
+  z-index: 20;
+  font-family: var(--font-mono), "Menlo", monospace;
+  font-size: 13px;
+  line-height: 13px;
+  font-style: normal;
+  white-space: pre;
+  color: var(--color-black);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 260ms ease,
+    visibility 0s linear 260ms;
+}
+/* Hidden over the splash, which carries no chrome at all. */
+.crumb[data-visible="true"] {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    opacity 260ms ease,
+    visibility 0s;
+}
+
+@media (max-width: 600px) {
+  .crumb {
+    top: 16px;
+    right: 16px;
+  }
+}
+
+/* The root belongs to whichever of the two is carrying it. The rail owns it wherever its
+   words are on screen — always under the dial, and while the tree is open below 1160 —
+   and the crumb takes it back wherever they are not. Both conditions are already
+   expressible here, so neither component has to know the other's state. */
+.prefix {
+  display: inline;
+}
+@media (min-width: 1160px) {
+  .crumb[data-rail="true"] .prefix {
+    display: none;
+  }
+}
+:global(html.rail-open) .crumb[data-rail="true"] .prefix {
+  display: none;
+}
+
+/* globals.css slants every anchor on hover; that is the prose's idiom, and a monospace
+   crumb that reflows on hover reads as a glitch. Two class-level selectors outrank
+   `a:hover`, so the colour still changes and the metrics do not. */
+.home,
+.home:hover {
+  font-style: normal;
+  text-decoration: none;
+}
+.home {
+  color: var(--color-black);
+}
+.home:hover {
+  color: var(--color-red);
+}
+.sep {
+  color: var(--color-stone);
+}
+.ext,
+.cursor {
+  color: var(--color-red);
+}
