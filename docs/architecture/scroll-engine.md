@@ -1,7 +1,7 @@
 ---
 owner: Eric Zheng
 status: current
-last_verified: 2026-09-02
+last_verified: 2026-09-03
 ---
 
 # Motion and scroll architecture
@@ -28,8 +28,9 @@ progressively shorter glides instead of queueing. Tiles taller than the viewport
 internally; whether a tile is "tall" is measured at runtime, never hard-coded.
 `app/scroll/tiles.ts` holds the ID list that the pager, rendered sections, rail model, and
 `next.config.ts` redirects all agree on. Mounted from the page, NOT the root layout, so
-`/leetcode` keeps plain native scrolling. `app/scroll/ZoomRealign.tsx` is the third file, and
-the only one that runs in BOTH branches of `SmoothScroll` — see the zoom bullet below.
+standalone routes (`/leetcode` and the unlisted `/test` fixture) keep plain native scrolling.
+`app/scroll/ZoomRealign.tsx` is the third file, and the only one that runs in BOTH branches
+of `SmoothScroll` — see the zoom bullet below.
 
 ## Invariants and regression history
 

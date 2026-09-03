@@ -1,7 +1,7 @@
 ---
 owner: Eric Zheng
 status: current
-last_verified: 2026-09-02
+last_verified: 2026-09-03
 ---
 
 # Product brief
@@ -23,6 +23,7 @@ last_verified: 2026-09-02
 | ------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | Home                | `/`                                          | Interactive hero followed by About, Blog, Contents, and Changelog sections in one document |
 | Leetcode            | `/leetcode`                                  | Standalone placeholder for a future solution log                                           |
+| Dial playground     | `/test`                                      | Unlisted, `noindex` heading fixture for manually exercising the shared dial                |
 | Legacy section URLs | `/about`, `/blog`, `/contents`, `/changelog` | Permanent redirects to matching fragments on `/`                                           |
 | Discovery           | `/robots.txt`, `/sitemap.xml`                | Search-engine guidance generated with Next metadata routes                                 |
 
@@ -51,7 +52,7 @@ Do not add these without an accepted decision record:
 
 - A CMS, database, API layer, authentication, or user accounts.
 - An MDX/Markdown publishing pipeline merely to fill the current placeholders.
-- A general component library or design-system package for this two-route site.
+- A general component library or design-system package for this small personal site.
 - Analytics, personalization, comments, or third-party embeds by default.
 - Replacing the home page's personality with a generic portfolio template.
 

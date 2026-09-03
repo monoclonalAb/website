@@ -13,8 +13,9 @@ This is a small, statically renderable Next.js App Router site. There is no CMS,
 ```text
 Author -> Git repository -> Next.js build -> hosting/CDN -> browser
                               |                  |
-                              + local fonts      + two public pages
-                              + local images     + metadata routes
+                              + local fonts      + two canonical pages
+                              + local images     + one unlisted test page
+                                                 + metadata routes
 ```
 
 The deploy target is external to this repository; `pnpm build` is the portable production contract.
@@ -32,8 +33,10 @@ app/layout.tsx
     │           ├── SiteCrumb (client)
     │           ├── SiteRail (client)
     │           └── four server-rendered section bodies
-    └── /leetcode: app/leetcode/page.tsx
-        └── SiteChrome + static placeholder content
+    ├── /leetcode: app/leetcode/page.tsx
+    │   └── SiteChrome + static placeholder content
+    └── /test: app/test/page.tsx
+        └── SiteChrome + decorated heading/dial fixture
 ```
 
 Server Components are the default. Client Components are limited to behavior that needs browser state:
@@ -51,7 +54,8 @@ Server Components are the default. Client Components are limited to behavior tha
 | `app/layout.tsx`           | Root document, metadata defaults, font variables                 |
 | `app/page.tsx`             | Home composition and structured Person data                      |
 | `app/_sections/`           | Non-routable, hand-authored home content                         |
-| `app/leetcode/page.tsx`    | Only standalone content route                                    |
+| `app/leetcode/page.tsx`    | Canonical standalone content route                               |
+| `app/test/`                | Unlisted, disposable heading/dial fixture                        |
 | `app/scroll/`              | Tile order, outline model, scrollspy, pager, and zoom correction |
 | `components/`              | Shared crumb, rail, and content shell                            |
 | `app/globals.css`          | Global reset, tokens, prose layout, and tile rules               |
@@ -67,6 +71,7 @@ The underscore in `app/_sections` opts the folder out of routing. Top-level `com
 
 - `/` is one document: `#top`, `#about`, `#blog`, `#contents`, and `#changelog`.
 - `/leetcode` shares the chrome but has no section tiles, so it uses native document scrolling.
+- `/test` is an unlisted, `noindex` native-scroll fixture with varied heading levels for exercising the scanned dial.
 - `next.config.ts` emits permanent redirects from the former section routes to home fragments.
 - `app/sitemap.ts` lists only canonical pages, not fragments or redirect sources.
 - `app/robots.ts`, route metadata, static Open Graph assets, and JSON-LD provide discovery metadata.

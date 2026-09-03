@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 
 /**
- * Two URLs, because the site has two.
+ * Two canonical, indexable URLs. The unlisted `/test` dial playground is deliberately
+ * `noindex`, so it does not belong here.
  *
  * The four sections (#about, #blog, #contents, #changelog) are fragments of `/`,
  * not URLs — crawlers discard the hash, so listing them would just repeat `/`.
