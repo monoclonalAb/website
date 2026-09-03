@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { OUTLINE_ROWS } from "./outline";
+import type { OutlineRow } from "./outline";
 
 /**
- * Where the reader is in the site tree: which file they are in, and which of its headings
+ * Where the reader is in an outline: which file they are in, and which of its headings
  * they are reading. The rail pins its caret to `rowId` and expands `tile`'s headings.
+ *
+ * The rows are a parameter, not an import: the home page passes the hand-authored
+ * OUTLINE_ROWS, and standalone routes pass whatever useHeadingOutline scanned off the
+ * page. The measurement is the same either way — every row id is a real element id.
  *
  * A plain window `scroll` listener, deliberately — NOT a Lenis subscription and not a
  * hook into PagerScroll. `<ReactLenis root>` eases the real window scroll and renders no
@@ -21,7 +25,7 @@ export type OutlinePosition = {
   /** The active row — a heading once one has climbed past the probe, else the file line. */
   rowId: string | null;
   /**
-   * Indices into OUTLINE_ROWS of the sections currently on screen — the rail's bar. Always
+   * Indices into the rows of the sections currently on screen — the rail's bar. Always
    * contains the active row; -1 when there is none. Two numbers rather than an array because
    * the bail-out below compares by identity, and a fresh array every frame would defeat it.
    */
@@ -40,7 +44,9 @@ export type OutlinePosition = {
  */
 const PROBE_LEAD = 24;
 
-export default function useOutlinePosition(): OutlinePosition {
+export default function useOutlinePosition(
+  rows: OutlineRow[],
+): OutlinePosition {
   const [position, setPosition] = useState<OutlinePosition>({
     tile: null,
     rowId: null,
@@ -55,8 +61,12 @@ export default function useOutlinePosition(): OutlinePosition {
       frame = 0;
 
       // --nav-h in px, straight off the box that actually reserves it. Reading the custom
-      // property instead would hand back "4.5rem", and it changes at 600px.
-      const section = document.querySelector(".content > section");
+      // property instead would hand back "4.5rem", and it changes at 600px. On the tiled
+      // home page that box is a section; on standalone routes the prose sits directly in
+      // .content and the column itself carries the band.
+      const section =
+        document.querySelector(".content > section") ??
+        document.querySelector(".content");
       const navH = section
         ? parseFloat(getComputedStyle(section).paddingTop) || 0
         : 0;
@@ -110,9 +120,9 @@ export default function useOutlinePosition(): OutlinePosition {
         return probe;
       };
 
-      // OUTLINE_ROWS is in document order and so, therefore, are the elements' tops — a
+      // The rows are in document order and so, therefore, are the elements' tops — a
       // file's headings all sit between it and the next file.
-      const tops = OUTLINE_ROWS.map((row) => {
+      const tops = rows.map((row) => {
         const el = document.getElementById(row.id);
         return el ? el.getBoundingClientRect().top : null;
       });
@@ -124,10 +134,10 @@ export default function useOutlinePosition(): OutlinePosition {
       // at the foot, one below it owes more than its endgame and sits at `base`). So no
       // row that would have qualified can sit below one that did not.
       let active = -1;
-      for (let i = 0; i < OUTLINE_ROWS.length; i++) {
+      for (let i = 0; i < rows.length; i++) {
         const top = tops[i];
         if (top === null) continue;
-        if (top > probeFor(OUTLINE_ROWS[i].tile)) break;
+        if (top > probeFor(rows[i].tile)) break;
         active = i;
       }
 
@@ -140,26 +150,26 @@ export default function useOutlinePosition(): OutlinePosition {
       let from = active;
       let to = active;
       if (active >= 0) {
-        const tile = OUTLINE_ROWS[active].tile;
+        const tile = rows[active].tile;
         const foot = tileRect(tile)?.bottom ?? view;
         const endOf = (i: number) => {
-          for (let j = i + 1; j < OUTLINE_ROWS.length; j++) {
+          for (let j = i + 1; j < rows.length; j++) {
             const next = tops[j];
             if (next !== null) return Math.min(next, foot);
           }
           return foot;
         };
 
-        for (let i = 0; i < OUTLINE_ROWS.length; i++) {
+        for (let i = 0; i < rows.length; i++) {
           const top = tops[i];
-          if (top === null || OUTLINE_ROWS[i].tile !== tile) continue;
+          if (top === null || rows[i].tile !== tile) continue;
           if (Math.min(endOf(i), view) - Math.max(top, 0) <= base) continue;
           if (i < from) from = i;
           if (i > to) to = i;
         }
       }
 
-      const row = active >= 0 ? OUTLINE_ROWS[active] : null;
+      const row = active >= 0 ? rows[active] : null;
       setPosition((prev) =>
         prev.tile === (row?.tile ?? null) &&
         prev.rowId === (row?.id ?? null) &&
@@ -189,7 +199,9 @@ export default function useOutlinePosition(): OutlinePosition {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
-  }, []);
+    // A scanned outline arrives after mount (and assigns its ids in the same effect
+    // that builds it), so the measurement re-arms on the new rows.
+  }, [rows]);
 
   return position;
 }

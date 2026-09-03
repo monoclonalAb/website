@@ -17,7 +17,9 @@ import styles from "./SiteCrumb.module.css";
  * entirely in the stylesheet, so neither component has to reach into the other.
  */
 export default function SiteCrumb() {
-  const { tile } = useOutlinePosition();
+  // Always the home outline: off the home page the crumb names the route, not a row,
+  // so the scanned outline (see SiteRail) has nothing to tell it.
+  const { tile } = useOutlinePosition(OUTLINE_ROWS);
   const pathname = usePathname();
 
   // Off the home page there are no tiles to track and no rail to hand the root to — the

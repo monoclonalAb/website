@@ -67,7 +67,7 @@ const splitLabel = (row: OutlineRow): [string, string] =>
     : [row.label, ""];
 
 export default function SiteRail() {
-  const { tile, rowId, spanFrom, spanTo } = useOutlinePosition();
+  const { tile, rowId, spanFrom, spanTo } = useOutlinePosition(OUTLINE_ROWS);
   const reduced = useReducedMotion();
   const lenis = useLenis();
 
