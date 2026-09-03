@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { OUTLINE_ROWS, type TileId } from "./outline";
+import { OUTLINE_ROWS } from "./outline";
 
 /**
  * Where the reader is in the site tree: which file they are in, and which of its headings
@@ -17,7 +17,7 @@ import { OUTLINE_ROWS, type TileId } from "./outline";
 
 export type OutlinePosition = {
   /** The file the reader is in; null only before the first measure, or where no tiles exist. */
-  tile: TileId | null;
+  tile: string | null;
   /** The active row — a heading once one has climbed past the probe, else the file line. */
   rowId: string | null;
   /**
@@ -63,8 +63,8 @@ export default function useOutlinePosition(): OutlinePosition {
       const base = navH + PROBE_LEAD;
       const view = window.innerHeight;
 
-      const tiles = new Map<TileId, DOMRect | null>();
-      const tileRect = (tile: TileId) => {
+      const tiles = new Map<string, DOMRect | null>();
+      const tileRect = (tile: string) => {
         if (!tiles.has(tile))
           tiles.set(
             tile,
@@ -93,8 +93,8 @@ export default function useOutlinePosition(): OutlinePosition {
        * simply never descends and claims no heading at all, which is where a browser
        * zoom-out leaves you.
        */
-      const probes = new Map<TileId, number>();
-      const probeFor = (tile: TileId) => {
+      const probes = new Map<string, number>();
+      const probeFor = (tile: string) => {
         let probe = probes.get(tile);
         if (probe === undefined) {
           const rect = tileRect(tile);

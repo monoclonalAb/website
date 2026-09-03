@@ -16,11 +16,15 @@ import { TILE_IDS } from "./tiles";
  * app/page.tsx, the heading ids in app/_sections/*.tsx — so a row is a plain anchor and
  * the scrollspy can measure it. Adding a row here without adding the id gets you a row
  * that reads as active but cannot be jumped to.
+ *
+ * This tree is the HOME page's outline only. Standalone routes build the same row
+ * shape at runtime from their own heading tags — components/useHeadingOutline.ts —
+ * through the exported buildOutlineRows below.
  */
 
 export type TileId = (typeof TILE_IDS)[number];
 
-type OutlineNode = {
+export type OutlineNode = {
   id: string;
   label: string;
   children?: OutlineNode[];
@@ -65,8 +69,12 @@ export type OutlineRow = {
   label: string;
   /** 1 = file line. Drives both the indent and the tick width. */
   depth: number;
-  /** The scroll tile this row lives in; a file row's own id. */
-  tile: TileId;
+  /**
+   * The scroll tile this row lives in; a file row's own id. A `TileId` on the home
+   * page; on standalone routes it is whatever id the heading scan anchored the file
+   * row to (components/useHeadingOutline.ts), so the type is the wider string.
+   */
+  tile: string;
   /** Tree-drawing glyphs, one per depth level, ending in the row's own branch. */
   prefix: string;
   isFile: boolean;
@@ -86,12 +94,12 @@ export type OutlineRow = {
 const flatten = (
   nodes: OutlineNode[],
   depth: number,
-  tile: TileId | null,
+  tile: string | null,
   spine: string,
 ): OutlineRow[] =>
   nodes.flatMap((node, i) => {
     const last = i === nodes.length - 1;
-    const rowTile = tile ?? (node.id as TileId);
+    const rowTile = tile ?? node.id;
     const row: OutlineRow = {
       id: node.id,
       label: node.label,
@@ -113,13 +121,20 @@ const flatten = (
       : [row];
   });
 
+/**
+ * Rows from any outline tree — the home TREE below, or a tree scanned off a page's
+ * headings (components/useHeadingOutline.ts). Same glyphs, same shape, one renderer.
+ */
+export const buildOutlineRows = (nodes: OutlineNode[]): OutlineRow[] =>
+  flatten(nodes, 1, null, "");
+
 /** All 13 rows in document order. The visible subset is chosen per tile below. */
-export const OUTLINE_ROWS = flatten(TREE, 1, null, "");
+export const OUTLINE_ROWS = buildOutlineRows(TREE);
 
 /**
  * What the rail shows on a given tile: every file line, plus only that tile's headings.
  * So `blog` and `changelog` are five rows and `about` and `contents` are nine — the
  * headings expand downwards on arrival and collapse again on leaving.
  */
-export const isRowVisible = (row: OutlineRow, activeTile: TileId | null) =>
+export const isRowVisible = (row: OutlineRow, activeTile: string | null) =>
   row.isFile || row.tile === activeTile;
