@@ -37,6 +37,7 @@ None.
 ## Completed
 
 - [2026-09-02 — Scaffold the repository-local agent harness](completed/2026-09-02-agent-harness.md)
+- [2026-09-03 — Make the rail's dial reusable on any page via heading discovery](completed/2026-09-03-reusable-heading-dial.md)
 
 ## Plan quality
 

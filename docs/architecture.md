@@ -1,7 +1,7 @@
 ---
 owner: Eric Zheng
 status: current
-last_verified: 2026-09-02
+last_verified: 2026-09-03
 ---
 
 # Architecture
@@ -40,7 +40,7 @@ Server Components are the default. Client Components are limited to behavior tha
 
 - `app/HomePage.tsx` and `app/useCursorRepel.ts` — pointer-driven hero physics.
 - `app/SmoothScroll.tsx`, `app/scroll/PagerScroll.tsx`, and `app/scroll/ZoomRealign.tsx` — home scrolling.
-- `components/SiteRail.tsx`, `components/SiteCrumb.tsx`, and `app/scroll/useOutlinePosition.ts` — scroll-aware navigation.
+- `components/SiteRail.tsx`, `components/SiteCrumb.tsx`, `components/useHeadingOutline.ts`, and `app/scroll/useOutlinePosition.ts` — scroll-aware navigation. The rail's outline has two sources chosen by route: the hand-authored, contract-checked tree in `app/scroll/outline.ts` on the home page, and rows scanned off the page's own heading tags (ids assigned when missing) everywhere else — mounting `SiteChrome` is all a standalone page needs to earn the dial.
 
 `components/SiteChrome.tsx` is a server component that composes client chrome around server-rendered children.
 
