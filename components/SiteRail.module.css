@@ -21,9 +21,11 @@
     opacity 260ms ease,
     visibility 0s linear 260ms;
 }
-/* Hidden on the splash (the `index` tile carries no chrome at all) and on any route
-   with no tiles to track, e.g. /leetcode. `visibility` — not just opacity — so the rows
-   leave the tab order and the a11y tree with it. */
+/* Hidden on the splash (the `index` tile carries no chrome at all) and anywhere no
+   outline has been measured yet — standalone routes scan their own headings after
+   mount (components/useHeadingOutline.ts) and fade in here once a tile resolves.
+   `visibility` — not just opacity — so the rows leave the tab order and the a11y tree
+   with it. */
 .rail[data-visible="true"] {
   visibility: visible;
   opacity: 1;
@@ -165,6 +167,11 @@
 }
 .rail[data-mode="ticks"] .row[data-depth="3"] .mark {
   width: 5px;
+}
+/* Depth 4 only occurs in scanned outlines (useHeadingOutline clamps h4–h6 there);
+   the hand-authored home tree stops at 3. */
+.rail[data-mode="ticks"] .row[data-depth="4"] .mark {
+  width: 3px;
 }
 .rail[data-mode="ticks"] .row[data-state="file"] .mark {
   color: var(--color-black);

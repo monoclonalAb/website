@@ -275,11 +275,13 @@ html.rail-open .content {
 .content > section > :is(h1, h2, h3, h4, h5, h6) {
   padding-top: 1em;
 }
-/* Rail rows are real anchors (app/scroll/outline.ts). This is the native fallback for
-   the reduced-motion branch, where the jump is a scrollIntoView with no Lenis to take
-   an explicit offset. It applies to headings ONLY — never to `.content > section`,
-   where an offset landing is what let the previous tile show above the chrome. */
-.content > section :is(h1, h2, h3)[id] {
+/* Rail rows are real anchors (app/scroll/outline.ts on the home page; ids scanned or
+   assigned by components/useHeadingOutline.ts on standalone routes). This is the
+   native fallback for fragment landings without Lenis to take an explicit offset. Not
+   scoped to `.content > section`: standalone prose sits directly in the column. It
+   applies to headings ONLY — never to the sections themselves, where an offset
+   landing is what let the previous tile show above the chrome. */
+.content :is(h1, h2, h3, h4, h5, h6)[id] {
   scroll-margin-top: var(--nav-h);
 }
 /* The tiled home column. Tiles have to butt directly against each other and

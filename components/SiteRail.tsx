@@ -3,17 +3,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAnimationFrame, useReducedMotion } from "motion/react";
 import { useLenis } from "lenis/react";
+import { usePathname } from "next/navigation";
 import {
   OUTLINE_ROWS,
   isRowVisible,
   type OutlineRow,
 } from "@/app/scroll/outline";
 import useOutlinePosition from "@/app/scroll/useOutlinePosition";
+import useHeadingOutline from "./useHeadingOutline";
 import { easeGlide } from "@/app/scroll/PagerScroll";
 import styles from "./SiteRail.module.css";
 
 /**
- * The site's file tree, and the reader's place in it. One component, two disclosures:
+ * A file tree, and the reader's place in it. One component, two disclosures:
  *
  * - **≥1160px — the dial.** Always words. A fixed 7-row window with the caret pinned at
  *   50%; the tree rotates under it. Arriving on a file expands its headings downwards
@@ -27,6 +29,13 @@ import styles from "./SiteRail.module.css";
  *
  * Both are the same rows, the same pitch, and the same layout pass — see the frame loop
  * below. What differs is one line: what the tree is anchored to.
+ *
+ * The rows themselves have two sources, chosen by route. The home page renders the
+ * hand-authored site tree (app/scroll/outline.ts — contract-checked against the tiles).
+ * Every other page gets its outline scanned off its own heading tags at mount
+ * (components/useHeadingOutline.ts), so mounting SiteChrome is all a new page has to do
+ * to earn the dial. Scanned rows arrive after hydration, which is why everything below
+ * treats the row list as replaceable rather than constant.
  */
 
 /** Row pitch. Every other vertical number here is a multiple or half-multiple of it. */
@@ -54,9 +63,12 @@ const fade = (distance: number) => {
   return RAMP[i] + (RAMP[i + 1] - RAMP[i]) * (distance - i);
 };
 
-/** --nav-h in px, read off the box that reserves it (it changes at 600px). */
+/** --nav-h in px, read off the box that reserves it (it changes at 600px). On the
+    tiled home page that is a section; on standalone routes, the column itself. */
 const navHeight = () => {
-  const section = document.querySelector(".content > section");
+  const section =
+    document.querySelector(".content > section") ??
+    document.querySelector(".content");
   return section ? parseFloat(getComputedStyle(section).paddingTop) || 0 : 0;
 };
 
@@ -67,7 +79,14 @@ const splitLabel = (row: OutlineRow): [string, string] =>
     : [row.label, ""];
 
 export default function SiteRail() {
-  const { tile, rowId, spanFrom, spanTo } = useOutlinePosition(OUTLINE_ROWS);
+  // The row source, by route: the home page's hand-authored tree, or an outline
+  // scanned off this page's own headings. The scan is disabled at home so the two
+  // never disagree about an id.
+  const home = usePathname() === "/";
+  const scanned = useHeadingOutline(!home);
+  const rows = home ? OUTLINE_ROWS : scanned;
+
+  const { tile, rowId, spanFrom, spanTo } = useOutlinePosition(rows);
   const reduced = useReducedMotion();
   const lenis = useLenis();
 
@@ -79,22 +98,33 @@ export default function SiteRail() {
 
   const rowRefs = useRef<(HTMLLIElement | null)[]>([]);
   const barRef = useRef<HTMLSpanElement | null>(null);
-  const presence = useRef(OUTLINE_ROWS.map((row) => (row.isFile ? 1 : 0)));
+  const presence = useRef(rows.map((row) => (row.isFile ? 1 : 0)));
   const translate = useRef<number | null>(null);
   const bar = useRef<{ top: number; bottom: number } | null>(null);
 
   // The frame loop reads these rather than closing over the render's values, so it stays
   // a single long-lived callback instead of being torn down on every scroll tick.
+  const rowsRef = useRef(rows);
   const tileRef = useRef(tile);
   const activeRef = useRef(-1);
   const spanRef = useRef([-1, -1]);
   const dialRef = useRef(dial);
+  // A new row list (the scan landing, or a client-side navigation) resets the model the
+  // frame loop animates: presence re-seeded to files-only, and the eased anchors dropped
+  // so nothing glides from a coordinate that belonged to the old tree.
+  useEffect(() => {
+    if (rowsRef.current === rows) return;
+    rowsRef.current = rows;
+    presence.current = rows.map((row) => (row.isFile ? 1 : 0));
+    translate.current = null;
+    bar.current = null;
+  }, [rows]);
   useEffect(() => {
     tileRef.current = tile;
-    activeRef.current = OUTLINE_ROWS.findIndex((row) => row.id === rowId);
+    activeRef.current = rows.findIndex((row) => row.id === rowId);
     spanRef.current = [spanFrom, spanTo];
     dialRef.current = dial;
-  }, [tile, rowId, spanFrom, spanTo, dial]);
+  }, [rows, tile, rowId, spanFrom, spanTo, dial]);
 
   useEffect(() => {
     const query = window.matchMedia(`(min-width: ${DIAL_MIN}px)`);
@@ -118,13 +148,14 @@ export default function SiteRail() {
    * mid-animation the way two independent CSS transitions would.
    */
   useAnimationFrame((_, delta) => {
+    const model = rowsRef.current;
     const k = reduced ? 1 : 1 - Math.exp(-Math.min(delta, 64) / TAU);
     const p = presence.current;
     const y: number[] = [];
     let filled = 0;
 
-    for (let i = 0; i < OUTLINE_ROWS.length; i++) {
-      const target = isRowVisible(OUTLINE_ROWS[i], tileRef.current) ? 1 : 0;
+    for (let i = 0; i < model.length; i++) {
+      const target = isRowVisible(model[i], tileRef.current) ? 1 : 0;
       p[i] += (target - p[i]) * k;
       if (Math.abs(target - p[i]) < 0.001) p[i] = target;
       y[i] = filled * ROW;
@@ -142,7 +173,7 @@ export default function SiteRail() {
         ? want
         : translate.current + (want - translate.current) * k;
 
-    for (let i = 0; i < OUTLINE_ROWS.length; i++) {
+    for (let i = 0; i < model.length; i++) {
       const el = rowRefs.current[i];
       if (!el) continue;
       el.style.transform = `translateY(${(translate.current + y[i]).toFixed(2)}px)`;
@@ -234,10 +265,17 @@ export default function SiteRail() {
           programmatic: false,
         });
       } else {
-        target.scrollIntoView();
+        // No Lenis here — a standalone route, or the reduced-motion branch. The manual
+        // offset is the same landing the Lenis path computes; smoothness defers to the
+        // reader's motion preference.
+        const top =
+          target.getBoundingClientRect().top +
+          window.scrollY -
+          (row.isFile ? 0 : navHeight());
+        window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
       }
     },
-    [lenis],
+    [lenis, reduced],
   );
 
   return (
@@ -265,7 +303,7 @@ export default function SiteRail() {
 
       <div className={styles.viewport}>
         <ul className={styles.tree}>
-          {OUTLINE_ROWS.map((row, i) => {
+          {rows.map((row, i) => {
             const [stem, ext] = splitLabel(row);
             return (
               <li
