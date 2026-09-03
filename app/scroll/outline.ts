@@ -101,7 +101,15 @@ const flatten = (
       isFile: depth === 1,
     };
     return node.children
-      ? [row, ...flatten(node.children, depth + 1, rowTile, spine + (last ? " " : "│"))]
+      ? [
+          row,
+          ...flatten(
+            node.children,
+            depth + 1,
+            rowTile,
+            spine + (last ? " " : "│"),
+          ),
+        ]
       : [row];
   });
 

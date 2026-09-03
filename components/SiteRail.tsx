@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAnimationFrame, useReducedMotion } from "motion/react";
 import { useLenis } from "lenis/react";
-import { OUTLINE_ROWS, isRowVisible, type OutlineRow } from "@/app/scroll/outline";
+import {
+  OUTLINE_ROWS,
+  isRowVisible,
+  type OutlineRow,
+} from "@/app/scroll/outline";
 import useOutlinePosition from "@/app/scroll/useOutlinePosition";
 import { easeGlide } from "@/app/scroll/PagerScroll";
 import styles from "./SiteRail.module.css";
@@ -165,7 +169,8 @@ export default function SiteRail() {
           ? edges
           : {
               top: bar.current.top + (edges.top - bar.current.top) * k,
-              bottom: bar.current.bottom + (edges.bottom - bar.current.bottom) * k,
+              bottom:
+                bar.current.bottom + (edges.bottom - bar.current.bottom) * k,
             };
       barEl.style.transform = `translateY(${bar.current.top.toFixed(2)}px)`;
       barEl.style.height = `${(bar.current.bottom - bar.current.top).toFixed(2)}px`;
@@ -191,7 +196,10 @@ export default function SiteRail() {
       if (e.key === "Escape") setOpen(false);
     };
     window.addEventListener("wheel", block, { passive: false, capture: true });
-    window.addEventListener("touchmove", block, { passive: false, capture: true });
+    window.addEventListener("touchmove", block, {
+      passive: false,
+      capture: true,
+    });
     window.addEventListener("keydown", onKey);
 
     return () => {

@@ -1,0 +1,22 @@
+# Dependencies and generated output
+node_modules
+.next
+out
+build
+coverage
+playwright-report
+test-results
+blob-report
+next-env.d.ts
+*.tsbuildinfo
+
+# Generated lockfile and binary assets
+pnpm-lock.yaml
+public
+app/fonts
+app/favicon.ico
+app/opengraph-image.jpg
+
+# Local agent/browser state
+.playwright-mcp
+.context

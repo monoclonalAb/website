@@ -98,7 +98,8 @@ export default function ZoomRealign() {
     const position = () => {
       const y = lenis ? lenis.targetScroll : window.scrollY;
       const limit =
-        lenis?.limit ?? document.documentElement.scrollHeight - window.innerHeight;
+        lenis?.limit ??
+        document.documentElement.scrollHeight - window.innerHeight;
       return Math.max(0, Math.min(y, Math.max(0, limit)));
     };
 
@@ -113,7 +114,8 @@ export default function ZoomRealign() {
         else break;
       }
       const { min, max } = span(tiles, index, vhRef.current);
-      const frac = max > min ? Math.min(1, Math.max(0, (y - min) / (max - min))) : 0;
+      const frac =
+        max > min ? Math.min(1, Math.max(0, (y - min) / (max - min))) : 0;
       anchorRef.current = { index, frac };
     };
 
@@ -159,8 +161,8 @@ export default function ZoomRealign() {
         // below correct the page inside the resize handler rather than a frame later.
         // programmatic:false so targetScroll holds the destination, which is what
         // PagerScroll's currentIndex() reads — and never passed alone, per the rule in
-        // CLAUDE.md, since the same flag governs whether lerp/duration/easing fall back to
-        // the instance options.
+        // docs/architecture/scroll-engine.md, since the same flag governs whether
+        // lerp/duration/easing fall back to the instance options.
         lenis.scrollTo(dest, {
           immediate: true,
           programmatic: false,
@@ -177,7 +179,10 @@ export default function ZoomRealign() {
     const settle = (waited = 0) => {
       settleTimerRef.current = null;
       if (!applyRealign() && waited < GLIDE_WAIT) {
-        settleTimerRef.current = setTimeout(() => settle(waited + SETTLE), SETTLE);
+        settleTimerRef.current = setTimeout(
+          () => settle(waited + SETTLE),
+          SETTLE,
+        );
         return;
       }
       if (resumeTimerRef.current !== null) clearTimeout(resumeTimerRef.current);

@@ -42,7 +42,8 @@ export default function Contents() {
           <a href="#changelog">/changelog.html</a>
         </dt>
         <dd>
-          for long time fans of the page who want to know what has <b>changed</b>
+          for long time fans of the page who want to know what has{" "}
+          <b>changed</b>
         </dd>
         <br />
         <dt>
@@ -76,7 +77,9 @@ export default function Contents() {
         </dd>
         <br />
         <dt>
-          <a href="mailto:ezhe473@aucklanduni.ac.nz">ezhe473@aucklanduni.ac.nz</a>
+          <a href="mailto:ezhe473@aucklanduni.ac.nz">
+            ezhe473@aucklanduni.ac.nz
+          </a>
         </dt>
         <dd>
           my <span>current university email</span>

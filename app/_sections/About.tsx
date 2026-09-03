@@ -40,7 +40,9 @@ export default function About() {
         <li>
           is a <i>little</i> below average height on a good day
         </li>
-        <li>dreams about becoming a fabled '<b>10x developer</b>'</li>
+        <li>
+          dreams about becoming a fabled '<b>10x developer</b>'
+        </li>
         <li>
           worries about getting replaced by the next{" "}
           <a
@@ -93,8 +95,7 @@ export default function About() {
           drop
         </li>
         <li>
-          hopes to maintain a semi-active semi-academic{" "}
-          <a href="#blog">blog</a>
+          hopes to maintain a semi-active semi-academic <a href="#blog">blog</a>
         </li>
       </ul>
 

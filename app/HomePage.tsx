@@ -132,7 +132,11 @@ export default function HomePage() {
           letters("N"),
           link("klm", "blog", "#blog", "n"),
         ])}
-        {line([letters("O"), name("ZHENG"), link("o", "contents", "#contents")])}
+        {line([
+          letters("O"),
+          name("ZHENG"),
+          link("o", "contents", "#contents"),
+        ])}
         {line([letters("PQRSTU"), link("p", "changelog", "#changelog")])}
         {line([letters("VWXYZ"), letters("qrstuvwxyz")])}
       </h1>

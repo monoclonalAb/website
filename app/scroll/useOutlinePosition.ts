@@ -66,7 +66,10 @@ export default function useOutlinePosition(): OutlinePosition {
       const tiles = new Map<TileId, DOMRect | null>();
       const tileRect = (tile: TileId) => {
         if (!tiles.has(tile))
-          tiles.set(tile, document.getElementById(tile)?.getBoundingClientRect() ?? null);
+          tiles.set(
+            tile,
+            document.getElementById(tile)?.getBoundingClientRect() ?? null,
+          );
         return tiles.get(tile) ?? null;
       };
 

@@ -44,10 +44,10 @@ body {
    a scroll offset. A tile's top edge therefore lands exactly on the viewport's
    top edge and no neighbouring tile can appear above or below it.
 
-   This also makes --nav-h forgiving. As a scroll-padding-top it had to equal
-   the real navbar height exactly: 4.5rem against a 46px navbar parked the
-   viewport 26px too high and leaked a strip of the previous tile out from under
-   the bar. As interior padding it only has to be >= what the chrome occupies.
+   This also makes --nav-h forgiving. When it was scroll-padding-top for the former
+   navbar, 4.5rem against a 46px bar parked the viewport 26px too high and leaked
+   a strip of the previous tile. As interior padding it only has to be >= what the
+   current fixed chrome occupies.
 
    The bar is gone, but this band is NOT: the crumb floats in it. Zero it and the
    crumb lands on the h1 of `about`, the one tile taller than the viewport, whose
@@ -256,7 +256,7 @@ html.rail-open .content {
      default) keeps it within the 100svh, so the tile stays exactly one viewport
      tall and its top edge can sit flush at scroll-top. Do NOT move this back out
      to scroll-padding-top / scroll-margin-top — an offset landing is precisely
-     what let the previous tile show above the navbar. */
+     what let the previous tile show above the fixed chrome. */
   padding-top: var(--nav-h);
   /* Closing space, so the end of a section reads as an end. Without it a tall
      tile's last line sits hard against the bottom of the viewport, which looks

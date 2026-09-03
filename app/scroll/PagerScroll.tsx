@@ -216,12 +216,14 @@ const easeOutQuad = (t: number) => 1 - Math.pow(1 - t, 2);
 
 /**
  * html's scroll-padding-top, which Lenis subtracts from element scroll targets.
- * It is 0 now — navbar clearance moved inside each tile so tiles land flush with
+ * It is 0 now — the former navbar clearance moved inside each tile so tiles land flush with
  * the viewport (see app/globals.css). Still read from the computed style rather
  * than hard-coded, so the tile maths stays correct if that ever changes again.
  */
 function scrollPadTop(): number {
-  return parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+  return (
+    parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0
+  );
 }
 
 export default function PagerScroll({
@@ -357,7 +359,8 @@ export default function PagerScroll({
      * repeated, not two hops owed.
      */
     const cancelPending = () => {
-      if (pendingTimerRef.current !== null) clearTimeout(pendingTimerRef.current);
+      if (pendingTimerRef.current !== null)
+        clearTimeout(pendingTimerRef.current);
       pendingTimerRef.current = null;
       pendingDirRef.current = 0;
     };
@@ -365,14 +368,17 @@ export default function PagerScroll({
     const schedulePending = (dir: number, delay: number) => {
       pendingDirRef.current = dir;
       if (pendingTimerRef.current !== null) return;
-      pendingTimerRef.current = setTimeout(() => {
-        pendingTimerRef.current = null;
-        const d = pendingDirRef.current;
-        pendingDirRef.current = 0;
-        if (!d) return;
-        const i = currentIndex();
-        transport(i + d, d > 0 ? "down" : "up");
-      }, Math.max(0, delay));
+      pendingTimerRef.current = setTimeout(
+        () => {
+          pendingTimerRef.current = null;
+          const d = pendingDirRef.current;
+          pendingDirRef.current = 0;
+          if (!d) return;
+          const i = currentIndex();
+          transport(i + d, d > 0 ? "down" : "up");
+        },
+        Math.max(0, delay),
+      );
     };
 
     /**
@@ -470,7 +476,12 @@ export default function PagerScroll({
         (window as unknown as { __pagerDebug?: boolean }).__pagerDebug
       ) {
         const w = window as unknown as { __pagerHops?: unknown[] };
-        (w.__pagerHops ??= []).push({ t: Math.round(now), from: here, to: k, dir });
+        (w.__pagerHops ??= []).push({
+          t: Math.round(now),
+          from: here,
+          to: k,
+          dir,
+        });
       }
 
       const opts = {
@@ -493,7 +504,10 @@ export default function PagerScroll({
         lenis.scrollTo(lenis.limit, opts);
       } else if (t.isFree && dir === "up" && !toTop) {
         // Enter a tall tile from below at its bottom screen (numeric → no nav pad).
-        const bottom = Math.max(t.top - scrollPadTop(), nextTop(k) - window.innerHeight);
+        const bottom = Math.max(
+          t.top - scrollPadTop(),
+          nextTop(k) - window.innerHeight,
+        );
         lenis.scrollTo(bottom, opts);
       } else {
         // Element target → Lenis subtracts scroll-padding-top, landing at top − 72.
@@ -587,8 +601,7 @@ export default function PagerScroll({
       // between ~14 and ~20ms, and dividing by that jitter injects ±15% noise into the
       // one signal the restart test reads — enough, on its own, to manufacture the climb
       // that means "the reader pushed again".
-      const mag =
-        continuation && gap >= REARM_GAP ? (raw * FRAME) / gap : raw;
+      const mag = continuation && gap >= REARM_GAP ? (raw * FRAME) / gap : raw;
 
       // Envelope follower with slow release: what counts as a collapse has to come down
       // as a tail decays, or a hard flick's own dying frames would eventually qualify.
@@ -627,7 +640,8 @@ export default function PagerScroll({
         now - lastDenseTimeRef.current <= DENSE_MEMORY ||
         now - lastDecayTimeRef.current <= DENSE_MEMORY;
       if (gap <= DENSE_GAP) lastDenseTimeRef.current = now;
-      const fell = mag1Ref.current > 0 && mag < mag1Ref.current && gap <= STREAM_GAP;
+      const fell =
+        mag1Ref.current > 0 && mag < mag1Ref.current && gap <= STREAM_GAP;
       if (!fell) {
         fallRunRef.current = 0;
         fallFromRef.current = mag; // where the next run down would start from
@@ -702,7 +716,8 @@ export default function PagerScroll({
               // A pause that resumes far BELOW the running rate is already half the
               // evidence: a stalled stream comes back bigger (that is what `continuation`
               // is for), never smaller. Only a real restart does that.
-              climbsRef.current = lifted || (gap >= DISCRETE_GAP && !continuation) ? 1 : 0;
+              climbsRef.current =
+                lifted || (gap >= DISCRETE_GAP && !continuation) ? 1 : 0;
             }
           } else quietRunRef.current = 0;
         } else if (mag < restartFloorRef.current) {
@@ -732,10 +747,10 @@ export default function PagerScroll({
         quietRunRef.current = 0;
       }
 
-      // The per-event decision log `.context/wheel.mjs` reads: which arm fired, on which
-      // event, and what it saw. Every regression in this file so far has been diagnosed
-      // from it and misdiagnosed without it, so it stays — but dev-only and opt-in, so it
-      // costs the shipped bundle nothing. Next replaces process.env.NODE_ENV at build
+      // The opt-in browser trace log records which arm fired, on which event, and what it
+      // saw. Every regression in this file so far has been diagnosed from it and
+      // misdiagnosed without it, so it stays — but dev-only and opt-in, so it costs the
+      // shipped bundle nothing. Next replaces process.env.NODE_ENV at build
       // time, which makes the whole block dead code in a production build.
       if (
         process.env.NODE_ENV !== "production" &&
@@ -782,7 +797,10 @@ export default function PagerScroll({
       // the gesture is going either — otherwise the noise frame is harmless but the swing
       // *back* off it reads as a full-sized reversal, and the pair costs two phantom
       // gestures instead of one.
-      if (sign !== 0 && (lastSignRef.current === 0 || sign === lastSignRef.current || reversed))
+      if (
+        sign !== 0 &&
+        (lastSignRef.current === 0 || sign === lastSignRef.current || reversed)
+      )
         lastSignRef.current = sign;
 
       // Bank this event's travel. Every event counts, acted on or not.
@@ -859,7 +877,8 @@ export default function PagerScroll({
         // a hard flick otherwise reaches the boundary still near its own peak and
         // carries straight on into the next one. The reader gets the section's closing
         // space as their cue, and leaves with a push of their own.
-        if (now - lastEdgeTimeRef.current > EDGE_MEMORY) edgeChargeRef.current = 0;
+        if (now - lastEdgeTimeRef.current > EDGE_MEMORY)
+          edgeChargeRef.current = 0;
         lastEdgeTimeRef.current = now;
         const live = !used;
         if (live) edgeChargeRef.current += Math.abs(deltaY);
@@ -892,7 +911,9 @@ export default function PagerScroll({
       // before the reader has really committed to a direction.
       absorb(event);
       if (used || !charged(TRANSPORT_THRESHOLD)) return false;
-      transport(deltaY > 0 ? i + 1 : i - 1, deltaY > 0 ? "down" : "up", { paced: true });
+      transport(deltaY > 0 ? i + 1 : i - 1, deltaY > 0 ? "down" : "up", {
+        paced: true,
+      });
       return false;
     };
 
@@ -969,17 +990,21 @@ export default function PagerScroll({
       if (t.isFree) {
         const iMin = t.top - pad;
         const iMax = Math.max(iMin, nextTop(i) - vh);
-        const atEdge = dir < 0 ? y <= iMin + EDGE_EPS : y + vh >= nextTop(i) - EDGE_EPS;
+        const atEdge =
+          dir < 0 ? y <= iMin + EDGE_EPS : y + vh >= nextTop(i) - EDGE_EPS;
         if (atEdge) {
           transport(i + dir, dir > 0 ? "down" : "up");
         } else {
-          lenis.scrollTo(Math.max(iMin, Math.min(iMax, y + dir * KEY_STEP * vh)), {
-            duration: GLIDE_DURATION,
-            easing: easeGlide,
-            programmatic: false, // keeps targetScroll on the destination, so a
-            // repeated key steps a full KEY_STEP each time instead of compounding
-            // from wherever the previous step happens to have animated to.
-          });
+          lenis.scrollTo(
+            Math.max(iMin, Math.min(iMax, y + dir * KEY_STEP * vh)),
+            {
+              duration: GLIDE_DURATION,
+              easing: easeGlide,
+              programmatic: false, // keeps targetScroll on the destination, so a
+              // repeated key steps a full KEY_STEP each time instead of compounding
+              // from wherever the previous step happens to have animated to.
+            },
+          );
         }
       } else {
         transport(i + dir, dir > 0 ? "down" : "up");
@@ -1003,19 +1028,25 @@ export default function PagerScroll({
       if (!anchor) return;
       const url = new URL(anchor.href, location.href);
       // Only same-page hashes; let cross-route links (e.g. /leetcode -> /#x) route.
-      if (url.pathname !== location.pathname || !url.hash || url.hash === "#") return;
+      if (url.pathname !== location.pathname || !url.hash || url.hash === "#")
+        return;
       const target = document.querySelector(url.hash);
       if (!target) return;
       e.preventDefault();
       const hashId = url.hash.slice(1);
-      const k = tilesRef.current.findIndex((t) => t.el === target || t.id === hashId);
+      const k = tilesRef.current.findIndex(
+        (t) => t.el === target || t.id === hashId,
+      );
       // A click is a destination, not a nudge: never inherit a wheel streak's
       // accelerated glide, always land at the section top, and re-run even when the
       // section is the one already being read.
       streakRef.current = 0;
       lastTransportRef.current = 0;
       if (k >= 0) {
-        transport(k, k >= currentIndex() ? "down" : "up", { toTop: true, force: true });
+        transport(k, k >= currentIndex() ? "down" : "up", {
+          toTop: true,
+          force: true,
+        });
         syncHash(tilesRef.current[k].id);
       } else {
         // A hash that is not a tile. Unreachable from the shipped markup (every
@@ -1036,7 +1067,7 @@ export default function PagerScroll({
      * Land a hash the page was *opened* on. next.config.ts serves permanent (308)
      * redirects from the old /about, /blog, /contents and /changelog routes to the
      * matching /#anchor, and browsers cache those indefinitely — so this is the normal
-     * arrival path for every legacy inbound link, not an edge case. Cross-route navbar
+     * arrival path for every legacy inbound link, not an edge case. Cross-route chrome
      * links (/leetcode -> /#about) land here too, since the click handler declines
      * those and lets the router move first.
      *

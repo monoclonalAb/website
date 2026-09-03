@@ -39,10 +39,11 @@ const personJsonLd = {
 
 /**
  * The whole site on one scroll: the interactive splash hero, then the shared
- * chrome (sticky navbar + centred content column) wrapping every prose section,
+ * chrome (fixed crumb/rail + centred content column) wrapping every prose section,
  * tiled into full-height panels you glide between via <SmoothScroll/> (Lenis).
- * <HomePage/> and <SmoothScroll/> are the client islands; the navbar and sections
- * stay server-rendered, passed through <SmoothScroll/> as children.
+ * <HomePage/> and <SmoothScroll/> own the page-level client behavior; SiteChrome's
+ * shell and the prose sections stay server-rendered while the crumb and rail keep
+ * their own narrow client boundaries.
  */
 export default function Home() {
   return (

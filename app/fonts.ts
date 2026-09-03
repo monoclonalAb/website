@@ -8,10 +8,26 @@ export const helvetica = localFont({
   preload: true,
   fallback: ["Arial", "sans-serif"],
   src: [
-    { path: "./fonts/helvetica/Helvetica.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/helvetica/Helvetica-Oblique.woff2", weight: "400", style: "italic" },
-    { path: "./fonts/helvetica/Helvetica-Bold.woff2", weight: "700", style: "normal" },
-    { path: "./fonts/helvetica/Helvetica-BoldOblique.woff2", weight: "700", style: "italic" },
+    {
+      path: "./fonts/helvetica/Helvetica.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/helvetica/Helvetica-Oblique.woff2",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "./fonts/helvetica/Helvetica-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "./fonts/helvetica/Helvetica-BoldOblique.woff2",
+      weight: "700",
+      style: "italic",
+    },
   ],
 });
 
@@ -33,8 +49,16 @@ export const baskerville = localFont({
   preload: true,
   fallback: ["Georgia", "serif"],
   src: [
-    { path: "./fonts/baskerville/LibreBaskerville-Regular.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/baskerville/LibreBaskerville-Italic.woff2", weight: "400", style: "italic" },
+    {
+      path: "./fonts/baskerville/LibreBaskerville-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/baskerville/LibreBaskerville-Italic.woff2",
+      weight: "400",
+      style: "italic",
+    },
   ],
 });
 
