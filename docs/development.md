@@ -1,7 +1,7 @@
 ---
 owner: Eric Zheng
 status: current
-last_verified: 2026-09-02
+last_verified: 2026-09-03
 ---
 
 # Development guide
@@ -53,6 +53,17 @@ Run narrow checks while iterating, then `pnpm validate`. Run Playwright whenever
 6. Review the resulting diff for accidental generated files, stale comments, and unhandled states.
 7. Validate from narrow to broad: focused test, `pnpm check`, `pnpm build`, then browser tests.
 8. Update docs, a decision record, quality grade, or debt item whenever the repository's truth changed.
+
+## Commit conventions
+
+Split work into commits a reviewer can read one at a time: one concern per commit
+(model, behavior, styling, docs), with mechanical refactors separated from the
+behavior change they enable. Each commit must typecheck and lint on its own — craft
+intermediate file states if the final diff entangles concerns — so review and
+`git bisect` stay honest. Subjects are imperative: a plain sentence for product
+work, a `docs:`/`test:`/`chore:`/`ci:` prefix for repository housekeeping,
+matching the existing log. Commit to `main` only when asked; never push without
+an explicit instruction.
 
 ## Next.js 16 constraints
 
