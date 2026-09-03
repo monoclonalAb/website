@@ -72,6 +72,14 @@ test("a cold fragment load lands on the requested tile", async ({ page }) => {
   await expect
     .poll(() => distanceFromViewportTop(page, "contents"), { timeout: 3_000 })
     .toBeCloseTo(0, 0);
+
+  const breadcrumb = page.getByRole("navigation", { name: "Breadcrumb" });
+  await expect(
+    breadcrumb.getByRole("link", { name: "ez", exact: true }),
+  ).toHaveAttribute("href", "/#top");
+  await expect(
+    breadcrumb.getByRole("link", { name: "contents.html", exact: true }),
+  ).toHaveAttribute("href", "/#contents");
 });
 
 test("the standalone Leetcode route keeps its own metadata and route home", async ({
@@ -85,9 +93,13 @@ test("the standalone Leetcode route keeps its own metadata and route home", asyn
   await expect(
     page.getByRole("heading", { level: 1, name: /leetcode/i }),
   ).toBeVisible();
+  const breadcrumb = page.getByRole("navigation", { name: "Breadcrumb" });
   await expect(
-    page.getByRole("link", { name: "ez", exact: true }),
+    breadcrumb.getByRole("link", { name: "ez", exact: true }),
   ).toHaveAttribute("href", "/#top");
+  await expect(
+    breadcrumb.getByRole("link", { name: "leetcode.html", exact: true }),
+  ).toHaveAttribute("href", "/leetcode");
   expect(pageErrors).toEqual([]);
 });
 

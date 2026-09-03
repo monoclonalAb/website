@@ -57,6 +57,7 @@ Do not add transformed or independently scrolling ancestors around the home cont
 ## Interaction and accessibility
 
 - Use semantic headings, links, lists, figures, and navigation landmarks.
+- The fixed crumb behaves as a file path: its root and current filename are semantic links to real destinations.
 - Preserve keyboard paths for scrolling and all destinations.
 - Do not suppress focus outlines without an equal or stronger visible replacement.
 - Interactive hit areas must remain usable when the compact rail is shown.

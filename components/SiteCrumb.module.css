@@ -35,34 +35,17 @@
   }
 }
 
-/* The root belongs to whichever of the two is carrying it. The rail owns it wherever its
-   words are on screen — always under the dial, and while the tree is open below 1160 —
-   and the crumb takes it back wherever they are not. Both conditions are already
-   expressible here, so neither component has to know the other's state. */
-.prefix {
-  display: inline;
-}
-@media (min-width: 1160px) {
-  .crumb[data-rail="true"] .prefix {
-    display: none;
-  }
-}
-:global(html.rail-open) .crumb[data-rail="true"] .prefix {
-  display: none;
-}
-
 /* globals.css slants every anchor on hover; that is the prose's idiom, and a monospace
    crumb that reflows on hover reads as a glitch. Two class-level selectors outrank
-   `a:hover`, so the colour still changes and the metrics do not. */
-.home,
-.home:hover {
+   `a:hover`, so the colour still changes and the metrics do not. Both path components
+   use the same treatment because both are real navigation targets. */
+.link,
+.link:hover {
+  color: var(--color-black);
   font-style: normal;
   text-decoration: none;
 }
-.home {
-  color: var(--color-black);
-}
-.home:hover {
+.link:hover {
   color: var(--color-red);
 }
 .sep {

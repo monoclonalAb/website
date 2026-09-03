@@ -7,14 +7,14 @@ import useOutlinePosition from "@/app/scroll/useOutlinePosition";
 import styles from "./SiteCrumb.module.css";
 
 /**
- * Where you are on the site, top-right, as a pseudo-filename: `ez / about.html_`.
+ * Where you are on the site, top-right, as a clickable file path: `ez / about.html_`.
+ * `ez` returns to the site root; the filename returns to the start of the current file.
  *
- * There are no routes behind those names — but the `contents` section already calls the
- * site's own sections `/about.html`, so this is the site's fiction rather than a new one.
+ * There are no routes behind the home filenames — but the `contents` section already
+ * calls its sections `/about.html`, so those links resolve to their real home fragments.
  *
- * The `ez /` prefix is conditional: the rail owns the root wherever its words are on
- * screen, and the crumb takes it back wherever they are not. That decision is made
- * entirely in the stylesheet, so neither component has to reach into the other.
+ * The root stays visible beside the current file even when the larger rail is on screen,
+ * so the crumb always reads—and works—like one complete path.
  */
 export default function SiteCrumb() {
   // Always the home outline: off the home page the crumb names the route, not a row,
@@ -28,24 +28,27 @@ export default function SiteCrumb() {
   const leaf = standalone
     ? pathname.replace(/^\//, "").replace(/\/$/, "")
     : OUTLINE_ROWS.find((row) => row.id === tile)?.label.replace(/\.html$/, "");
+  const leafHref = standalone ? pathname : `/#${tile ?? "top"}`;
 
   return (
-    <div
+    <nav
       className={styles.crumb}
       data-visible={standalone || (tile !== null && tile !== "top")}
-      data-rail={!standalone}
+      aria-label="Breadcrumb"
     >
-      <span className={styles.prefix}>
-        <Link href="/#top" className={styles.home}>
+      <span>
+        <Link href="/#top" className={styles.link}>
           ez
         </Link>
         <span className={styles.sep}> / </span>
       </span>
-      <span>
+      <Link href={leafHref} className={styles.link} aria-current="location">
         {leaf}
         <span className={styles.ext}>.html</span>
+      </Link>
+      <span className={styles.cursor} aria-hidden>
+        _
       </span>
-      <span className={styles.cursor}>_</span>
-    </div>
+    </nav>
   );
 }
