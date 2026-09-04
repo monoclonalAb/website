@@ -43,6 +43,25 @@ Open `http://localhost:3000`. Next.js 16 uses Turbopack by default; development 
 
 Run narrow checks while iterating, then `pnpm validate`. Run Playwright whenever output, navigation, responsive layout, or interaction changes.
 
+## Penpot MCP
+
+The project-local Pi MCP adapter reads Penpot's hosted endpoint from `PENPOT_MCP_URL`; no local Penpot server or plugin is required. Copy the full server URL from **Penpot → Settings → Integrations → MCP Server** into an ignored `.env.penpot.local` file:
+
+```dotenv
+PENPOT_MCP_URL='https://design.penpot.app/mcp/stream?userToken=...'
+```
+
+Load it before starting Pi:
+
+```bash
+set -a
+source .env.penpot.local
+set +a
+pi
+```
+
+The URL contains a non-expiring credential. Never commit it, paste it into chat, or add it directly to `.mcp.json`; regenerate the MCP key in Penpot if it is exposed. Use `/mcp reconnect penpot` to connect and `/mcp` to inspect status.
+
 ## Change workflow
 
 1. Inspect `git status`, the relevant diff, and recent history. Do not overwrite unrelated work.
