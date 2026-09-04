@@ -4,3 +4,5 @@ allowBuilds:
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+patchedDependencies:
+  "@penpot/mcp@2.15.4": patches/@penpot__mcp@2.15.4.patch

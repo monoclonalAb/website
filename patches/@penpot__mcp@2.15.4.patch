@@ -1,0 +1,10 @@
+diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
+index 9bc2f715c9ddd0084a5c592aceead6bc97a39c0a..6a082117a653f6303560dc86362afc8b66ca57f1 100644
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -1 +1,5 @@
++allowBuilds:
++    esbuild: true
++    sharp: true
++
+ linkWorkspacePackages: true
