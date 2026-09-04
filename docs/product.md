@@ -1,7 +1,7 @@
 ---
 owner: Eric Zheng
 status: current
-last_verified: 2026-09-03
+last_verified: 2026-09-04
 ---
 
 # Product brief
@@ -19,13 +19,13 @@ last_verified: 2026-09-03
 
 ## Current surfaces
 
-| Surface             | URL                                          | Purpose                                                                                    |
-| ------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Home                | `/`                                          | Interactive hero followed by About, Blog, Contents, and Changelog sections in one document |
-| Leetcode            | `/leetcode`                                  | Standalone placeholder for a future solution log                                           |
-| Dial playground     | `/test`                                      | Unlisted, `noindex` heading fixture for manually exercising the shared dial                |
-| Legacy section URLs | `/about`, `/blog`, `/contents`, `/changelog` | Permanent redirects to matching fragments on `/`                                           |
-| Discovery           | `/robots.txt`, `/sitemap.xml`                | Search-engine guidance generated with Next metadata routes                                 |
+| Surface             | URL                                             | Purpose                                                                                    |
+| ------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Home                | `/`                                             | Interactive hero followed by About, Blog, Contents, and Changelog sections in one document |
+| Leetcode            | `/leetcode`                                     | Standalone placeholder for a future solution log                                           |
+| Dial playground     | `/test`                                         | Unlisted, `noindex` heading fixture for manually exercising the shared dial                |
+| Legacy section URLs | `/about`, `/blog`, `/contents`, `/changelog`    | Permanent redirects to matching fragments on `/`                                           |
+| Discovery           | `/robots.txt`, `/sitemap.xml`, `/changelog.xml` | Search-engine guidance plus a static RSS feed for changelog updates                        |
 
 The Blog and Leetcode empty states are intentional. Their future authoring workflow is undecided.
 
@@ -44,6 +44,7 @@ The Blog and Leetcode empty states are intentional. Their future authoring workf
 - `/leetcode` remains independently navigable and uses native scrolling.
 - Every visible internal destination has a semantic link and a real DOM target.
 - Metadata identifies Eric unambiguously and canonical URLs resolve to `https://ericzheng.nz`.
+- Changelog updates come from one hand-authored source shared by the home section and `/changelog.xml`; an empty feed is valid until a new update is authored.
 - The experience remains usable with JavaScript motion reduced or unavailable.
 
 ## Non-goals

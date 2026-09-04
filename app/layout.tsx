@@ -17,7 +17,10 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   authors: [{ name: "Eric Zheng" }],
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    types: { "application/rss+xml": "/changelog.xml" },
+  },
   openGraph: {
     ...OPEN_GRAPH_BASE,
     url: "/",

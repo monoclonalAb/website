@@ -48,6 +48,33 @@ test("home renders its canonical content and every outline target", async ({
   expect(pageErrors).toEqual([]);
 });
 
+test("the changelog advertises a valid RSS feed", async ({ page, request }) => {
+  await page.goto("/");
+
+  await expect(
+    page.locator('head link[rel="alternate"][type="application/rss+xml"]'),
+  ).toHaveAttribute("href", "https://ericzheng.nz/changelog.xml");
+  await expect(page.locator('#changelog a[href="/changelog.xml"]')).toHaveText(
+    "RSS",
+  );
+
+  const response = await request.get("/changelog.xml");
+  expect(response.ok()).toBe(true);
+  expect(response.headers()["content-type"]).toContain("application/rss+xml");
+
+  const xml = await response.text();
+  const parseError = await page.evaluate((feed) => {
+    const document = new DOMParser().parseFromString(feed, "application/xml");
+    return document.querySelector("parsererror")?.textContent ?? null;
+  }, xml);
+
+  expect(parseError).toBeNull();
+  expect(xml).toContain('<rss version="2.0"');
+  expect(xml).toContain(
+    '<atom:link href="https://ericzheng.nz/changelog.xml" rel="self" type="application/rss+xml" />',
+  );
+});
+
 test("legacy section routes are permanent fragment redirects", async ({
   request,
   baseURL,

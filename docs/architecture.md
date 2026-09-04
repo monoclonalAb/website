@@ -1,21 +1,22 @@
 ---
 owner: Eric Zheng
 status: current
-last_verified: 2026-09-03
+last_verified: 2026-09-04
 ---
 
 # Architecture
 
 ## System context
 
-This is a small, statically renderable Next.js App Router site. There is no CMS, database, API route, authentication, server mutation, or runtime fetch. Hand-authored JSX and local assets become HTML, React Server Component payloads, CSS, and the client JavaScript needed for interaction.
+This is a small, statically renderable Next.js App Router site. There is no CMS, database, application API, authentication, server mutation, or runtime fetch. Hand-authored JSX and local assets become HTML, React Server Component payloads, CSS, client JavaScript needed for interaction, and one static RSS response.
 
 ```text
-Author -> Git repository -> Next.js build -> hosting/CDN -> browser
+Author -> Git repository -> Next.js build -> hosting/CDN -> browser/feed reader
                               |                  |
                               + local fonts      + two canonical pages
                               + local images     + one unlisted test page
                                                  + metadata routes
+                                                 + static changelog feed
 ```
 
 The deploy target is external to this repository; `pnpm build` is the portable production contract.
@@ -35,8 +36,10 @@ app/layout.tsx
     │           └── four server-rendered section bodies
     ├── /leetcode: app/leetcode/page.tsx
     │   └── SiteChrome + static placeholder content
-    └── /test: app/test/page.tsx
-        └── SiteChrome + decorated heading/dial fixture
+    ├── /test: app/test/page.tsx
+    │   └── SiteChrome + decorated heading/dial fixture
+    └── /changelog.xml: app/changelog.xml/route.ts
+        └── static RSS 2.0 response from the shared changelog entries
 ```
 
 Server Components are the default. Client Components are limited to behavior that needs browser state:
@@ -54,6 +57,8 @@ Server Components are the default. Client Components are limited to behavior tha
 | `app/layout.tsx`           | Root document, metadata defaults, font variables                 |
 | `app/page.tsx`             | Home composition and structured Person data                      |
 | `app/_sections/`           | Non-routable, hand-authored home content                         |
+| `app/_content/`            | Typed hand-authored data shared by HTML and non-HTML output      |
+| `app/changelog.xml/`       | Static RSS route for the changelog                               |
 | `app/leetcode/page.tsx`    | Canonical standalone content route                               |
 | `app/test/`                | Unlisted, disposable heading/dial fixture                        |
 | `app/scroll/`              | Tile order, outline model, scrollspy, pager, and zoom correction |
@@ -72,6 +77,7 @@ The underscore in `app/_sections` opts the folder out of routing. Top-level `com
 - `/` is one document: `#top`, `#about`, `#blog`, `#contents`, and `#changelog`.
 - `/leetcode` shares the chrome but has no section tiles, so it uses native document scrolling.
 - `/test` is an unlisted, `noindex` native-scroll fixture with varied heading levels for exercising the scanned dial.
+- `/changelog.xml` is a force-static route handler. It and the visible changelog consume the same typed records from `app/_content/changelog.ts`; the collection may be empty.
 - `next.config.ts` emits permanent redirects from the former section routes to home fragments.
 - `app/sitemap.ts` lists only canonical pages, not fragments or redirect sources.
 - `app/robots.ts`, route metadata, static Open Graph assets, and JSON-LD provide discovery metadata.
@@ -102,7 +108,7 @@ Home smoothing uses `<ReactLenis root>` and the real document scroller. No trans
 
 ### Static content boundary
 
-Content is authored in JSX. Blog and Leetcode are intentional placeholders, not evidence that a generic publishing layer is required. Record and accept that product/architecture decision before adding one.
+Content is authored in JSX or, for changelog records shared with RSS, a plain typed TypeScript collection. Blog and Leetcode are intentional placeholders, not evidence that a generic publishing layer is required. Record and accept that product/architecture decision before adding one.
 
 ## Dependency rules
 
@@ -110,7 +116,7 @@ Content is authored in JSX. Blog and Leetcode are intentional placeholders, not 
 - Content sections may use React/Next primitives and static assets, but should not import scroll controllers.
 - Shared chrome may read the stable contracts in `app/scroll/outline.ts` and `app/scroll/tiles.ts`.
 - Browser-only libraries (`lenis`, `motion`) stay behind client boundaries.
-- Metadata and sitemap modules remain server-only and deterministic.
+- Metadata, sitemap, and RSS modules remain server-only and deterministic.
 - New dependencies need a concrete product capability; prefer platform and existing framework APIs for small helpers.
 
 ## High-risk areas

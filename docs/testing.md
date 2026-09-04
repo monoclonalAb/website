@@ -1,7 +1,7 @@
 ---
 owner: Eric Zheng
 status: current
-last_verified: 2026-09-02
+last_verified: 2026-09-04
 ---
 
 # Testing strategy
@@ -30,6 +30,7 @@ These checks should be fast enough to run before and after every change.
 `pnpm test:e2e` starts the app and runs Playwright tests in Chromium. The suite covers:
 
 - canonical pages and semantic landmarks,
+- RSS autodiscovery plus the feed response's content type and XML well-formedness,
 - the home tile/outline target contract in rendered DOM,
 - permanent legacy redirects,
 - direct fragment arrival,
@@ -88,7 +89,7 @@ For changes that affect output or interaction, exercise the relevant cells:
 
 ## Content and metadata changes
 
-At minimum, verify title, canonical URL, description, heading order, internal targets, sitemap membership, image alternatives, and outbound-link security attributes. Do not put redirected fragment aliases into the sitemap.
+At minimum, verify title, canonical URL, description, heading order, internal targets, sitemap membership, feed discovery when relevant, image alternatives, and outbound-link security attributes. Do not put redirected fragment aliases or non-HTML feeds into the sitemap.
 
 ## Baseline discipline
 
