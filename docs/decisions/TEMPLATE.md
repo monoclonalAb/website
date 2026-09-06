@@ -6,7 +6,7 @@ last_verified: YYYY-MM-DD
 
 # ADR-NNNN: <decision title>
 
-- **Status:** proposed
+- **Status:** proposed (frontmatter uses `draft`)
 - **Date:** YYYY-MM-DD
 - **Owners:** <name>
 - **Supersedes:** none
@@ -22,7 +22,16 @@ What forces make a durable decision necessary?
 
 ## Decision
 
-State the chosen direction precisely.
+State the proposed direction precisely. Distinguish agreed requirements from open choices; until accepted, this does not replace current architecture.
+
+## Approval and implementation
+
+- **Owner approval:** pending; record date and approved scope before setting both statuses to `accepted`.
+- **Blocking decisions:** none, or link the unresolved owner questions.
+- **Implementation:** not started; link the execution plan and its evidence separately from approval.
+- **Transition:** which existing constraints change, when, and which remain protected.
+
+Do not infer acceptance from passing tests or update current docs to describe unimplemented behavior.
 
 ## Alternatives considered
 
@@ -46,4 +55,4 @@ Why it was plausible and why it was not selected.
 
 ## Validation
 
-How can a future agent prove the decision is still implemented?
+How can a future agent prove the decision has been implemented and remains valid? Name exact tests, source boundaries, and operational/manual checks; separate planned evidence from completed results.

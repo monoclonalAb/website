@@ -11,11 +11,11 @@ Eric Zheng's personal website: a typographic, single-scroll introduction with an
 - Self-hosted fonts and local images
 - Playwright for browser validation
 
-The site has no CMS, API, database, authentication, or required environment variables. Content is hand-authored in JSX and remains statically renderable.
+The public site has no runtime CMS, application API, database connection, authentication, or required runtime environment variables. Content is hand-authored in JSX or shared typed TypeScript records and remains statically renderable; `/changelog.xml` serves a static RSS feed. The [accepted hosted-studio direction](docs/decisions/0002-dynamic-content-and-hosted-studio.md) authorizes staged implementation, not hosted setup or shipment. [Foundation contracts, Drizzle artifacts and thin interactive adapters](docs/architecture/cms-foundations.md) now exist outside the public runtime; local PostgreSQL migration/transaction tests pass through opt-in `pnpm test:cms:docker` ([disposable setup](docs/development.md#disposable-docker-integration-run)). A separate CI database job is configured. Eric selected **Neon Free**, confirmed **Vercel deployment**, and requires **$0 spending**. The unused production-provider foundation is now a lazy Neon `pg`/verified-TLS adapter with explicit direct/pooled endpoint and opportunistic-channel-binding policy; its 16 provider cases are offline only. The original SQL artifacts and 19-test local PostgreSQL fresh/replay evidence remain intact. No hosted Neon connection, project configuration or deployment has been performed. Free-quota/cold-start limits, least-privilege/private-table API isolation and independent recovery remain gates. Neon Auth/Storage/Data API/Functions, paid features and a provider SDK are not selected. Optional Penpot design tooling has separate [credential setup](docs/development.md#penpot-mcp).
 
 ## Run locally
 
-Requirements: Node.js 20.9+ and Corepack.
+Use Node.js 24 (`.nvmrc` and CI) and the pnpm version pinned in `package.json`. Next.js itself supports Node.js 20.9+, but the package manager has its own runtime requirements. See [development](docs/development.md) for setup.
 
 ```bash
 corepack enable
@@ -28,7 +28,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Validate
 
 ```bash
-pnpm check      # docs, repository contracts, lint, and types
+pnpm check      # docs, contracts, formatting, lint, types, CMS unit/schema tests
 pnpm build      # production compilation
 pnpm test:e2e   # browser smoke and interaction tests
 ```
@@ -37,17 +37,19 @@ pnpm test:e2e   # browser smoke and interaction tests
 
 ## Repository map
 
-| Path          | Purpose                                                                   |
-| ------------- | ------------------------------------------------------------------------- |
-| `app/`        | Routes, home sections, metadata, styles, fonts, and home-only interaction |
-| `components/` | Shared crumb, file-tree rail, and content chrome                          |
-| `public/`     | Local public images and icons                                             |
-| `tests/e2e/`  | Browser-level product and interaction checks                              |
-| `scripts/`    | Documentation and site-contract checks                                    |
-| `docs/`       | Product, architecture, testing, plans, decisions, quality, and debt       |
-| `AGENTS.md`   | Concise task map for coding agents                                        |
+| Path                          | Purpose                                                                   |
+| ----------------------------- | ------------------------------------------------------------------------- |
+| `app/`                        | Routes, home sections, metadata, styles, fonts, and home-only interaction |
+| `components/`                 | Shared crumb, file-tree rail, and content chrome                          |
+| `public/`                     | Local public images and icons                                             |
+| `cms/`                        | Non-runtime content contracts and PostgreSQL migration artifacts          |
+| `tests/cms/`, `tests/cms-db/` | Unit/schema tests and opt-in isolated PostgreSQL checks                   |
+| `tests/e2e/`                  | Browser-level product and interaction checks                              |
+| `scripts/`                    | Documentation and site-contract checks                                    |
+| `docs/`                       | Product, architecture, testing, plans, decisions, quality, and debt       |
+| `AGENTS.md`                   | Concise task map for coding agents                                        |
 
-Start with [the repository knowledge index](docs/README.md). Contributors and agents should read [AGENTS.md](AGENTS.md), then follow only the task-specific links it provides.
+Astra and other coding agents start at [AGENTS.md](AGENTS.md), then follow its task-specific links and [working procedure](docs/agent-workflow.md). [The knowledge index](docs/README.md) maps current references; [active plans](docs/plans/README.md) record unfinished work, not permission to start it.
 
 ## Architecture in one paragraph
 

@@ -1,7 +1,7 @@
 ---
 owner: Eric Zheng
 status: current
-last_verified: 2026-09-03
+last_verified: 2026-09-05
 ---
 
 # Motion and scroll architecture
@@ -9,6 +9,23 @@ last_verified: 2026-09-03
 This is the deep reference for the home page's two coupled interaction systems. Read
 [the architecture overview](../architecture.md) first. The source files contain local
 implementation rationale; this document records cross-file invariants and regression history.
+
+## Find the right subsystem
+
+| Symptom or task                              | Inspect first                                                                                    | Verify                                                                       |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| Hero letters, collisions, pointer gates      | `app/HomePage.tsx`, `app/useCursorRepel.ts`, `app/HomePage.module.css`                           | Fine pointer, touch/coarse pointer, reduced motion                           |
+| Double hops, ignored swipes, edge resistance | `app/scroll/PagerScroll.tsx`, `app/SmoothScroll.tsx`                                             | Pager baseline plus regression traces on both sides of the changed threshold |
+| Wrong hash landing or tile order             | `app/scroll/tiles.ts`, `app/page.tsx`, `app/scroll/outline.ts`, `next.config.ts`                 | `pnpm contracts:check`, cold-fragment and redirect browser checks            |
+| Dial rows, heading anchors, drawer           | `components/SiteRail.tsx`, `components/useHeadingOutline.ts`, `app/scroll/useOutlinePosition.ts` | Home plus `/test`; desktop, compact rail, keyboard, reduced motion           |
+| Tile straddles after zoom/resize             | `app/scroll/ZoomRealign.tsx`, tile CSS in `app/globals.css`                                      | Real browser zoom in animated and reduced-motion modes                       |
+
+Run `pnpm exec playwright test tests/e2e/pager.spec.ts` before and after motion changes.
+The suite is deliberately small; [testing](../testing.md) distinguishes current assertions
+from required manual/regression cases. The 2026-09-05 review cross-checked source structure
+and test scope only. The historical hardware explanations below are not fresh multi-device
+measurements and do not close DEBT-001. Do not retune constants from prose alone or start
+by rewriting the whole pager.
 
 ## Cursor-repel system
 
@@ -28,11 +45,13 @@ progressively shorter glides instead of queueing. Tiles taller than the viewport
 internally; whether a tile is "tall" is measured at runtime, never hard-coded.
 `app/scroll/tiles.ts` holds the ID list that the pager, rendered sections, rail model, and
 `next.config.ts` redirects all agree on. Mounted from the page, NOT the root layout, so
-standalone routes (`/leetcode` and the unlisted `/test` fixture) keep plain native scrolling.
+standalone routes (`/leetcode`, the unlisted `/test` fixture, and `/explore`) keep plain native scrolling.
 `app/scroll/ZoomRealign.tsx` is the third file, and the only one that runs in BOTH branches
 of `SmoothScroll` — see the zoom bullet below.
 
 ## Invariants and regression history
+
+### Coordinate space and transport
 
 - **Never add a wrapper transform or an overflow scroll container.** `<ReactLenis root>`
   eases the real window scroll and renders children directly, which is what keeps
@@ -44,6 +63,9 @@ of `SmoothScroll` — see the zoom bullet below.
   motion law left, so it jumps instead of gliding.
 - **A superseded `scrollTo` never fires its `onComplete`.** Chaining depends on that; don't
   add bookkeeping that assumes every transport finishes.
+
+### Gesture boundaries and momentum
+
 - **A gap in the wheel stream is not a gap in the gesture.** A busy frame doesn't lose that
   scroll — the browser coalesces it and delivers the backlog as one fat delta, so a stalled
   momentum tail is indistinguishable by magnitude from a deliberate new flick. Judging a
@@ -109,6 +131,9 @@ of `SmoothScroll` — see the zoom bullet below.
 - **A transport refused by the pace must be queued, not dropped** (`schedulePending`), and
   queued on a _timer_ — the input most likely to be refused is the last event of a stream,
   so anything that waits for a following wheel event to flush it will silently lose it.
+
+### Tall sections, edges, and mouse detents
+
 - **The edge band overshoots the tile, so `currentIndex()` lies while it is held.** Pushing
   up at a tall tile's top puts `targetScroll` above that tile, which reads as the tile
   _above_ — so "go to the previous tile" resolves to the one we are already deemed to be
@@ -164,6 +189,9 @@ of `SmoothScroll` — see the zoom bullet below.
   apart, so per-frame normalisation injects ±15% noise into the exact signal the restart
   test reads — enough on its own to manufacture "the reader pushed again". It is only
   correct across a real stall (`gap >= REARM_GAP`), where the delta really is a backlog.
+
+### Native snap, zoom, and reduced motion
+
 - `globals.css` keeps CSS scroll-snap as a `proximity` backstop for input the pager doesn't
   drive, switched off via `html.lenis-scrolling` while a glide runs. It deliberately does
   NOT set `scroll-behavior: smooth` — see the comment there.

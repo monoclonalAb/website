@@ -11,9 +11,16 @@ last_verified: YYYY-MM-DD
 - **Created:** YYYY-MM-DD
 - **Updated:** YYYY-MM-DD
 
+## Handoff
+
+- **Next action:** one concrete step and its file/design-page target.
+- **Blockers / owner input:** none, or the precise prerequisite and who resolves it.
+- **Evidence so far:** exact commands/results and dated manual/tool observations; include baseline failures.
+- **Unverified:** remaining checks, assumptions to recheck, and temporary state to reconstruct.
+
 ## Context
 
-What is true now? Link the product, architecture, decision, quality, and debt records that matter.
+What is implemented now? Link the relevant product, architecture, decision, quality, and debt records. Distinguish proposed behavior and prior observations from current evidence. Record pre-existing user changes that overlap this work.
 
 ## Goal
 
@@ -30,7 +37,8 @@ State the observable outcome in one paragraph.
 
 ## Constraints and invariants
 
-- Name the contracts that must not move.
+- Name the contracts, user changes, and remote pages/assets that must not move.
+- Record approval gates and irreversible steps. A proposed ADR is not permission to implement.
 
 ## Plan
 
@@ -39,9 +47,11 @@ State the observable outcome in one paragraph.
 
 ## Validation
 
-| Criterion   | Evidence / command                |
-| ----------- | --------------------------------- |
-| <criterion> | `<command>` or manual observation |
+| Criterion   | Evidence / command                                 | Result                                                              |
+| ----------- | -------------------------------------------------- | ------------------------------------------------------------------- |
+| <criterion> | `<exact command>` or dated manual/tool observation | Pending; later passed, failed, blocked, not run, or N/A with reason |
+
+Use [the testing strategy](../testing.md) to choose checks; update this relative link to `../../testing.md` when copying into `active/`. Keep browser, physical-device, and design-export evidence separate.
 
 ## Progress log
 
@@ -49,8 +59,8 @@ State the observable outcome in one paragraph.
 
 ## Decision log
 
-- YYYY-MM-DD — Decision and why; link an ADR if it is durable.
+- YYYY-MM-DD — Decision and why; identify owner approval versus an agent proposal, and link an ADR if durable.
 
 ## Outcome
 
-Complete when closing: what shipped, what did not, evidence, follow-up debt, and links to superseding records.
+Complete when closing: what changed, what did not, evidence, follow-up debt, and links to superseding records. Do not mark unmet criteria complete. Update both status fields and dates, move to `completed/`, and repair the index/inbound links. If unfinished, keep the handoff current instead.
