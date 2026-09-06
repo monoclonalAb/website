@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788602425535,
+      "tag": "0000_cms_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788602425934,
+      "tag": "0001_cms_integrity",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788653395738,
+      "tag": "0002_studio_auth_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788653396171,
+      "tag": "0003_studio_auth_integrity",
+      "breakpoints": true
+    }
+  ]
+}
