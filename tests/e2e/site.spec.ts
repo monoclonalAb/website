@@ -130,6 +130,41 @@ test("the standalone Leetcode route keeps its own metadata and route home", asyn
   expect(pageErrors).toEqual([]);
 });
 
+test("the academic style study covers every surface without entering search", async ({
+  page,
+}) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await page.goto("/explore");
+  await waitForFonts(page);
+
+  await expect(page).toHaveTitle("Academic style study | Eric Zheng");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "noindex, nofollow",
+  );
+  await expect(
+    page.getByRole("navigation", { name: "Style study index" }),
+  ).toBeVisible();
+
+  for (const id of [
+    "study-index",
+    "study-about",
+    "study-blog",
+    "study-contents",
+    "study-changelog",
+    "study-leetcode",
+  ]) {
+    await expect(page.locator(`#${id}`)).toHaveCount(1);
+  }
+
+  await expect(
+    page.getByRole("link", { name: /return to current site/i }),
+  ).toHaveAttribute("href", "/#top");
+  expect(pageErrors).toEqual([]);
+});
+
 test.describe("reduced motion", () => {
   test.use({ contextOptions: { reducedMotion: "reduce" } });
 
