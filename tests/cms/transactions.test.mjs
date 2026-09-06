@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { sql } from "drizzle-orm";
 import pg from "pg";
@@ -341,4 +342,20 @@ test("local pg real factory is lazy and uses the shared interactive boundary (st
   assert.equal(commands(f).at(-1), "COMMIT");
   await db.close();
   await f.db.close();
+});
+
+test("CI isolates database job from unchanged database-free app/browser validation", async () => {
+  const workflow = await readFile(
+    new URL("../../.github/workflows/ci.yml", import.meta.url),
+    "utf8",
+  );
+  const [database, app] = workflow.split("\n  validate:");
+  assert.match(database, /cms-database:/);
+  assert.match(database, /run: pnpm test:cms:docker/);
+  assert.match(database, /timeout-minutes: 10/);
+  assert.match(database, /run: pnpm install --frozen-lockfile/);
+  assert.ok(!/secrets\.|DATABASE_URL|services:/.test(workflow));
+  assert.match(app, /run: pnpm validate/);
+  assert.match(app, /run: pnpm test:e2e/);
+  assert.ok(!/test:cms:docker|test:cms:db/.test(app));
 });
