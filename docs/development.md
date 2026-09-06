@@ -45,22 +45,21 @@ Run narrow checks while iterating, then `pnpm validate`. Run Playwright whenever
 
 ## Penpot MCP
 
-The project-local Pi MCP adapter reads Penpot's hosted endpoint from `PENPOT_MCP_URL`; no local Penpot server or plugin is required. Copy the full server URL from **Penpot → Settings → Integrations → MCP Server** into an ignored `.env.penpot.local` file:
+Penpot is optional and independent of `pnpm dev`/`pnpm validate`; no local Penpot server or plugin is required. Astra should first inspect the current session's MCP status and available tool schemas. Connection state is session-specific: an old plan's connection failure is not evidence that today's connection is blocked.
 
-```dotenv
-PENPOT_MCP_URL='https://design.penpot.app/mcp/stream?userToken=...'
-```
-
-Load it before starting Pi:
+Pi's MCP adapter and Penpot server definition are user-global machine configuration, not repository files. The adapter is installed in the default Pi agent directory, and `~/.config/mcp/mcp.json` supplies the server to Pi sessions in every project for the same user. A new machine can install the pinned adapter with:
 
 ```bash
-set -a
-source .env.penpot.local
-set +a
-pi
+pi install npm:pi-mcp-adapter@2.32.1
 ```
 
-The URL contains a non-expiring credential. Never commit it, paste it into chat, or add it directly to `.mcp.json`; regenerate the MCP key in Penpot if it is exposed. Use `/mcp reconnect penpot` to connect and `/mcp` to inspect status.
+Copy the full server URL from **Penpot → Settings → Integrations → MCP Server** into the `penpot.url` field in `~/.config/mcp/mcp.json`, then restrict that file to the current user:
+
+```bash
+chmod 600 ~/.config/mcp/mcp.json
+```
+
+The URL contains a non-expiring credential. Never commit it or paste it into chat; regenerate the MCP key in Penpot if it is exposed. Pi instances using a custom `PI_CODING_AGENT_DIR` need the adapter installed in that agent directory too, although they still discover the shared global MCP file. Use `/mcp reconnect penpot` to connect and `/mcp` to inspect status.
 
 ## Change workflow
 

@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "penpot": {
-      "url": "${PENPOT_MCP_URL}",
-      "lifecycle": "lazy"
-    }
-  }
-}
