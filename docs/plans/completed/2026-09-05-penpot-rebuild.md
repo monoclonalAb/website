@@ -23,7 +23,6 @@ Rebuild pages 02, 03, 04, and 08 from flex-layout, auto-height, token-consistent
 
 - Changing pages `01 · Foundations`, `05 · Nav & chrome`, `06 · Tile separation`, `07 · Edge signal`, or `99 · Archive`. They are decision history; application CSS transcribes geometry from page 05.
 - Changing application code, existing token values, or the `/explore` route.
-- Building page `09 · Studio` (tracked in [the dynamic studio plan](../active/2026-09-05-dynamic-cms-studio.md)).
 - Inventing published Blog, Changelog, or Leetcode content.
 
 ## Acceptance criteria
@@ -87,4 +86,4 @@ Known limits, recorded rather than hidden:
 - Equal shape counts on protected pages prove no shapes were added or removed, not that no property changed; nothing in this work targeted those pages.
 - The Penpot plugin API in this build ignores `leftPadding`/`leftMargin` and applies `rightPadding`/`rightMargin` symmetrically. Asymmetric insets in the components use `columnGap` plus spacer children instead. Text measurement and flex recomputation only run while the Penpot tab is visible; builds made with the tab hidden read stale sizes.
 
-Follow-ups: none required for this plan. Page `09 · Studio` remains with the studio plan.
+Follow-ups: none required for this plan.

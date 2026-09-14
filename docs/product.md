@@ -1,75 +1,64 @@
 ---
 owner: Eric Zheng
 status: current
-last_verified: 2026-09-06
+last_verified: 2026-09-14
 ---
 
 # Product brief
 
-## Purpose
+## Purpose and audience
 
-`ericzheng.nz` is Eric Zheng's personal website: an expressive introduction, a compact biography, contact links, a changelog, and space for future writing and Leetcode notes. It should feel personal and playful without making the content difficult to read or navigate.
+`ericzheng.nz` is Eric Zheng's personal website: an expressive introduction, biography/contact links, changelog, technical blog and Leetcode notes. It serves friends, recruiters, collaborators, classmates, readers arriving through shared links, and Eric as its single author.
 
-## Audience
-
-- People learning who Eric is and how to contact him.
-- Recruiters, collaborators, classmates, and friends.
-- Readers arriving from an old section URL or a shared deep link.
-- Eric himself, maintaining a small site without a content platform.
+The selected Paper01/02 page sets keep a standalone alphabet opening and separate native-scrolling reading pages. The owner-requested fixed-grid edge waves decorate these surfaces without controlling scrolling: the right tracks progress and the left remains `#c8c5bc`. [Design](design.md) and [the wave plan](plans/active/2026-09-14-scroll-waves.md) own those details.
 
 ## Current surfaces
 
-| Surface             | URL                                             | Purpose                                                                                    |
-| ------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Home                | `/`                                             | Interactive hero followed by About, Blog, Contents, and Changelog sections in one document |
-| Leetcode            | `/leetcode`                                     | Standalone placeholder for a future solution log                                           |
-| Dial playground     | `/test`                                         | Unlisted, `noindex` heading fixture for manually exercising the shared dial                |
-| Visual style study  | `/explore`                                      | Unlisted, `noindex` editorial reinterpretation of every current human-facing surface       |
-| Legacy section URLs | `/about`, `/blog`, `/contents`, `/changelog`    | Permanent redirects to matching fragments on `/`                                           |
-| Discovery           | `/robots.txt`, `/sitemap.xml`, `/changelog.xml` | Search-engine guidance plus a static RSS feed for changelog updates                        |
+| Surface               | URL                                 | Purpose                                              |
+| --------------------- | ----------------------------------- | ---------------------------------------------------- |
+| Home                  | `/`                                 | Standalone alphabet opening linking to reading pages |
+| About/Contents        | `/about`, `/contents`               | Verified biography, directory and contact links      |
+| Blog                  | `/blog`, `/blog/<slug>`             | Markdown index and articles                          |
+| Leetcode              | `/leetcode`, `/leetcode/YYYY-MM-DD` | Markdown daily-solution index and entries            |
+| Changelog             | `/changelog`, `/changelog.xml`      | Shared hand-authored changelog and RSS               |
+| Writing RSS           | `/writing.xml`                      | Published Blog and Leetcode summaries                |
+| Discovery             | `/robots.txt`, `/sitemap.xml`       | Canonical pages and published article URLs           |
+| Legacy home fragments | `/#about`, `/#footnote`, etc.       | Native page-moved links to current pages/headings    |
 
-The Blog and Leetcode empty states remain intentional until the publishing milestone. Eric accepted [ADR-0002](decisions/0002-dynamic-content-and-hosted-studio.md) and approved its block direction on 2026-09-05; [the active plan](plans/active/2026-09-05-dynamic-cms-studio.md) governs staged CMS implementation. Acceptance changes the intended authoring model, not today's public routes: there is no working studio or publishing service yet. No old-site posts are imported and no invented content is published. External provisioning and the security, hosted-cache and recovery release gates remain separate.
+Empty writing collections are valid until Eric authors posts; no old-site posts are imported and no design specimens are presented as real publications. `/test` and `/explore` remain retired404s.
 
-## Authoring cost and hosting constraints
+## Authoring direction
 
-On 2026-09-06 Eric described occasional small blog posts (roughly monthly) with intermittent small edits, explicitly required **$0 spending**, and confirmed **Vercel deployment**. He selected **Neon Free Postgres** after comparing its automatic wake-on-connection with Supabase Free's manual inactivity-pause recovery. The accepted [ADR](decisions/0002-dynamic-content-and-hosted-studio.md) and [current plan](plans/active/2026-09-05-dynamic-cms-studio.md#neon-return-slice--next-bounded-step-2) now have an unused Neon SQL adapter foundation; this changes neither current public output nor proof of hosted configuration. Retain single-owner passkeys; Neon Auth/Storage/Data API/Functions are not selected. Free-tier quota/cold-start/outage limits, independent backups and restore evidence must be addressed without buying add-ons or weakening security/release gates. Public stack/host copy remains a separate content edit, not part of this provider migration.
+On2026-09-14 Eric selected file-based Markdown publishing under [ADR-0004](decisions/0004-markdown-publishing.md). Write local Markdown with frontmatter, use scaffold commands and browser preview, then publish via a validated build and owner-controlled commit/deployment. Publishing requires a build; no external authoring service is needed.
 
-## Content edits
+Both collections support standard Markdown/GFM, highlighted code, maths, footnotes and referenced local raster images. Shared templates own layout and decorative styling; Eric should not author React, JSON documents or HTML presentation in posts. [Writing](writing.md) owns the practical workflow and limitations. More editing UI, remote daily metadata fetching, pagination/topic filters, custom rich blocks and interactive components are optional future work, not prerequisites to writing.
 
-- Home prose lives in `app/_sections/`; Leetcode content lives in `app/leetcode/page.tsx`.
-- Changelog records live only in `app/_content/changelog.ts`, shared by HTML and RSS. Do not invent entries or duplicate records in the feed handler.
-- Preserve Eric's voice, real links, and intentional empty states. Do not invent biography, publications, hosting details, or design sample posts and present them as published content.
-- The stale “about this site” stack/host copy is tracked as DEBT-002 in [debt](debt.md); ask Eric for the public story rather than guessing the host from the framework.
-- Update `app/sitemap.ts` dates for actual canonical content changes, not merely because a build or documentation review ran. Keep `/test` and `/explore` unlisted and `noindex`.
+New files start as drafts. Development previews are labelled/noindex and loopback-only by default. Production detail/index/assets/feed/sitemap omit draft-only content. A draft flag is not privacy: committed files/history remain visible to repository readers, and an exposed dev server can expose previews. Keep genuinely private writing elsewhere until it can be shared. Git history is useful but not independent backup.
 
-## Experience principles
+## Cost and hosting
 
-1. **Personality before polish.** Keep the idiosyncratic copy, typography, file-tree metaphor, and playful hero.
-2. **Content remains reachable.** Keyboard, touch, reduced-motion, hash links, legacy redirects, zoom, and direct URLs must not depend on decorative motion.
-3. **Motion answers input.** A gesture must not feel ignored, and one gesture must not skip unread sections.
-4. **One coherent document.** Home sections remain fragment-addressable parts of one page unless a recorded product decision changes that model.
-5. **Fast and private by default.** Today's content and fonts are local, routes are statically renderable, and there is no tracking or runtime data dependency. Accepted ADR-0002 narrows the future constraint to reader privacy and cached performance for published writing; it does not add tracking or authorize arbitrary runtime dependencies.
+Eric previously confirmed Vercel and requires $0 spending. Static writing needs no external content service. Git-connected hosting can build/deploy commits once configured; no hosting configuration, provider connection, provisioning, external write, commit, push or deployment is inferred from this repository change. Free-tier limits remain external facts, not guaranteed capacity or availability.
 
-## Product invariants
+## Content ownership
 
-- Home renders the IDs `top`, `about`, `blog`, `contents`, and `changelog` exactly once and in that order.
-- A cold visit to a home fragment lands on the intended section.
-- `/leetcode` remains independently navigable and uses native scrolling.
-- Every visible internal destination has a semantic link and a real DOM target.
-- Metadata identifies Eric unambiguously and canonical URLs resolve to `https://ericzheng.nz`.
-- Changelog updates come from one hand-authored source shared by the home section and `/changelog.xml`; an empty feed is valid until a new update is authored.
-- The experience remains usable with JavaScript motion reduced or unavailable.
+- About/Contents prose lives in `app/_sections/`; Blog/Leetcode writing lives in `content/`.
+- Changelog records live only in `app/_content/changelog.ts`, shared by HTML/RSS. Preserve Eric's voice, real links and intentional empty states.
+- Keep the verified undergraduate biography. The proposed employment copy from Paper still needs owner confirmation. The native footnote contains only the factual Next.js stack description, not the old Bash/GitHub Pages story or an unverified hosting claim.
+- Sitemap article dates come from authored `date`/`updated`; fixed page dates change only with actual canonical content edits, not because a build ran.
+
+## Experience principles and invariants
+
+1. Personality without obstructing reading: lowercase voice, split alphabet, warm paper, Eiko headings and Georgia body.
+2. One main/h1 per page, unique main/top/article heading targets, semantic links and visible keyboard focus. Headings in Markdown start at h2.
+3. Native document scrolling, zoom, history, direct fragments and details/summary. No pager, scrollspy, drawer, repulsion, snap, smoothing or input interception. Waves may only read progress and animate their own fixed glyph grids with reduced-motion support.
+4. Content, links, code/math and disclosures remain available without JavaScript. Fonts/assets stay local and no tracking or embeds are introduced.
+5. Separate canonical pages retain shared navigation/footer; historical home bookmarks offer native links to the new targets, not old path-to-home redirects.
+6. Publishing/correcting/unpublishing requires a successful rebuild/deploy; failed deployments leave the previous site live. Removing public content cannot retract repository history, old deployments, feeds or downloaded copies.
 
 ## Non-goals
 
-Do not add these without an accepted decision record:
-
-- A CMS, database, API layer, authentication, or user accounts outside ADR-0002's accepted single-owner scope.
-- An MDX/Markdown publishing pipeline merely to fill the current placeholders.
-- A general component library or design-system package for this small personal site.
-- Analytics, personalization, comments, or third-party embeds by default.
-- Replacing the home page's personality with a generic portfolio template.
+No runtime authoring services without a new owner-approved decision. No MDX merely to add code or maths. No general component library, analytics, comments, third-party embeds, automatic content import or unrelated design rewrite. Preserve accepted public design and native scrolling.
 
 ## Success evidence
 
-A change is successful when the relevant automated checks pass, direct and legacy navigation work, content is readable at supported responsive sizes, reduced-motion behavior remains complete, and no avoidable client-side JavaScript or external dependency was added. See [testing](testing.md) and the [quality scorecard](quality.md).
+The writer can create a file, preview/edit it, publish and later unpublish through builds, with valid metadata, readable code/math/images and honest draft behavior. Existing public navigation and accessibility contracts must remain intact. [Testing](testing.md), [quality](quality.md), [debt](debt.md) and [the Markdown plan](plans/active/2026-09-14-markdown-publishing.md) distinguish automated proof from manual/hosted/independent review not performed.

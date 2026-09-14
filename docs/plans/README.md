@@ -24,7 +24,7 @@ A focused content edit or obvious one-file fix can use acceptance criteria in th
 
 1. Copy [the template](TEMPLATE.md) to `docs/plans/active/YYYY-MM-DD-short-name.md`.
 2. Fill in context, non-goals, acceptance criteria, constraints, steps, and validation before implementation.
-3. Add a handoff near the top: next action, blockers/owner input, completed evidence, and unverified assumptions. Recheck tool state and working-tree changes at every resume; old errors and session storage are not current facts.
+3. Add a bounded handoff near the top: next action, blockers/owner input, completed evidence, and unverified assumptions. Link detailed evidence rather than recursively requiring predecessor reports. Recheck relevant tool/worktree state at resume; old errors and session storage are not current facts.
 4. Keep progress and decision logs current while working. Separate recorded owner choices from proposals; include approval evidence for any governing ADR. Do not implement past an unresolved gate.
 5. When complete, add the outcome and exact evidence, set both frontmatter and body status to `completed`, and move the file to `docs/plans/completed/`. Check relative links after the move.
 6. Update this index and inbound links so `pnpm docs:check` can prove the plan is discoverable.
@@ -33,12 +33,18 @@ An active plan is an open record, not permission for Astra to start it during an
 
 ## Active
 
-| Plan                                                                               | Current recorded next action / gate                                                                                                                                                                                                                          |
-| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Dynamic content model and hosted studio](active/2026-09-05-dynamic-cms-studio.md) | Neon Free `pg` provider return complete with 80 offline / 19 local fresh-replay tests. Next: zero-cost recovery/seed/localhost prerequisites; hosted provisioning/transport/security proof, paid features, runtime auth and publishing remain separate gates |
+- [2026-09-14 — Scroll waves](active/2026-09-14-scroll-waves.md) — adapt Paper12–18 to passive per-page progress while preserving native scrolling and the separate-page layout.
+
+- [2026-09-14 — Separate public pages](active/2026-09-14-separate-pages.md) — implement the refined Paper 01/02 page sets, canonical routes, native compatibility links and shared chrome; supersedes the consolidated-document model.
+
+- [2026-09-14 — Public site overhaul](active/2026-09-14-public-overhaul.md) — Paper 01/02 responsive implementation; remove public motion while preserving unrelated work.
+
+- [2026-09-14 — Markdown publishing](active/2026-09-14-markdown-publishing.md) — file-based authoring, local draft preview, static pages and generated discovery. [Writing guide](../writing.md).
 
 ## Completed
 
+- [2026-09-09 — Add the task-completion workflow](completed/2026-09-09-task-completion-workflow.md) — explicit checks, early/final review records and current-source status; source-reviewed and exercised, not a general efficiency claim.
+- [2026-09-09 — Review delegation and tighten task context](completed/2026-09-09-delegation-context.md) — startup routing and worker/integration ownership clarified; cost/speed gains not yet measured.
 - [2026-09-02 — Scaffold the repository-local agent harness](completed/2026-09-02-agent-harness.md)
 - [2026-09-03 — Make the rail's dial reusable on any page via heading discovery](completed/2026-09-03-reusable-heading-dial.md)
 - [2026-09-04 — Scaffold changelog RSS](completed/2026-09-04-changelog-rss.md)

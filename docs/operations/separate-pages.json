@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "id": "separate-pages",
+  "outcome": "Implement the approved Paper separate-page Home/About/Blog/Contents/Changelog design and refined navigation/footer/RSS.",
+  "contract": "docs/plans/active/2026-09-14-separate-pages.md",
+  "boundary": [
+    "Six static public pages including Leetcode; old section paths no longer redirect to home.",
+    "Keep native scrolling and server-rendered page-moved links for historical home fragments, with native new-page disclosure fragments.",
+    "Preserve verified biography, empty states, shared changelog records and unrelated inherited work.",
+    "Live Eiko/Georgia type; active navigation, name-free back-to-top footer and only rss linked.",
+    "No dependencies, remote writes, deployment or commit."
+  ],
+  "inputs": [
+    "app",
+    "components",
+    "tests/e2e",
+    "scripts/check-site-contracts.mjs",
+    "next.config.ts",
+    "docs/product.md",
+    "docs/architecture.md",
+    "docs/design.md",
+    "docs/testing.md",
+    "AGENTS.md"
+  ],
+  "boundaryInputs": [],
+  "ownerInput": [
+    "Physical touch/trackpad, screen reader and actual browser-chrome zoom verification."
+  ],
+  "outOfScope": [
+    "Deployment and hosted/browser cached-redirect eviction",
+    "Unconfirmed biography changes",
+    "Remote design edits"
+  ],
+  "checks": [
+    {
+      "id": "contracts",
+      "phase": "fast",
+      "argv": ["pnpm", "contracts:check"],
+      "timeoutSeconds": 30,
+      "cleanupSeconds": 5
+    },
+    {
+      "id": "repository",
+      "phase": "full",
+      "argv": ["pnpm", "validate"],
+      "timeoutSeconds": 300,
+      "cleanupSeconds": 30,
+      "inputs": ["."]
+    },
+    {
+      "id": "browser",
+      "phase": "full",
+      "argv": ["env", "CI=1", "pnpm", "test:e2e", "--retries=0"],
+      "timeoutSeconds": 180,
+      "cleanupSeconds": 30
+    }
+  ]
+}

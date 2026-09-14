@@ -24,7 +24,7 @@ Give future agents a concise path from intent to implementation and enough execu
 ## Non-goals
 
 - Change the site's visual design or product behavior.
-- Add a CMS, backend, analytics, or publishing pipeline.
+- Add a backend, analytics, or publishing pipeline.
 - Rebuild the timing-sensitive pager.
 - Pretend a small personal site needs enterprise infrastructure.
 

@@ -22,7 +22,7 @@ Expose a discoverable, statically generated RSS 2.0 feed for the changelog and e
 ## Non-goals
 
 - Restoring the changelog entries that were deliberately removed.
-- Adding a CMS, Markdown/MDX pipeline, database, or feed-generation dependency.
+- Adding a Markdown/MDX pipeline, database, or feed-generation dependency.
 - Creating standalone pages for individual changelog entries.
 
 ## Acceptance criteria

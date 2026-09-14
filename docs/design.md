@@ -1,106 +1,77 @@
 ---
 owner: Eric Zheng
 status: current
-last_verified: 2026-09-05
+last_verified: 2026-09-14
 ---
 
 # Design system
 
-## Character
+## Selected direction
 
-The site combines an editorial paper-like page with a terminal/file-tree navigation metaphor. It is intentionally typographic and restrained: warm paper, near-black text, one red accent, muted structural chrome, and motion used as feedback rather than decoration alone.
+Paper's **01.1–01.5 desktop** and **02.1–02.5 mobile** are the selected Home/About/Blog/Contents/Changelog page sets. Eric approved propagating the separate-page design and final navigation/footer/RSS refinements to the website; the [implementation plan](plans/active/2026-09-14-separate-pages.md) records scope and evidence. This supersedes the consolidated page from the [earlier overhaul](plans/active/2026-09-14-public-overhaul.md), not its removal of scrolling machinery and animations.
+
+The static split alphabet opening keeps red ERIC/ZHENG and four semantic page links. Each reading destination has its own warm-paper canvas and compact column with live Eiko headings, Georgia prose, an inline portrait, a normal masthead and a native footnote disclosure. Do not ship the design's outlined heading images or its simulated mobile status bar.
 
 ## Source of truth
 
-Design tokens live in the `@theme` block of `app/globals.css`. Component-specific behavior belongs in CSS Modules. Tailwind v4 is available through CSS-first configuration, but JSX generally uses semantic class names rather than long utility lists.
-
-### Penpot-first exploration
-
-When a request is framed as designing or exploring alternatives on a new or separate page, start with a new Penpot page unless the request explicitly asks for an implemented web route. Build the direction from isolated local-library components, bind existing tokens where possible, include desktop and mobile compositions, and move it into application code only after the direction is selected or a coded preview is requested.
-
-Before changing Penpot:
-
-1. Check current MCP availability using [development setup](development.md#penpot-mcp); discover the actual API rather than assuming an old plan's tool names or temporary storage still work.
-2. Inspect the connected file, pages, components, tokens, and fonts. Confirm the target surface and excluded pages in the matching [active plan](plans/README.md).
-3. Save a file version before destructive edits. Capture comparable serialized state or hashes for protected pages; unchanged shape counts alone do not prove unchanged content/styles.
-4. Build prose with flex layouts, fill-width instances, and auto-height text rather than fixed boxes. Use full real content and inspect both desktop and mobile compositions. Keep hero letter geometry intentional rather than applying prose layout rules blindly.
-5. Export every changed screen and visually inspect for clipped text, overlap, and reading order. A non-empty PNG only proves exportability, not visual correctness. Compare protected-page state and token values after the work.
-6. Record file/page/board identifiers, the saved version, evidence, and remaining defects in the plan. If access is blocked, do not substitute a coded route without asking.
-
-API caveats verified during the [studio block-sheet work](plans/active/2026-09-05-dynamic-cms-studio.md):
-
-- Font-name lookup can match substrings: `findByName("Helvetica")` returned Helvetica Oblique. Filter `findAllByName` by exact `fontFamily` and select the intended variant.
-- Resizing text can reset fill-width sizing. Restore auto-height and fill-width layout, wait for real text measurements, and check containment inside parents plus sibling overlap—not just the outer board. Seed from measured line-box heights when stale construction bounds persist; do not hide overflow to obtain a passing check.
-- Keep the actual connected design tab/window visible for measurement and export. Activating another window of the same browser is insufficient. Recheck current tools/windows rather than persisting session-local IDs.
-
-The [Penpot rebuild plan](plans/completed/2026-09-05-penpot-rebuild.md) rebuilt pages 02–04 and 08 on 2026-09-05 from flex-layout `Prose /`, `Chrome /`, `Hero /`, and `Academic /` components, with the canonical screens carrying the full source content and the crumb + rail chrome. Pages 01, 05–07, and 99 were left untouched as the design record. The studio is separate accepted work; Eric approved page 09's block direction on 2026-09-05, while studio chrome/flows remain later plan steps. Treat that plan's evidence as dated: re-inspect before relying on the remote file state. Code/CSS describe the implemented design; Penpot studies are candidates until selected and implemented.
-
-The separately authorized [Sightseeing article study](plans/completed/2026-09-06-sightseeing-article-design.md) is ready for owner review on page `10 · Sightseeing · Article` (2026-09-06). Its nine boards include complete desktop/mobile articles, opening/code-reading viewports, mobile contents, a linked code component and renderer handoff. Native exports, source-text checks, nesting/containment checks and protected-page comparisons passed. The study uses 650px/318px prose and retains all 345 source blocks. This is a candidate reading-page design, not a selected direction, CMS import or working route; the CMS engineering gates are unchanged.
+`app/globals.css` contains the shared palette, semantic roles, reset and reading layout. CSS Modules own the opening, sections, masthead and footer. Tailwind v4 supplies the reset and utilities; no new styling dependencies or component framework are needed.
 
 ### Palette
 
-| Token                | Value     | Use                            |
-| -------------------- | --------- | ------------------------------ |
-| `--color-paper`      | `#f0eee8` | Page and hero background       |
-| `--color-black`      | `#16171b` | Primary headings and links     |
-| `--color-navy`       | `#1c2129` | Body link base                 |
-| `--color-dark-gray`  | `#374151` | Body copy                      |
-| `--color-gray`       | `#666666` | Secondary metadata             |
-| `--color-light-gray` | `#c8c5bc` | Hero alphabet texture          |
-| `--color-stone`      | `#8f8b80` | Resting chrome                 |
-| `--color-red`        | `#d91620` | Name, extensions, and emphasis |
+| Role              | Value     | Use                                       |
+| ----------------- | --------- | ----------------------------------------- |
+| Paper/surface     | `#f0eee8` | Page canvas                               |
+| Ink/text/heading  | `#16171b` | Body and headings                         |
+| Muted/caption     | `#666666` | Secondary prose and captions              |
+| Rule/alphabet     | `#c8c5bc` | Fine rules and pale alphabet              |
+| Accent/focus      | `#d91620` | Name, colons, disclosure marker and focus |
+| Link              | `#7c4147` | Underlined reading links                  |
+| Opening dark half | `#30312e` | Static split background                   |
 
-Do not introduce a near-duplicate color locally when a token expresses the same role.
+Semantic roles are emitted on `:root`; root overrides remain supported. No theme toggle or scroll-dependent page background is implemented. The isolated [Paper12–18 waves](plans/active/2026-09-14-scroll-waves.md) use rule/ink/accent colors to indicate native page progress.
 
 ### Typography
 
-- Helvetica is the body and hero family.
-- PPEiko is the display family for prose headings.
-- Libre Baskerville is the serif accent for dates and metadata.
-- Fira Code is the primary monospace family for the file-tree chrome and code, with local system-monospace fallbacks.
-- Fonts are self-hosted through `next/font/local` in `app/fonts.ts`; avoid external font requests.
+- Georgia, 18px/29px, for body copy and italic passages.
+- Self-hosted PP Eiko Medium 500 for all reading h1s: 42px/50px desktop, 36px/44px mobile. Footnote h2s retain 24px/32px.
+- Self-hosted Helvetica Bold for the alphabet and logo; Helvetica regular for portrait captions and contact metadata.
+- The opening uses 80px/88px at 1440px, 32px/35.2px at 390px, with responsive intermediate sizing and narrower-screen reflow.
+- Eiko navigation uses its native Medium 500 weight at 16px/24px, tilde separators, and a 1.5px red active underline at 2px offset. Mobile link hit areas are at least 44px high; below 360px the nav reduces to 14px to fit.
+- Footer is only “back to top ↑”, right-aligned Eiko Medium 500 at 16px/36px. RSS is Georgia 16px/24px: plain muted “subscribe with” followed by the underlined link “rss”.
+- Existing Libre Baskerville and Fira Code remain available to other retained surfaces. Fonts are declared in `app/fonts.ts`; no external font requests.
 
 ## Layout
 
-- The prose column is capped at `650px` and centered.
-- The home hero and each home section are scroll tiles with a minimum height of `100svh`.
-- `--nav-h` reserves the top band for the crumb; `--tile-end` gives sections a legible ending.
-- At `1160px` and above, navigation is a worded file-tree dial in the gutter. Below it, the rail collapses to ticks and opens as a drawer.
-- At narrow widths, the prose gains a left gutter so the tick rail never overlaps text.
+- Home is the standalone `100svh`-minimum opening. Reading pages have separate `100svh`-minimum flex shells with the footer pushed toward the page end; prose remains natural flow, not full-screen tiles.
+- Reading column: maximum 720px; 24px side gutters; 64px desktop / 16px mobile page-top clearance; 40px / 32px bottom padding.
+- Masthead: the archived 01/02 Eiko/tilde navigation and home logo; stacks below 600px with a 10px gap and 12px bottom clearance. Desktop has 22px bottom clearance. No fixed navigation crumb, tree rail, drawer or scrollspy.
+- About: 160px portrait at desktop, 96px on mobile, with native image sizing and a real caption. Mobile peers list spans both columns.
+- Reading content: 64px desktop / 40px mobile clearance after the masthead, then 24px content gaps (22px on About). About has 48px / 40px before the footer; other pages have at least 64px.
+- Footer: a simple rule and only the back-to-top link, with 20px top padding. No identity credit or home link. The separate opening has no bottom identity or page-invitation caption.
+- RSS remains right-aligned beside the Changelog title at supported widths; its group wraps to a right-aligned second line rather than colliding at narrower/enlarged layouts.
 
-Do not add transformed or independently scrolling ancestors around the home content. That is both a layout and behavior invariant; see [motion and scroll architecture](architecture/scroll-engine.md).
+The existing verified undergraduate biography is retained instead of the proposed employment wording. This intentionally changes wrapping relative to the static boards. Do not invent biography, employment or published posts to match a screenshot.
 
-## Exploratory study
+## Markdown reading pages
 
-`/explore` is an intentionally unlisted, route-scoped visual study rather than a change to the canonical design. It keeps the four self-hosted families and core paper/black/red tokens, then tests an “annotated field journal” grammar: thesis-cover scale, marginal folios, journal front matter, card-catalogue rows, an errata ledger, and a graph-paper problem sheet. Its variation comes from formatting and composition, not extra dependencies, invented published content, or a palette swap. Promote any part of it to a canonical page only through a separate user-visible change that revalidates the relevant navigation and responsive behavior.
+The owner-authorized Markdown routes inherit the same720px Eiko/Georgia reading shell and passive waves, with no new decorative surface. `components/Writing.module.css` owns chronological post rows, muted dates/topics, a visible local-draft notice, native outline disclosure and article prose. Each article has one h1 and starts body headings at h2. Tables/code overflow inside focusable regions, images remain responsive, and server-rendered maths uses local KaTeX fonts. Raw HTML/Pandoc presentation does not enter authoring. [Writing](writing.md) and [its implementation evidence](plans/active/2026-09-14-markdown-publishing.md) distinguish supported formatting from deferred richer callouts/interactive blocks.
 
-## Motion
+## Motion and accessibility
 
-- Motion must explain state or acknowledge input: letter repulsion, section transport, rail position, edge resistance, and zoom realignment.
-- `prefers-reduced-motion` removes cursor repulsion, Lenis smoothing, pager transport, and nonessential transitions while preserving all content and navigation.
-- Reduced and animated branches must produce equivalent semantic DOM.
-- Avoid global `scroll-behavior: smooth`; Lenis is the sole smooth-scroll authority on home.
+There is no Lenis, Motion, paging, repulsion, scroll locking, snapping or scripted zoom correction. The owner's explicitly requested edge-wave glyph animations are the sole decorative-motion exception. Links, wheel, touch, keyboard and history use the browser.
 
-## Interaction and accessibility
+The owner-requested Paper12–18 right-edge waves are a passive progress tint, not a replacement scrollbar. A small canvas samples Maxime Heckel's source-derived, nested eight-octave Perlin/fBm domain warp with ordered Bayer dithering, changing ASCII characters in fixed cells; the field does not translate or scroll. The ASCII ramp reserves80% of its range for `. , : ; +`, with a light-bias curve and left-edge dissolve; the darkest range alone uses `x X # M W`. Desktop uses Helvetica Regular11px in11×13px cells, starting at the Paper study's8s state. Idle redraws are capped at12fps. The actual desktop/mobile Paper glyph textures remain local alpha masks for static fallbacks. Read glyphs become ink from the top, with a red current band and pale unread glyphs. Progress resets to the current document. Once measured, pages without scroll range show fully read glyphs with no red band: dark ink on paper, or the full contrasting paper color on the dark opening. Following the owner's request for much greater desktop width variation, at1200px+ the field can occupy the reading gutter up to360px (296px at1440), retaining at least64px prose clearance. Coherent-noise contours use soft bounds instead of clipped minimum/maximum plateaus, keeping the outline curved. Their base is at least30% of the field or eight visible character cells, whichever is wider; near-white source areas retain faint punctuation within that base rather than collapsing to four-character slivers. Their width clock runs twice as fast as the original contour cadence, independently of the unchanged character-field speed. The opening has an extra width cap to protect its longest alphabet link. Smaller layouts retain the original compact sizing, reaching14px inside existing24px gutters rather than narrowing the page. It is pointer-transparent and aria-hidden. Reduced motion shows a static texture, fully inked on measured non-scrollable pages and pale otherwise. Without JavaScript or canvas measurement the fallback stays pale; print/forced-colors hide it. Paper credits the texture direction to “Dithered Waves” by Maxime Heckel. See [implementation and evidence](plans/active/2026-09-14-scroll-waves.md).
 
-- Use semantic headings, links, lists, figures, and navigation landmarks.
-- The fixed crumb behaves as a file path: its root and current filename are semantic links to real destinations.
-- Preserve keyboard paths for scrolling and all destinations.
-- Do not suppress focus outlines without an equal or stronger visible replacement.
-- Interactive hit areas must remain usable when the compact rail is shown.
-- Color cannot be the only carrier of meaning; file extensions and active states also use position, shape, or text.
-- Images require useful `alt` text and intrinsic sizing through `next/image`.
-- Pinch zoom must remain enabled.
+The left companion reuses the same renderer, speed, soft width bounds and eight-cell desktop base, but samples separate field/contour coordinates. It is not a flipped texture or synchronized mirror: only its edge dissolve faces the opposite direction. Its ink is always exactly `#c8c5bc`, including Home, scrolling, short pages, root theme overrides and static fallbacks. Both sides stay pointer-transparent and inside the existing gutters. Independent left fallback masks are generated at8s with the site's Helvetica font by `pnpm exec node scripts/generate-left-wave-masks.mjs`; the original Paper right masks remain unchanged.
+
+Use one main/h1 per page, subordinate h2s, lists, figures and visible focus. Decorative alphabet spans are hidden from accessibility APIs; all four opening links remain readable and focusable. Home's skip link targets its page navigation; reading skip links focus the main. `aria-current="page"` supplements the active underline. Each reading page has its own top fragment to avoid retained-DOM collisions. Historical home fragments reveal a native page-moved link. The footnote uses native `details`/`summary`; direct `/about#…` hidden heading fragments reveal the disclosure even without JavaScript. Pinch zoom remains unrestricted.
 
 ## Responsive verification
 
-For user-visible changes, check at least:
+Inspect 390 × 844, 768 × 1024 and 1440 × 900 renders, reduced motion, keyboard navigation, direct fragments, history and no-JavaScript disclosure. Test narrower reflow and enlarged text; actual browser-chrome zoom, physical touch/trackpad input and screen-reader checks must be labelled separately from emulation. See [testing](testing.md).
 
-- `390 × 844` touch-sized mobile layout,
-- `768 × 1024` narrow/tablet layout,
-- `1440 × 900` desktop dial layout,
-- reduced motion,
-- keyboard-only navigation,
-- browser zoom above and below 100% when tile geometry is affected.
+## Penpot-first exploration
 
-The exact behavioral matrix for the pager lives in [testing](testing.md).
+For a new design exploration without an explicit request for a coded route, use Penpot first. Inspect current [MCP setup](development.md#penpot-mcp), connected file, pages, fonts and tokens; confirm scope before mutation. Save a version before destructive edits and compare protected-page serialized state, not only shape counts. Build auto-height prose and visually inspect desktop/mobile exports for clipping, overlap and reading order. Never expose design credentials or treat old session IDs as current capability.
+
+Historical candidates remain in the [Penpot rebuild](plans/completed/2026-09-05-penpot-rebuild.md) and [Sightseeing article study](plans/completed/2026-09-06-sightseeing-article-design.md). Those designs do not establish current browser behavior. The `/explore` and `/test` coded studies have been retired; remote designs were not changed by this overhaul.

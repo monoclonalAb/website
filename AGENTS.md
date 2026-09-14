@@ -12,53 +12,54 @@ Shared entry point for Astra and other coding agents. Keep this file a map, not 
 ## Start each task
 
 1. Inspect `git status --short` and the relevant diff, including untracked files. Preserve existing work; do not reset, stash, clean, or reformat it away.
-2. Define the requested outcome and acceptance criteria. Do not start unrelated work just because a plan is active.
-3. Read [product](docs/product.md) and [architecture](docs/architecture.md), then the task-specific references below. Consult [quality](docs/quality.md) and [debt](docs/debt.md) for relevant risks; do not load the entire archive by default.
-4. Before commands or edits, follow [development](docs/development.md). For session startup, tool safety, blockers, and handoff, use [the Astra workflow](docs/agent-workflow.md).
-5. Check [active plans](docs/plans/README.md). Resume the matching plan or create one for multi-step/risky work; recheck its next action and blockers against the current workspace.
+2. Define the requested outcome and acceptance criteria. For multi-step shared/security-boundary work, use the [task-completion workflow](docs/operations/task-workflow.md). Do not start unrelated work just because a plan is active.
+3. Read the relevant current sections of [product](docs/product.md) and [architecture](docs/architecture.md), then task-specific references below. Consult [quality](docs/quality.md) and [debt](docs/debt.md) for relevant risks. Links are targeted retrieval, not recursive full-file prerequisites.
+4. Before commands or edits, read development [prerequisites](docs/development.md#prerequisites) and [commands](docs/development.md#commands), plus setup only for tools this task uses. The [Astra workflow](docs/agent-workflow.md) owns scope, safety and handoff; optional tool setup is not universal startup context.
+5. Check [active plans](docs/plans/README.md) for a matching bounded handoff and recheck its next action/blockers. Writing starts with [the writing guide](docs/writing.md). Use the [delegation decision and packet](docs/agent-workflow.md#delegation) when splitting work; do not automatically launch successors.
 
 ## Current boundaries
 
-- The public site is static and hand-authored; non-runtime CMS foundations are separate. [ADR-0002](docs/decisions/0002-dynamic-content-and-hosted-studio.md) is **accepted** for staged CMS implementation, not a claim of shipped runtime services. Follow its plan gates; external provisioning/writes/deployment require separate authorization.
-- Home is one document: `top`, `about`, `blog`, `contents`, `changelog`, in that order. `/leetcode` is standalone; `/test` and `/explore` are unlisted fixtures/studies.
+- [ADR-0004](docs/decisions/0004-markdown-publishing.md) defines Markdown/frontmatter publishing. Public pages build from local files. No importing, provisioning, external writes or deployment without authorization.
+- Home is the standalone alphabet opening. `/about`, `/blog`, `/contents`, `/changelog` and `/leetcode` are separate native-scrolling pages. Paper 01.1–01.5 / 02.1–02.5 are the desktop/mobile design. Historical home fragments show page-moved links; `/test` and `/explore` are retired.
 - For design exploration on a new/separate page, start in Penpot unless the user explicitly requests a coded route. Read [design](docs/design.md) before editing either surface.
 - Plans describe intent; completed plans describe historical evidence. Neither proves current behavior or live tool availability.
 
 ## Task map
 
-| Task                                     | Read next                                                                                                    | Start in                                                     |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
-| Hero, paging, anchors, rail, zoom        | [Motion architecture](docs/architecture/scroll-engine.md), [testing](docs/testing.md)                        | `app/HomePage.tsx`, `app/scroll/`, `components/SiteRail.tsx` |
-| Routes, metadata, images, framework APIs | [Architecture](docs/architecture.md), relevant installed Next.js guide                                       | `app/`, `next.config.ts`                                     |
-| CSS, typography, responsive UI           | [Design](docs/design.md), [testing](docs/testing.md)                                                         | `app/globals.css`, relevant CSS Module                       |
-| Penpot exploration or rebuild            | [Design](docs/design.md), [MCP setup](docs/development.md#penpot-mcp), matching [plan](docs/plans/README.md) | Inspect the connected file before mutation                   |
-| Copy, links, changelog/RSS               | [Product](docs/product.md), [testing](docs/testing.md)                                                       | `app/_sections/`, `app/_content/changelog.ts`                |
-| Content platform or studio               | [Accepted ADR](docs/decisions/0002-dynamic-content-and-hosted-studio.md), [plans](docs/plans/README.md)      | Resume the authorized slice; preserve later gates            |
-| Tooling, CI, docs                        | [Development](docs/development.md), [docs index](docs/README.md), [decisions](docs/decisions/README.md)      | `package.json`, `scripts/`, `.github/`, `docs/`              |
+| Task                                     | Read next                                                                                                      | Start in                                                        |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Home, anchors, navigation, zoom          | [Architecture](docs/architecture.md), [testing](docs/testing.md)                                               | `app/HomePage.tsx`, `app/page.tsx`, `components/SiteHeader.tsx` |
+| Routes, metadata, images, framework APIs | [Architecture](docs/architecture.md), relevant installed Next.js guide                                         | `app/`, `next.config.ts`                                        |
+| CSS, typography, responsive UI           | [Design](docs/design.md), [testing](docs/testing.md)                                                           | `app/globals.css`, relevant CSS Module                          |
+| Penpot exploration or rebuild            | [Design](docs/design.md), [MCP setup](docs/development.md#penpot-mcp), matching [plan](docs/plans/README.md)   | Inspect the connected file before mutation                      |
+| Copy, links, changelog/RSS               | [Product](docs/product.md), [testing](docs/testing.md)                                                         | `app/_sections/`, `app/_content/changelog.ts`                   |
+| Writing, Markdown, publishing            | [Writing](docs/writing.md), [ADR-0004](docs/decisions/0004-markdown-publishing.md), [testing](docs/testing.md) | `content/`, `lib/content/`, `scripts/new-post.mjs`              |
+| Tooling, CI, docs                        | [Development](docs/development.md), [docs index](docs/README.md), [decisions](docs/decisions/README.md)        | `package.json`, `scripts/`, `.github/`, `docs/`                 |
 
 ## Commands
 
 Use pnpm only; `package.json` pins the version and defines the scripts.
 
-- `pnpm dev` — local development server
+- `pnpm dev` — loopback local preview, including labelled drafts
+- `pnpm new:blog <slug> [title]` / `pnpm new:leetcode <date> [title]` — scaffold drafts
+- `pnpm content:check` / `pnpm test:content` — content validation/regressions
 - `pnpm docs:check` — documentation metadata, freshness, local file links, reachability
-- `pnpm contracts:check` — static home IDs, outline, anchors, redirects, scroll guards
+- `pnpm contracts:check` — canonical pages, legacy fragment notices, shared links and native-scroll guards
 - `pnpm format:check` — Prettier; format only touched files while editing
 - `pnpm lint` — ESLint
 - `pnpm typecheck` — generate Next route types, then TypeScript
 - `pnpm test:e2e` — Chromium browser tests; focused commands in [testing](docs/testing.md)
 - `pnpm build` — production build
-- `pnpm test:cms` — database-free CMS validation/schema tests; isolated DB setup in [development](docs/development.md)
-- `pnpm check` — docs, contracts, formatting, lint, types, CMS unit/schema tests
+- `pnpm check` — content, docs, contracts, formatting, lint, types and workflow tests
 - `pnpm validate` — `check` plus `build`; does **not** run browser tests
 
 ## Guardrails
 
 - Server Components are the default. Add `"use client"` only at the smallest interactive boundary.
-- Do not introduce a CMS, API layer, database, auth, or MDX pipeline without an owner-approved accepted decision; see [ADR process](docs/decisions/README.md).
-- `TILE_IDS`, rendered home IDs, outline rows, fragment links, and legacy redirects form one contract. Run `pnpm contracts:check` when any changes.
-- Keep home scrolling in real window coordinates: no transformed wrapper, overflow scroller, or global `scroll-behavior: smooth`; `SmoothScroll` stays off the root layout.
-- Preserve reduced-motion DOM parity, keyboard access, semantic HTML, visible focus, and zoom.
+- Markdown is non-executable data, not MDX/JSX/raw HTML. Draft flags do not make repository files private. Do not add runtime authoring services or MDX without a new owner-approved [decision](docs/decisions/README.md).
+- Canonical pages, route-local top/heading IDs, legacy home notices and shared links form one contract. Run `pnpm contracts:check` when any changes. Do not restore the old path-to-home redirects.
+- Keep native document scrolling: no pager, Lenis/Motion, repulsion, scrollspy, drawer, snapping, smooth scrolling or unrelated decorative animations. The owner-requested ScrollWaves leaf may animate changing characters in a fixed grid and tint them with document progress; it must not control scrolling and must honor reduced motion.
+- Preserve keyboard access, semantic HTML, visible focus, zoom and no-JavaScript content/disclosure behavior.
 - Never expose credentials, including the Penpot URL. Discover actual tool capabilities; do not invent commands or carry session-local tool IDs into a new session.
 - Make the smallest coherent change. Do not fix unrelated debt, add dependencies, or change generated files opportunistically.
 - Commit only when asked; never push, deploy, or mutate unrelated remote designs without explicit authorization.
@@ -68,6 +69,6 @@ Use pnpm only; `package.json` pins the version and defines the scripts.
 - Run the smallest relevant baseline before editing, then validate from narrow to broad.
 - `pnpm validate` must pass for completed repository changes. User-visible/navigation/interaction changes also require `pnpm test:e2e` and the relevant [manual matrix](docs/testing.md).
 - Docs-only and Penpot-only tasks do not imply browser/device checks; mark inapplicable checks with a reason. Penpot changes need design evidence instead.
-- Update current docs in the same change; record unresolved risks in [debt](docs/debt.md). Do not advance verification dates or checkboxes without evidence.
+- Update docs whose meaning changed; record detailed evidence once and link it rather than copying counts across records. Record unresolved risks in [debt](docs/debt.md). Do not advance verification dates or checkboxes without evidence.
 - Review the final diff for unrelated changes, secrets, and generated output. Preserve any user work that was present at startup.
 - Finish with what changed, exact checks/results, and any blockers or checks not run. For unfinished work, update the plan's handoff with the next action and required owner input.

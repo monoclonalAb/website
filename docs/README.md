@@ -8,23 +8,27 @@ last_verified: 2026-09-05
 
 [AGENTS.md](../AGENTS.md) is the entry point for Astra and other agents; this directory is the durable system of record. Follow task-specific links rather than reading the entire archive for every task. Code comments explain local mechanics; these documents explain intent, boundaries, evidence, and decisions across files.
 
-For a new session, use [the Astra workflow](agent-workflow.md). For resumed work, check [active plans](plans/README.md) and reverify their handoffs. The implemented app is still static; the [dynamic-studio ADR](decisions/0002-dynamic-content-and-hosted-studio.md) is accepted for staged implementation, not a claim of shipped runtime services.
+For a new session, use [the Astra workflow](agent-workflow.md). For resumed work, check [active plans](plans/README.md) and reverify their handoffs. Writing starts with [the Markdown guide](writing.md) and [ADR-0004](decisions/0004-markdown-publishing.md).
 
 ## Map
 
-| Document                                                        | Question it answers                                               |
-| --------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [Astra workflow](agent-workflow.md)                             | How do I scope work, use tools safely, validate, and hand off?    |
-| [Product brief](product.md)                                     | What is the site for, and what is deliberately out of scope?      |
-| [Architecture](architecture.md)                                 | How is the app composed, and which contracts are load-bearing?    |
-| [Motion and scroll architecture](architecture/scroll-engine.md) | Why do the cursor, pager, rail, and zoom systems behave this way? |
-| [Design system](design.md)                                      | Which visual, responsive, motion, and accessibility rules apply?  |
-| [Development](development.md)                                   | How do I install, change, and validate the project?               |
-| [Testing](testing.md)                                           | Which automated and manual checks provide evidence?               |
-| [Quality scorecard](quality.md)                                 | Where is the project strong or weak right now?                    |
-| [Technical debt](debt.md)                                       | Which known gaps are intentionally deferred?                      |
-| [Execution plans](plans/README.md)                              | How is multi-step work made resumable?                            |
-| [Decision records](decisions/README.md)                         | Why were durable technical choices made?                          |
+[Domain-first operating model](agents/domain-first-operating-model.md) records canonical domain representations and their parsing/proof boundaries.
+
+| Document                                                     | Question it answers                                                |
+| ------------------------------------------------------------ | ------------------------------------------------------------------ |
+| [Task-completion workflow](operations/task-workflow.md)      | Which checks/reviews are current, stale, missing or owner-blocked? |
+| [Astra workflow](agent-workflow.md)                          | How do I scope work, use tools safely, validate, and hand off?     |
+| [Product brief](product.md)                                  | What is the site for, and what is deliberately out of scope?       |
+| [Architecture](architecture.md)                              | How is the app composed, and which contracts are load-bearing?     |
+| [Retired motion architecture](architecture/scroll-engine.md) | Historical rationale for the removed cursor/pager/rail system.     |
+| [Design system](design.md)                                   | Which visual, responsive, motion, and accessibility rules apply?   |
+| [Development](development.md)                                | How do I install, change, and validate the project?                |
+| [Testing](testing.md)                                        | Which automated and manual checks provide evidence?                |
+| [Quality scorecard](quality.md)                              | Where is the project strong or weak right now?                     |
+| [Technical debt](debt.md)                                    | Which known gaps are intentionally deferred?                       |
+| [Execution plans](plans/README.md)                           | How is multi-step work made resumable?                             |
+| [Writing guide](writing.md)                                  | How do I scaffold, preview and publish Markdown?                   |
+| [Decision records](decisions/README.md)                      | Why were durable technical choices made?                           |
 
 ## Maintenance contract
 

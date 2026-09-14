@@ -15,7 +15,7 @@ last_verified: 2026-09-05
 
 The owner requested a review of all documentation and `AGENTS.md` for Astra. No Astra-specific runtime contract is recorded in the repository, so this work treats Astra as the coding agent consuming the shared guidance, not as a new tool integration. [ADR-0001](../../decisions/0001-repository-local-agent-harness.md) already establishes a provider-neutral entry point.
 
-The working tree contains pre-existing documentation edits, `/explore`, its browser test, a proposed dynamic-studio ADR, and two active design/content plans. Preserve that work and its recorded owner choices. Current docs describe a static site; proposals must not be mistaken for implemented behavior or permission to start unrelated work.
+The working tree contains pre-existing documentation edits, `/explore`, its browser test, and two active design/content plans. Preserve that work and its recorded owner choices. Current docs describe a static site; proposals must not be mistaken for implemented behavior or permission to start unrelated work.
 
 ## Goal
 
@@ -24,7 +24,6 @@ A fresh Astra session can locate the right files, understand constraints and dec
 ## Non-goals
 
 - Changing application behavior, tests, tooling configuration, dependencies, or Penpot designs.
-- Implementing or accepting the proposed studio architecture.
 - Rewriting historical outcomes or claiming fresh browser/device/Penpot verification.
 - Adding a second provider-specific instruction tree.
 

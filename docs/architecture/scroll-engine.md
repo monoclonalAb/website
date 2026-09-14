@@ -1,12 +1,14 @@
 ---
 owner: Eric Zheng
-status: current
+status: deprecated
 last_verified: 2026-09-05
 ---
 
-# Motion and scroll architecture
+# Motion and scroll architecture (retired)
 
-This is the deep reference for the home page's two coupled interaction systems. Read
+**2026-09-14:** Eric requested removal of custom scrolling and animations. The pager, repulsion, rail, heading scanner, Lenis and Motion are deleted. This document preserves historical reasoning, not current implementation instructions. Use the [current architecture](../architecture.md), [design](../design.md) and [overhaul record](../plans/active/2026-09-14-public-overhaul.md).
+
+This was the deep reference for the home page's two coupled interaction systems. Read
 [the architecture overview](../architecture.md) first. The source files contain local
 implementation rationale; this document records cross-file invariants and regression history.
 

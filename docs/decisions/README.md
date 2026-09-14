@@ -30,11 +30,11 @@ Routine implementation details belong in code comments or an execution plan.
 6. Track implementation separately in an execution plan. Acceptance authorizes a direction; it does not prove that it is shipped. Current product/architecture/setup docs continue to describe implemented behavior, with an explicit transition note if needed. Update them and validation evidence as implementation lands.
 7. Link the record from this index and affected architecture documents. Supersede old decisions with a linked new record; do not rewrite their history. Use `deprecated` for superseded/rejected records and explain the disposition in the body.
 
-Existing recorded owner choices need not be asked again. Eric explicitly accepted ADR-0002 and approved its block direction on 2026-09-05; the hosting/passkey/Postgres choices and design decisions are recorded in [the studio plan](../plans/active/2026-09-05-dynamic-cms-studio.md). Its accepted status authorizes staged implementation, not external provisioning or shipment. The plan's hosted-cache, security and recovery evidence still gates release.
+Eric selected Markdown publishing on 2026-09-14. [ADR-0004](0004-markdown-publishing.md) is current. Content imports, remote writes and deployment require separate authorization.
 
 ## Index
 
-| ADR                                                   | Status   | Decision                                                                      |
-| ----------------------------------------------------- | -------- | ----------------------------------------------------------------------------- |
-| [ADR-0001](0001-repository-local-agent-harness.md)    | Accepted | Treat repository-local knowledge and executable feedback as the agent harness |
-| [ADR-0002](0002-dynamic-content-and-hosted-studio.md) | Accepted | Dynamic content model with a hosted single-user authoring studio              |
+| ADR                                                | Status   | Decision                                                                      |
+| -------------------------------------------------- | -------- | ----------------------------------------------------------------------------- |
+| [ADR-0001](0001-repository-local-agent-harness.md) | Accepted | Treat repository-local knowledge and executable feedback as the agent harness |
+| [ADR-0004](0004-markdown-publishing.md)            | Accepted | File-based Markdown, local draft preview and build/deploy publishing          |

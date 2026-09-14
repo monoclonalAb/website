@@ -15,22 +15,22 @@ last_verified: 2026-09-06
 
 Page `10 · Sightseeing · Article` now contains two complete article compositions, four opening/code-reading viewport boards, a mobile contents view, a linked code component sheet and a renderer handoff. All nine boards were exported and visually reviewed, with additional native PNG review of all sixteen desktop/mobile article sections. Source fidelity, nesting, code wrapping and geometry checks passed. All ten pre-existing pages, 82 protected component identities and existing tokens matched captured startup state.
 
-**Next:** Eric reviews the reading-page direction. This completion does not imply owner approval, a working prototype, content import or a public article route. The [CMS plan](../active/2026-09-05-dynamic-cms-studio.md) retains its database, authenticated publishing and release gates. A selected direction may inform its later public renderer.
+**Next:** Eric reviews the reading-page direction. This completion does not imply owner approval, a working prototype, content import or a public article route. A selected direction may inform a later public renderer.
 
 ## Scope and authorization
 
-Eric asked for a complete desktop/mobile reading-page design for “Sightseeing the Sea of C++ (#1)”, then asked to continue the existing draft. This is a separate public-reading study before the future public renderer, not an early implementation of the gated Studio chrome/flows. Follow [design safety](../../design.md), [product](../../product.md), [architecture](../../architecture.md) and [quality](../../quality.md).
+Eric asked for a complete desktop/mobile reading-page design for “Sightseeing the Sea of C++ (#1)”, then asked to continue the existing draft. This is a separate public-reading study before the future public renderer. Follow [design safety](../../design.md), [product](../../product.md), [architecture](../../architecture.md) and [quality](../../quality.md).
 
-Extensive pre-existing repository documentation, CMS foundation, configuration, browser-test and explore-route work was preserved. This task changed only its design records and the new Penpot page. No application/CMS code, global tokens, protected component mains, production content, provisioning or deployment was changed. No commit or push was made.
+Extensive pre-existing repository documentation, configuration, browser-test and explore-route work was preserved. This task changed only its design records and the new Penpot page. No application code, global tokens, protected component mains, production content, provisioning or deployment was changed. No commit or push was made.
 
 ## Acceptance criteria
 
 - [x] Complete desktop/mobile compositions retain all 345 source blocks and 35 preformatted examples; actual visible text matches source records.
-- [x] Linked Prose/Studio/Chrome instances and existing tokens are reused. Flex/fill-width/auto-height prose, visible nesting and horizontal-only code overflow pass geometry checks.
+- [x] Linked prose, code and chrome instances and existing tokens are reused. Flex/fill-width/auto-height prose, visible nesting and horizontal-only code overflow pass geometry checks.
 - [x] Every final board is exported and visually inspected, including readable viewport details and sixteen section exports.
 - [x] All ten pre-existing pages, 82 protected component identities and existing token sets/values match captured state; safety and review versions are recorded.
 - [x] The handoff records provenance, dimensions, heading roles, component mapping and untested interaction behavior.
-- [x] Repository validation passes; public application and CMS implementation remain untouched.
+- [x] Repository validation passes; public application remains untouched.
 
 ## File, boards and versions
 
@@ -52,7 +52,7 @@ Re-discover the file/page and names before using these recorded IDs in a future 
 | Article · local components        | `e3a0dad5-68ba-80a0-8008-98658a742916` | 760 × 262    |
 | Reading page · renderer handoff   | `e3a0dad5-68ba-80a0-8008-98768250c229` | 1180 × 848   |
 
-The local `Article / Code / rendered` component is `e3a0dad5-68ba-80a0-8008-98661f933e03`. It is the only new component main; its nested Studio block stays linked. The canvas opens on the two opening boards; full compositions and the handoff remain separately editable.
+The local `Article / Code / rendered` component is `e3a0dad5-68ba-80a0-8008-98661f933e03`. It is the only new component main; its nested code block stays linked. The canvas opens on the two opening boards; full compositions and the handoff remain separately editable.
 
 | Version label                                                                      | Confirmed creation time    |
 | ---------------------------------------------------------------------------------- | -------------------------- |
@@ -66,14 +66,14 @@ The first label mistakenly used the previous records' date; its actual task/vers
 ## Design and renderer handoff
 
 - **Measure:** 650px desktop prose; 318px mobile prose with symmetric 36px gutters and compact ticks outside the text. Body Helvetica is 16px with 1.55 leading. Display titles are PP Eiko at 48px/36px; desktop has an intentional line break to avoid a lone `(#1)` widow. Fira Code handles navigation and code; Libre Baskerville handles the byline.
-- **Palette:** existing paper, paper-raised, ink, gray and red values. Code panels use the approved Studio paper-raised surface, not the first draft's unintended full blue selection fill. No global token values changed.
+- **Palette:** existing paper, paper-raised, ink, gray and red values. Code panels use the existing paper-raised surface, not the first draft's unintended full blue selection fill. No global token values changed.
 - **Navigation:** linked `Chrome / Crumb` and desktop dial/mobile ticks, article-ending links and a separate mobile contents composition. All eight contents rows are 64px high and store original section anchors. This is a static treatment, not a tested drawer or anchor-navigation prototype.
-- **Hierarchy:** article title is h1; source main sections map to h2, subsections to h3 and deeper linked subsections to h4. Source note/definition labels without IDs are callout labels, not additional heading levels. The six initially h5-labelled deeper sections were reconciled to h4 rather than silently extending the CMS schema. Source tags remain available separately in plugin data.
+- **Hierarchy:** article title is h1; source main sections map to h2, subsections to h3 and deeper linked subsections to h4. Source note/definition labels without IDs are callout labels, not additional heading levels. The six initially h5-labelled deeper sections were reconciled to h4. Source tags remain available separately in plugin data.
 - **Lists:** source nesting is visible at 16px per depth, plus a 14px inset for source sidebar lists. Because asymmetric padding did not reliably position children, list groups use right-aligned, fixed-width items reduced by the intended indent. Exact x-offset checks passed, including depth three.
-- **Code:** 35 complete preformatted blocks; fixed-width unwrapped source and line numbers sit inside explicitly named horizontal code viewports. Code stays vertically contained. Copy is a 64 × 44 drawing. The linked Studio template's unused original three rows are hidden only in local instances. The new wrapper supplies Copy and overflow hints without modifying or detaching the Studio main.
+- **Code:** 35 complete preformatted blocks; fixed-width unwrapped source and line numbers sit inside explicitly named horizontal code viewports. Code stays vertically contained. Copy is a 64 × 44 drawing. The linked code template's unused original three rows are hidden only in local instances. The new wrapper supplies Copy and overflow hints without modifying or detaching the component main.
 - **Inline content:** source-derived bold, italic, inline code and underlined links were applied to 211 blocks in each composition (495 source ranges). Range/link metadata is retained on the corresponding shape. Syntax colors are illustrative; no Shiki rendering or editor round-trip is claimed.
 
-For implementation, read each shape's `article-source` plugin data (text, source tag, supplied ID, list depth and sidebar flag), `article-inline-marks` (ranges/types/link targets), and where present `article-render-role`. These are design specimens, not CMS records or seeds. Renderer work must still validate URLs, accessibility, semantic structure and the editor's actual document schema.
+For implementation, read each shape's `article-source` plugin data (text, source tag, supplied ID, list depth and sidebar flag), `article-inline-marks` (ranges/types/link targets), and where present `article-render-role`. These are design specimens, not publications. Renderer work must still validate URLs, accessibility and semantic structure.
 
 ## Content provenance and fidelity
 
@@ -134,16 +134,16 @@ The initial pass was explicitly left incomplete: native exports timed out, some 
 
 ## Validation and limits
 
-| Check                                                                     | Result                                                                                                                           |
-| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Both passes' startup `pnpm docs:check` and `pnpm format:check`            | Passed                                                                                                                           |
-| Source retrieval and transport/final text checks                          | Passed                                                                                                                           |
-| Final native PNG visual review                                            | Passed for all nine boards, plus sixteen section exports                                                                         |
-| Geometry, nesting and code wrapping                                       | Passed with the explicit viewport exceptions above                                                                               |
-| Protected pages/components/tokens                                         | Passed                                                                                                                           |
-| Final `env -u DATABASE_URL pnpm validate`                                 | Passed: docs (27 knowledge files), contracts, formatting, lint, route types/TypeScript, 41 CMS tests and static production build |
-| Final `git diff --check`                                                  | Passed                                                                                                                           |
-| App browser/device matrix                                                 | N/A: Penpot/docs-only task, no application output or interaction changes                                                         |
-| Interaction, keyboard/screen-reader, physical-device or CMS/runtime tests | Not performed; static designs are not implementation evidence                                                                    |
+| Check                                                                 | Result                                                                                                             |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Both passes' startup `pnpm docs:check` and `pnpm format:check`        | Passed                                                                                                             |
+| Source retrieval and transport/final text checks                      | Passed                                                                                                             |
+| Final native PNG visual review                                        | Passed for all nine boards, plus sixteen section exports                                                           |
+| Geometry, nesting and code wrapping                                   | Passed with the explicit viewport exceptions above                                                                 |
+| Protected pages/components/tokens                                     | Passed                                                                                                             |
+| Final `pnpm validate`                                                 | Passed: docs (27 knowledge files), contracts, formatting, lint, route types/TypeScript and static production build |
+| Final `git diff --check`                                              | Passed                                                                                                             |
+| App browser/device matrix                                             | N/A: Penpot/docs-only task, no application output or interaction changes                                           |
+| Interaction, keyboard/screen-reader, physical-device or runtime tests | Not performed; static designs are not implementation evidence                                                      |
 
-No approval of the reading-page direction is inferred from the request to continue. No CMS import, publication, provisioning, deployment, commit or push was performed.
+No approval of the reading-page direction is inferred from the request to continue. No content import, publication, provisioning, deployment, commit or push was performed.
