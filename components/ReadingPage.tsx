@@ -5,21 +5,23 @@ import ScrollWaves from "./ScrollWaves";
 
 export default function ReadingPage({
   page,
+  id = page,
   children,
 }: {
   page: ReadingPageId;
+  id?: string;
   children: ReactNode;
 }) {
   return (
-    <div id={`${page}-top`} className="reading-column">
-      <a className="skip-link" href={`#${page}`}>
+    <div id={`${id}-top`} className="reading-column">
+      <a className="skip-link" href={`#${id}`}>
         Skip to content
       </a>
       <SiteHeader currentPage={page} />
-      <main id={page} tabIndex={-1} className="standalone">
+      <main id={id} tabIndex={-1} className="standalone">
         {children}
       </main>
-      <SiteFooter page={page} />
+      <SiteFooter page={id} />
       <ScrollWaves />
       <ScrollWaves side="left" />
     </div>

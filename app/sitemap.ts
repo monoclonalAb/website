@@ -1,14 +1,16 @@
 import type { MetadataRoute } from "next";
+import { publishedWriting } from "./_content/writing";
 
 /**
- * Six canonical, indexable HTML URLs. Retired studies, fragment aliases and
- * the non-HTML changelog feed do not belong in the sitemap.
+ * Six canonical pages plus published writing. Retired studies, drafts,
+ * fragment aliases and non-HTML feeds do not belong in the sitemap.
  *
  * `lastModified` is hardcoded to when each route's content actually changed
  * rather than `new Date()`, which would restamp on every build and tell crawlers
  * the page changed when nothing did.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const posts = await publishedWriting();
   return [
     {
       url: "https://ericzheng.nz",
@@ -24,9 +26,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     {
       url: "https://ericzheng.nz/leetcode",
-      lastModified: new Date("2026-07-29"),
+      lastModified: new Date("2026-09-14"),
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    ...posts.map((post) => ({
+      url: `https://ericzheng.nz${post.url}`,
+      lastModified: new Date(post.updated ?? post.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
   ];
 }

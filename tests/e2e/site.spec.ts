@@ -83,7 +83,10 @@ test("canonical reading routes return 200 with distinct metadata and current nav
     await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
     await expect(
       page.locator('head link[rel="alternate"][type="application/rss+xml"]'),
-    ).toHaveAttribute("href", "https://ericzheng.nz/changelog.xml");
+    ).toHaveAttribute(
+      "href",
+      `https://ericzheng.nz/${route === "blog" || route === "leetcode" ? "writing" : "changelog"}.xml`,
+    );
     await expect(page.getByRole("main")).toHaveCount(1);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       route === "about" ? "about me:" : `${route}:`,

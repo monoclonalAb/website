@@ -1,4 +1,8 @@
-export default function Blog() {
+import { writingCollection } from "@/app/_content/writing";
+import PostList from "@/components/PostList";
+
+export default async function Blog() {
+  const posts = await writingCollection("blog");
   return (
     <>
       <h1>
@@ -7,8 +11,15 @@ export default function Blog() {
       <p>
         place for me to put my thoughts on interesting topics! (group theory)
       </p>
-      <p className="muted">
-        <i>turns out this bit requires writing-</i>
+      {posts.length ? (
+        <PostList posts={posts} />
+      ) : (
+        <p className="muted">
+          <i>turns out this bit requires writing-</i>
+        </p>
+      )}
+      <p className="rss-subscribe">
+        subscribe with <a href="/writing.xml">rss</a>
       </p>
     </>
   );

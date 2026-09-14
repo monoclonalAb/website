@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated browser evidence contains bundled third-party report code.
+    "playwright-report/**",
+    "test-results/**",
   ]),
 ]);
 

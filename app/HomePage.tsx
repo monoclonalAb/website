@@ -35,6 +35,7 @@ export default function HomePage() {
           </div>
           <div>
             <span aria-hidden="true">klm</span>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Home-boundary links deliberately load a fresh document for legacy fragment isolation. */}
             <a href="/blog">blog</a>
             <span aria-hidden="true">n</span>
           </div>

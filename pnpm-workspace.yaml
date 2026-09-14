@@ -1,6 +1,4 @@
 allowBuilds:
-  # Drizzle Kit uses esbuild's platform optional dependency; no postinstall downloads.
-  esbuild: false
   sharp: false
   unrs-resolver: false
 ignoredBuiltDependencies:

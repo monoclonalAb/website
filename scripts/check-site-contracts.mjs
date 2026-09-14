@@ -51,8 +51,8 @@ for (const page of pages) {
 }
 const shell = read("components/ReadingPage.tsx");
 if (
-  !shell.includes("<main id={page}") ||
-  !shell.includes("id={`${page}-top`}") ||
+  !shell.includes("<main id={id}") ||
+  !shell.includes("id={`${id}-top`}") ||
   !shell.includes("tabIndex={-1}")
 )
   errors.push("Reading pages need focusable main and native top targets");

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import ReadingPage from "@/components/ReadingPage";
+import PostList from "@/components/PostList";
+import { writingCollection } from "@/app/_content/writing";
 import { readingMetadata } from "../shared-metadata";
 
 const DESCRIPTION =
@@ -12,7 +14,8 @@ export const metadata: Metadata = readingMetadata(
   DESCRIPTION,
 );
 
-export default function LeetcodePage() {
+export default async function LeetcodePage() {
+  const posts = await writingCollection("leetcode");
   return (
     <ReadingPage page="leetcode">
       <h1>
@@ -22,8 +25,15 @@ export default function LeetcodePage() {
         for me to conveniently <b>group</b> and post my solutions to the daily
         leetcode question... hopefully I do not end up missing any... right...
       </p>
-      <p className="muted">
-        <i>daily solutions coming soon.</i>
+      {posts.length ? (
+        <PostList posts={posts} />
+      ) : (
+        <p className="muted">
+          <i>daily solutions coming soon.</i>
+        </p>
+      )}
+      <p className="rss-subscribe">
+        subscribe with <a href="/writing.xml">rss</a>
       </p>
     </ReadingPage>
   );

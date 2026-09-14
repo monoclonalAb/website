@@ -57,7 +57,12 @@ export function readingMetadata(
     description,
     alternates: {
       canonical: path,
-      types: { "application/rss+xml": "/changelog.xml" },
+      types: {
+        "application/rss+xml":
+          path === "/blog" || path === "/leetcode"
+            ? "/writing.xml"
+            : "/changelog.xml",
+      },
     },
     openGraph: {
       ...OPEN_GRAPH_BASE,
