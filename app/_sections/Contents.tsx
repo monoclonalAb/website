@@ -4,9 +4,9 @@ import styles from "./Contents.module.css";
 export default function Contents() {
   return (
     <>
-      <h2>
+      <h1>
         contents<span>:</span>
-      </h2>
+      </h1>
       <p>elsewhere on this site, and on the internet.</p>
       <dl className={styles.directory}>
         <div id="internal-links">

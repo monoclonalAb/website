@@ -19,6 +19,10 @@
   gap: 22px;
   padding-top: 24px;
 }
+.body h2 {
+  font-size: 24px;
+  line-height: 32px;
+}
 .reasons {
   list-style: decimal;
   padding-left: 30px;

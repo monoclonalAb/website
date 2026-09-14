@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import ericPhoto from "@/public/images/eric_photo_2.jpg";
 import Footnote from "./Footnote";
 import styles from "./About.module.css";
@@ -7,9 +8,9 @@ export default function About() {
   return (
     <>
       <div className={styles.intro}>
-        <h2 id="about-me" className={styles.heading}>
+        <h1 id="about-me" className={styles.heading}>
           about me<span>:</span>
-        </h2>
+        </h1>
         <p className={styles.biography}>
           you are visiting the site of Eric Zheng, an undergraduate student
           studying Mathematics and Computer Science in Auckland, New Zealand.
@@ -38,7 +39,7 @@ export default function About() {
               <a href="https://en.wikipedia.org/wiki/Devin_AI">Devin</a>
             </li>
             <li>
-              muses over the <a href="/leetcode">daily Leetcode</a> on his
+              muses over the <Link href="/leetcode">daily Leetcode</Link> on his
               journey to class
             </li>
           </ul>
@@ -61,7 +62,7 @@ export default function About() {
           </li>
           <li>
             hopes to maintain a semi-active semi-academic{" "}
-            <a href="#blog">blog</a>
+            <Link href="/blog">blog</Link>
           </li>
         </ul>
       </div>

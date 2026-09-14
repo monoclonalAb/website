@@ -4,11 +4,11 @@ import {
   changelogEntryPath,
 } from "@/app/_content/changelog";
 
-const SITE_URL = "https://ericzheng.nz";
-const CHANGELOG_URL = `${SITE_URL}/#changelog`;
-const FEED_URL = `${SITE_URL}/changelog.xml`;
-
 export const dynamic = "force-static";
+
+const SITE_URL = "https://ericzheng.nz";
+const CHANGELOG_URL = `${SITE_URL}/changelog`;
+const FEED_URL = `${SITE_URL}/changelog.xml`;
 
 function escapeXml(value: string) {
   return value.replace(/[&<>"']/g, (character) => {

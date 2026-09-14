@@ -1,60 +1,64 @@
 import { expect, test } from "@playwright/test";
 
-// Regression for the removal: native input must never be cancelled or tile-snapped.
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   test.describe(`native scrolling / ${reducedMotion}`, () => {
     test.use({ contextOptions: { reducedMotion } });
-    test("wheel, keyboard and anchors work without scroll interception", async ({
+    test("wheel, keyboard and top links never intercept or snap reading", async ({
       page,
     }) => {
-      await page.goto("/");
+      await page.goto("/about");
+      await page.locator("summary").click();
       await page.evaluate(() => document.fonts.ready);
-      const uncancelled = await page.evaluate(() => {
-        const wheel = new WheelEvent("wheel", {
-          deltaY: 100,
-          bubbles: true,
-          cancelable: true,
-        });
-        const key = new KeyboardEvent("keydown", {
-          key: "PageDown",
-          bubbles: true,
-          cancelable: true,
-        });
-        return [document.dispatchEvent(wheel), document.dispatchEvent(key)];
-      });
+      const uncancelled = await page.evaluate(() => [
+        document.dispatchEvent(
+          new WheelEvent("wheel", {
+            deltaY: 100,
+            bubbles: true,
+            cancelable: true,
+          }),
+        ),
+        document.dispatchEvent(
+          new KeyboardEvent("keydown", {
+            key: "PageDown",
+            bubbles: true,
+            cancelable: true,
+          }),
+        ),
+      ]);
       expect(uncancelled).toEqual([true, true]);
       await expect(page.locator("html")).toHaveCSS("scroll-snap-type", "none");
       await expect(page.locator("html")).toHaveCSS("scroll-behavior", "auto");
       await expect(page.locator("html")).not.toHaveClass(/lenis|rail-open/);
+      await page.getByRole("link", { name: "back to top ↑" }).click();
+      await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
       await page.mouse.wheel(0, 180);
       await expect
         .poll(() => page.evaluate(() => scrollY))
         .toBeGreaterThan(100);
       await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(300);
+      await page
+        .locator("main")
+        .evaluate((el) => (el as HTMLElement).focus({ preventScroll: true }));
       await page.keyboard.press("PageDown");
       await expect
         .poll(() => page.evaluate(() => scrollY))
-        .toBeGreaterThan(600);
-      await page.keyboard.press("ControlOrMeta+Home");
-      // Explicit Home is the browser's document key on Chromium across platforms.
-      await page.keyboard.press("Home");
-      await page
-        .getByRole("navigation", { name: "Introduction" })
-        .getByRole("link", { name: "about", exact: true })
-        .click();
-      await expect(page).toHaveURL(/#about$/);
-      await expect(page.locator("#about-me")).toBeInViewport();
+        .toBeGreaterThan(500);
       await page.getByRole("link", { name: "back to top ↑" }).click();
       await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
       expect(await page.evaluate(() => document.getAnimations().length)).toBe(
         0,
       );
     });
-    test("cold fragment arrival uses the native bottom-of-document clamp", async ({
+    test("cold reading fragments use native arrival and bottom clamping", async ({
       page,
     }) => {
-      for (const id of ["about", "blog", "contents", "changelog"]) {
-        await page.goto(`/#${id}`);
+      for (const [route, id] of [
+        ["about", "about-me"],
+        ["about", "fun-fact"],
+        ["contents", "emails"],
+        ["changelog", "changelog-top"],
+      ]) {
+        await page.goto(`/${route}#${id}`);
         await page.evaluate(() => document.fonts.ready);
         await expect(page.locator(`#${id}`)).toBeInViewport();
         await expect

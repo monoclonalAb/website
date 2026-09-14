@@ -6,9 +6,9 @@ export default function Footnote() {
     <details className={styles.footnote}>
       <summary>a footnote on why this site exists</summary>
       <div className={styles.body}>
-        <h3 id="footnote">
+        <h2 id="footnote">
           footnote<span>:</span>
-        </h3>
+        </h2>
         <p>
           to be completely transparent, the creation of this blog/website was
           quite spontaneous, but there were <b>2 main reasons</b> why I decided
@@ -48,16 +48,16 @@ export default function Footnote() {
           </em>
           "
         </p>
-        <h3 id="fun-fact">
+        <h2 id="fun-fact">
           fun fact<span>:</span>
-        </h3>
+        </h2>
         <p>
           when I was 11, I wrote in my yearbook that “I wanted to be a computer
           scientist” when I grow up. Apparently dreams do come true...
         </p>
-        <h3 id="about-this-site">
+        <h2 id="about-this-site">
           about this site<span>:</span>
-        </h3>
+        </h2>
         <p>
           This site is built with Next.js, with hand-authored content and local
           fonts. Its original inspiration was{" "}

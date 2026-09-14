@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import HomePage from "./HomePage";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
-import About from "./_sections/About";
-import Blog from "./_sections/Blog";
-import Contents from "./_sections/Contents";
-import Changelog from "./_sections/Changelog";
+import LegacyHomeFragments from "./LegacyHomeFragments";
 
 export const metadata: Metadata = {
   // Exact "Eric Zheng" (the root template would otherwise append "| Eric Zheng").
@@ -37,7 +32,7 @@ const personJsonLd = {
   ],
 };
 
-/** One server-rendered document. Scrolling and disclosures belong to the browser. */
+/** The standalone opening; each reading destination has its own static page. */
 export default function Home() {
   return (
     <>
@@ -45,28 +40,11 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
       />
-      <a className="skip-link" href="#about">
-        Skip to content
+      <a className="skip-link" href="#pages">
+        Skip to navigation
       </a>
       <HomePage />
-      <div className="reading-column">
-        <SiteHeader home />
-        <main className="content">
-          <section id="about">
-            <About />
-          </section>
-          <section id="blog">
-            <Blog />
-          </section>
-          <section id="contents">
-            <Contents />
-          </section>
-          <section id="changelog">
-            <Changelog />
-          </section>
-        </main>
-        <SiteFooter home />
-      </div>
+      <LegacyHomeFragments />
     </>
   );
 }

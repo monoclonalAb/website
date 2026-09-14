@@ -1,12 +1,10 @@
+import type { ReadingPageId } from "./SiteHeader";
 import styles from "./SiteFooter.module.css";
 
-export default function SiteFooter({ home = false }: { home?: boolean }) {
+export default function SiteFooter({ page }: { page: ReadingPageId }) {
   return (
     <footer className={styles.footer}>
-      <p>Eric Zheng · Auckland, New Zealand</p>
-      <a href={home ? "#top" : "/"}>
-        {home ? "back to top ↑" : "back to home ↑"}
-      </a>
+      <a href={`#${page}-top`}>back to top ↑</a>
     </footer>
   );
 }

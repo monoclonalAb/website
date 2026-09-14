@@ -1,6 +1,7 @@
 .hero {
   --letter-size: clamp(1.625rem, 8.205vw, 2rem);
   --letter-line: calc(var(--letter-size) * 1.1);
+  position: relative;
   display: grid;
   align-items: center;
   min-height: max(100svh, calc(var(--letter-line) * 10));
@@ -47,6 +48,16 @@
 .links a:focus-visible {
   outline-color: var(--color-paper);
   outline-offset: 0;
+}
+
+.legacyNotice {
+  display: none;
+  width: min(720px, calc(100% - 48px));
+  margin: 24px auto;
+  padding-block: 24px;
+}
+.legacyNotice:target {
+  display: block;
 }
 
 @media (min-width: 600px) {

@@ -26,14 +26,19 @@
   gap: 12px;
   font-family: var(--font-display), Georgia, serif;
   font-size: 16px;
+  font-weight: 500;
   line-height: 24px;
 }
 .navigation a {
   color: var(--color-heading);
   text-decoration: none;
 }
-.navigation a:hover {
+.navigation a:hover,
+.navigation a[aria-current="page"] {
   text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
 }
 .navigation span {
   color: var(--color-text-muted);
@@ -43,12 +48,25 @@
   .header {
     align-items: flex-start;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
+    padding-bottom: 12px;
   }
   .navigation {
     width: 100%;
     justify-content: space-between;
     gap: 4px;
-    font-size: 15px;
+    font-size: 16px;
+  }
+  .navigation a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 359px) {
+  .navigation {
+    font-size: 14px;
+    gap: 2px;
   }
 }

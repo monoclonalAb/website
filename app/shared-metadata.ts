@@ -45,3 +45,30 @@ export const TWITTER_BASE = {
   // same photo would only add weight.
   card: "summary_large_image",
 } satisfies Metadata["twitter"];
+
+/** Nested metadata is replaced, so each reading route retains social/RSS fields. */
+export function readingMetadata(
+  title: string,
+  path: string,
+  description: string,
+): Metadata {
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: path,
+      types: { "application/rss+xml": "/changelog.xml" },
+    },
+    openGraph: {
+      ...OPEN_GRAPH_BASE,
+      url: path,
+      title: `${title} | Eric Zheng`,
+      description,
+    },
+    twitter: {
+      ...TWITTER_BASE,
+      title: `${title} | Eric Zheng`,
+      description,
+    },
+  };
+}

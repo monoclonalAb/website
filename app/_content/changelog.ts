@@ -11,7 +11,7 @@ export type ChangelogEntry = {
 
 /**
  * Newest first. This remains deliberately empty until there is a new update to
- * publish; adding one record makes it appear on both the home page and RSS feed.
+ * publish; adding one record makes it appear on both the changelog page and RSS feed.
  */
 export const CHANGELOG_ENTRIES: readonly ChangelogEntry[] = [];
 
@@ -20,7 +20,7 @@ export function changelogEntryId(entry: ChangelogEntry) {
 }
 
 export function changelogEntryPath(entry: ChangelogEntry) {
-  return `/#${encodeURIComponent(changelogEntryId(entry))}`;
+  return `/changelog#${encodeURIComponent(changelogEntryId(entry))}`;
 }
 
 export function changelogEntryDate(entry: ChangelogEntry) {

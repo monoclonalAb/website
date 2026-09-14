@@ -121,23 +121,13 @@ pre {
 .reading-column {
   width: min(720px, calc(100% - 48px));
   margin-inline: auto;
-  padding-block: 64px 48px;
-}
-
-.content > section {
-  padding-top: 52px;
+  min-height: 100svh;
+  padding-block: 64px 40px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
 }
 
-.content > section:first-child {
-  padding-top: 44px;
-}
-.content > section:last-child {
-  padding-bottom: 52px;
-}
-.content :is(p, li, dd, a) {
+.standalone :is(p, li, dd, a) {
   overflow-wrap: anywhere;
 }
 
@@ -156,27 +146,41 @@ pre {
 
 .section-title {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+.rss-subscribe {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 24px;
+  white-space: nowrap;
 }
 .standalone {
-  padding-block: 44px 80px;
-  display: grid;
+  flex: 1;
+  padding-block: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.standalone#about {
   gap: 22px;
+  padding-bottom: 48px;
 }
 
 @media (max-width: 599px) {
   .reading-column {
     padding-block: 16px 32px;
   }
-  .content > section {
+  .standalone {
     padding-top: 40px;
   }
-  .content > section:first-child {
-    padding-top: 32px;
-  }
-  .content > section:last-child {
-    padding-bottom: 52px;
+  .standalone#about {
+    padding-bottom: 40px;
   }
   h1 {
     font-size: 36px;

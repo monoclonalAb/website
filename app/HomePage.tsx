@@ -3,7 +3,7 @@ import styles from "./HomePage.module.css";
 /** Static alphabet artwork; only the four real links enter the accessibility tree. */
 export default function HomePage() {
   return (
-    <header id="top" className={styles.hero}>
+    <main id="top" className={styles.hero}>
       <h1 className="sr-only">Eric Zheng</h1>
       <div className={styles.alphabet}>
         <div className={styles.name} aria-hidden="true">
@@ -18,29 +18,34 @@ export default function HomePage() {
           <div>PQRSTU</div>
           <div>VWXYZ</div>
         </div>
-        <nav className={styles.links} aria-label="Introduction">
+        <nav
+          id="pages"
+          tabIndex={-1}
+          className={styles.links}
+          aria-label="Introduction"
+        >
           <div aria-hidden="true">abcdefg</div>
           <div>
             <span aria-hidden="true">h</span>
-            <a href="#about">about</a>
+            <a href="/about">about</a>
             <span aria-hidden="true">ij</span>
           </div>
           <div>
             <span aria-hidden="true">klm</span>
-            <a href="#blog">blog</a>
+            <a href="/blog">blog</a>
             <span aria-hidden="true">n</span>
           </div>
           <div>
             <span aria-hidden="true">o</span>
-            <a href="#contents">contents</a>
+            <a href="/contents">contents</a>
           </div>
           <div>
             <span aria-hidden="true">p</span>
-            <a href="#changelog">changelog</a>
+            <a href="/changelog">changelog</a>
           </div>
           <div aria-hidden="true">qrstuvwxyz</div>
         </nav>
       </div>
-    </header>
+    </main>
   );
 }

@@ -1,25 +1,49 @@
 import Link from "next/link";
 import styles from "./SiteHeader.module.css";
 
-export default function SiteHeader({ home = false }: { home?: boolean }) {
+export type ReadingPageId =
+  "about" | "blog" | "contents" | "changelog" | "leetcode";
+
+export default function SiteHeader({
+  currentPage,
+}: {
+  currentPage: ReadingPageId;
+}) {
   return (
-    <div className={styles.header}>
-      <Link
-        href={home ? "#top" : "/"}
-        className={styles.logo}
-        aria-label="Eric Zheng — home"
-      >
+    <header className={styles.header}>
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Isolate legacy home IDs from Next's retained reading DOM. */}
+      <a href="/" className={styles.logo} aria-label="Eric Zheng — home">
         ez<span>._</span>
-      </Link>
+      </a>
       <nav aria-label="Site navigation" className={styles.navigation}>
-        <a href={home ? "#about" : "/#about"}>about</a>
+        <Link
+          href="/about"
+          aria-current={currentPage === "about" ? "page" : undefined}
+        >
+          about
+        </Link>
         <span aria-hidden="true">~</span>
-        <a href={home ? "#blog" : "/#blog"}>blog</a>
+        <Link
+          href="/blog"
+          aria-current={currentPage === "blog" ? "page" : undefined}
+        >
+          blog
+        </Link>
         <span aria-hidden="true">~</span>
-        <a href={home ? "#contents" : "/#contents"}>contents</a>
+        <Link
+          href="/contents"
+          aria-current={currentPage === "contents" ? "page" : undefined}
+        >
+          contents
+        </Link>
         <span aria-hidden="true">~</span>
-        <a href={home ? "#changelog" : "/#changelog"}>changelog</a>
+        <Link
+          href="/changelog"
+          aria-current={currentPage === "changelog" ? "page" : undefined}
+        >
+          changelog
+        </Link>
       </nav>
-    </div>
+    </header>
   );
 }

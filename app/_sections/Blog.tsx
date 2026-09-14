@@ -1,9 +1,9 @@
 export default function Blog() {
   return (
     <>
-      <h2>
+      <h1>
         blog<span>:</span>
-      </h2>
+      </h1>
       <p>
         place for me to put my thoughts on interesting topics! (group theory)
       </p>

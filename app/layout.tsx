@@ -34,9 +34,8 @@ export const metadata: Metadata = {
   },
 };
 
-// Zoom is deliberately left unrestricted (WCAG 1.4.4): the home page now carries
-// all of the site's prose, so pinch-to-zoom has to keep working. Only the two
-// defaults Next would emit anyway are declared.
+// Zoom remains unrestricted (WCAG 1.4.4) on every page. Only the two defaults
+// Next would emit anyway are declared.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,

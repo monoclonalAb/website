@@ -15,12 +15,12 @@ export default function Changelog() {
   return (
     <>
       <div className="section-title">
-        <h2>
+        <h1>
           changelog<span>:</span>
-        </h2>
-        <a className="small-links" href="/changelog.xml">
-          RSS
-        </a>
+        </h1>
+        <p className="rss-subscribe">
+          subscribe with <a href="/changelog.xml">rss</a>
+        </p>
       </div>
       {CHANGELOG_ENTRIES.length === 0 ? (
         <p className="muted">the update log!! no entries yet.</p>

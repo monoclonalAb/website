@@ -1,14 +1,8 @@
 import type { MetadataRoute } from "next";
 
 /**
- * Two canonical, indexable HTML URLs. Retired studies and the non-HTML
- * changelog feed do not belong in the sitemap.
- *
- * The four sections (#about, #blog, #contents, #changelog) are fragments of `/`,
- * not URLs — crawlers discard the hash, so listing them would just repeat `/`.
- * The old `/about`, `/blog`, `/contents` and `/changelog` paths are 308s
- * (next.config.ts) and must stay out: a redirect in a sitemap is a Search
- * Console error, not a hint.
+ * Six canonical, indexable HTML URLs. Retired studies, fragment aliases and
+ * the non-HTML changelog feed do not belong in the sitemap.
  *
  * `lastModified` is hardcoded to when each route's content actually changed
  * rather than `new Date()`, which would restamp on every build and tell crawlers
@@ -22,6 +16,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 1,
     },
+    ...["about", "blog", "contents", "changelog"].map((page) => ({
+      url: `https://ericzheng.nz/${page}`,
+      lastModified: new Date("2026-09-14"),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     {
       url: "https://ericzheng.nz/leetcode",
       lastModified: new Date("2026-07-29"),
