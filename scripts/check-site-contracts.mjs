@@ -89,18 +89,34 @@ for (const file of publicFiles) {
   if (!existsSync(resolve(root, file))) continue;
   const source = read(file);
   for (const [, href] of source.matchAll(/href="(\/[^"]*|#[^"]*)"/g)) {
-    if (href === "/changelog.xml" || href === "#top") continue;
+    if (href === "/changelog.xml" || href === "/writing.xml" || href === "#top")
+      continue;
     const [path, hash] = href.split("#");
     const route = path || "/";
     if (!targets.has(route) || (hash && !targets.get(route).has(hash)))
       errors.push(`${file}: unknown public destination ${href}`);
   }
-  if (/^["']use client["']/m.test(source))
-    errors.push(`${file}: public UI must remain server-rendered`);
   if (
-    /\b(?:SmoothScroll|useCursorRepel|SiteRail|SiteCrumb|requestAnimationFrame)\b|from ["'](?:lenis|motion)/.test(
+    /^["']use client["']/m.test(source) &&
+    file !== "components/ScrollWaves.tsx"
+  )
+    errors.push(
+      `${file}: only the passive ScrollWaves leaf may use a client boundary`,
+    );
+  if (
+    /\bpreventDefault\s*\(|\bscrollTo\s*\(|\bscrollBy\s*\(|\bsetInterval\s*\(|addEventListener\(["'](?:wheel|touchmove|keydown)["']/.test(
       source,
     )
+  )
+    errors.push(
+      `${file}: public UI must not control scrolling or run an idle loop`,
+    );
+  if (
+    /\b(?:SmoothScroll|useCursorRepel|SiteRail|SiteCrumb)\b|from ["'](?:lenis|motion)/.test(
+      source,
+    ) ||
+    (file !== "components/ScrollWaves.tsx" &&
+      /\brequestAnimationFrame\b/.test(source))
   )
     errors.push(`${file}: retired motion/chrome must not return`);
 }
@@ -116,7 +132,9 @@ for (const file of [
       source,
     )
   )
-    errors.push(`${file}: use native scrolling without decorative animation`);
+    errors.push(
+      `${file}: native scrolling; only the isolated wave canvas may animate`,
+    );
 }
 if (/redirects\s*\(/.test(read("next.config.ts")))
   errors.push("Canonical reading pages must not retain the old redirect table");

@@ -1,9 +1,12 @@
 import styles from "./HomePage.module.css";
+import ScrollWaves from "@/components/ScrollWaves";
 
 /** Static alphabet artwork; only the four real links enter the accessibility tree. */
 export default function HomePage() {
   return (
     <main id="top" className={styles.hero}>
+      <ScrollWaves opening />
+      <ScrollWaves opening side="left" />
       <h1 className="sr-only">Eric Zheng</h1>
       <div className={styles.alphabet}>
         <div className={styles.name} aria-hidden="true">
