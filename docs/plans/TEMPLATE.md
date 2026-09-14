@@ -35,6 +35,8 @@ State the observable outcome in one paragraph.
 - [ ] A user- or system-observable result.
 - [ ] A validation result.
 
+For a multi-step shared/security boundary, link a [task-completion packet](../operations/task-workflow.md) here (use `../../operations/task-workflow.md` from an active/completed plan). Keep the packet's acceptance/check selection and stable boundary clauses authoritative; this plan owns mutable progress and failure history. Record early boundary review and current implementation review separately. Do not put review reports or local receipts in source inputs.
+
 ## Constraints and invariants
 
 - Name the contracts, user changes, and remote pages/assets that must not move.

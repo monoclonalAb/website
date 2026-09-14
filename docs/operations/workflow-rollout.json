@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "id": "task-workflow-rollout",
+  "outcome": "Add and verify the repository task-completion workflow without changing application behaviour.",
+  "contract": "docs/operations/task-workflow.md",
+  "boundary": [
+    "This is local evidence accounting, not authenticated review, release approval or automatic orchestration.",
+    "Status performs no checks/mutations, only read-only inventory; run executes one explicitly selected argv with owned cleanup and no saved logs/environment.",
+    "Full verification requires current fast checks and boundary review. Final completion also requires current implementation review.",
+    "Receipts bind declared worktree inputs, including untracked files; changed source or review artifacts become stale.",
+    "Preserve existing work. No application changes, provisioning, deployment, dependency additions or automatic agents."
+  ],
+  "inputs": [
+    "scripts/task-workflow.mjs",
+    "tests/workflow",
+    "docs/agent-workflow.md",
+    "docs/development.md",
+    "docs/operations/task-workflow.md",
+    "docs/plans/TEMPLATE.md",
+    "docs/README.md",
+    "docs/quality.md",
+    "docs/testing.md",
+    "AGENTS.md"
+  ],
+  "boundaryInputs": ["docs/operations/task-workflow.md"],
+  "ownerInput": [],
+  "outOfScope": [
+    "Application runtime and hosted release",
+    "Global Pi/Herdr configuration",
+    "Claiming general model efficiency gains from one pilot"
+  ],
+  "checks": [
+    {
+      "id": "boundary-tests",
+      "phase": "fast",
+      "argv": ["pnpm", "test:workflow"],
+      "timeoutSeconds": 60,
+      "cleanupSeconds": 5
+    },
+    {
+      "id": "repository",
+      "phase": "full",
+      "argv": ["pnpm", "validate"],
+      "timeoutSeconds": 180,
+      "cleanupSeconds": 30,
+      "inputs": ["."]
+    }
+  ]
+}
