@@ -1,126 +1,56 @@
-/* Home page — scoped port of the source index.css.
-   Kept in a CSS Module so its full-viewport sizing / overflow / selection
-   colour cannot leak onto the scrolling content routes. */
-
-.siteContainer {
-  position: relative;
-  z-index: 2;
-  min-height: 100svh; /* full-height tile, parity with the section panels below */
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  row-gap: 10px;
-  justify-content: center;
+.hero {
+  --letter-size: clamp(1.625rem, 8.205vw, 2rem);
+  --letter-line: calc(var(--letter-size) * 1.1);
+  display: grid;
   align-items: center;
-  background-color: var(--color-paper);
-  overflow: hidden;
-  scroll-snap-align: start; /* first snap point (#top splash), parity with the section tiles */
-  scroll-snap-stop: always;
-}
-
-.siteContainer ::selection {
-  background-color: #f47142;
-}
-
-.title {
-  position: absolute;
-  top: 50%; /* centre within the (svh) container rather than the vh viewport */
-  left: 0;
-  width: 100%;
-  transform: translateY(-50%);
-  font-family: var(--font-helvetica), "Helvetica", sans-serif;
-  font-weight: 700; /* keeps Helvetica Bold — Helvetica is 400/700, so inheriting
-                       the h1 default of 500 would match *down* to Regular */
+  min-height: max(100svh, calc(var(--letter-line) * 10));
+  background: linear-gradient(to right, var(--color-surface) 50%, #30312e 50%);
+  font-family: var(--font-helvetica), Arial, sans-serif;
+  font-size: var(--letter-size);
+  font-weight: 700;
   line-height: 1.1;
-  color: var(--color-light-gray);
-  --expand: 0.2em; /* hover tracking-expand: per-gap spacing (single tunable knob) */
 }
 
-.leftSeg,
-.rightSeg {
-  flex: 1 1 0;
-  min-width: 0;
+.alphabet {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-block: var(--letter-line);
+}
+
+.name {
+  color: var(--color-light-gray);
+  text-align: right;
   white-space: nowrap;
 }
-.leftSeg {
-  text-align: right;
-}
-.rightSeg {
-  text-align: left;
+
+.name span {
+  color: var(--color-accent);
 }
 
-.title .letter {
-  display: inline-block;
-  color: inherit;
-  will-change: transform;
-}
-.title :global(a) .letter {
-  pointer-events: none;
+.links {
+  margin-top: calc(var(--letter-line) * 2);
+  color: #666;
+  white-space: nowrap;
 }
 
-.glyph {
-  display: inline-block;
-  will-change: transform;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.title .line:has(:global(a):hover) .glyph {
-  transform: translateX(var(--spread-x, 0));
+.links a {
+  color: var(--color-paper);
+  text-decoration: none;
 }
 
-.title .line {
-  display: flex;
-  color: inherit;
+.links a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
 }
 
-.title .name {
-  color: var(--color-red);
+.links a:focus-visible {
+  outline-color: var(--color-paper);
+  outline-offset: 0;
 }
 
-.title .name,
-.title :global(a) {
-  position: relative;
-  z-index: 1;
-}
-
-.title :global(a) {
-  color: var(--color-black);
-}
-.title :global(a):hover {
-  color: var(--color-black);
-  font-style: normal;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .glyph {
-    transition: none;
-  }
-  .title .line:has(:global(a):hover) .glyph {
-    transform: none;
-  }
-}
-
-@media (max-width: 600px) {
-  .title {
-    font-size: 2rem;
-  }
-}
-@media (min-width: 600px) and (min-height: 480px) {
-  .title {
-    font-size: 3rem;
-  }
-}
-@media (min-width: 768px) and (min-height: 600px) {
-  .title {
-    font-size: 4rem;
-  }
-}
-@media (min-width: 992px) and (min-height: 768px) {
-  .title {
-    font-size: 5rem;
-  }
-}
-@media (min-width: 1200px) and (min-height: 992px) {
-  .title {
-    font-size: 6rem;
+@media (min-width: 600px) {
+  .hero {
+    --letter-size: clamp(2rem, 5.556vw, 5rem);
   }
 }

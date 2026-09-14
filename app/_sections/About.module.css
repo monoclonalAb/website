@@ -1,0 +1,85 @@
+.intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px;
+  grid-template-areas: "heading portrait" "biography portrait" "peers portrait";
+  column-gap: 44px;
+  row-gap: 20px;
+}
+.heading {
+  grid-area: heading;
+  font-size: 42px;
+  line-height: 50px;
+}
+.biography {
+  grid-area: biography;
+}
+.portrait {
+  grid-area: portrait;
+  margin-top: 7px;
+}
+.portrait img {
+  width: 100%;
+  aspect-ratio: 160 / 213;
+  object-fit: cover;
+}
+.portrait figcaption {
+  margin-top: 8px;
+  color: var(--color-caption);
+  font-family: var(--font-helvetica), Arial, sans-serif;
+  font-size: 12px;
+  line-height: 20px;
+}
+.portrait a {
+  color: inherit;
+  text-decoration: none;
+}
+.portrait a:hover {
+  text-decoration: underline;
+}
+.peers {
+  grid-area: peers;
+}
+.peers,
+.interests {
+  display: grid;
+  gap: 12px;
+}
+.list {
+  list-style: "·   ";
+  padding-left: 22px;
+  display: grid;
+  gap: 8px;
+}
+.list li::marker {
+  color: var(--color-text-muted);
+}
+.list a {
+  color: inherit;
+  text-decoration: none;
+}
+.list a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 599px) {
+  .intro {
+    grid-template-columns: minmax(0, 1fr) 96px;
+    grid-template-areas: "heading heading" "biography portrait" "peers peers";
+    column-gap: 28px;
+    row-gap: 20px;
+  }
+  .heading {
+    font-size: 36px;
+    line-height: 44px;
+  }
+  .portrait {
+    margin-top: 0;
+  }
+  .portrait figcaption {
+    font-size: 11px;
+    line-height: 18px;
+  }
+  .peers {
+    margin-top: 16px;
+  }
+}

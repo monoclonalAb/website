@@ -1,0 +1,30 @@
+.footnote {
+  margin-top: 4px;
+}
+.footnote summary {
+  color: var(--color-link);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 28px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.footnote summary::marker {
+  color: var(--color-accent);
+  font-size: 12px;
+}
+.body {
+  display: grid;
+  gap: 22px;
+  padding-top: 24px;
+}
+.reasons {
+  list-style: decimal;
+  padding-left: 30px;
+  display: grid;
+  gap: 22px;
+}
+.reasons li::marker {
+  color: var(--color-text-muted);
+}

@@ -1,192 +1,75 @@
-/* eslint-disable react/no-unescaped-entities */
 import Image from "next/image";
-import Link from "next/link";
 import ericPhoto from "@/public/images/eric_photo_2.jpg";
+import Footnote from "./Footnote";
+import styles from "./About.module.css";
 
 export default function About() {
   return (
     <>
-      <figure>
-        <Image
-          src={ericPhoto}
-          alt="recent photo of me at Parable House"
-          sizes="(max-width: 650px) 80vw, 520px"
-          style={{ width: "100%", maxWidth: "80%", height: "auto" }}
-        />
-        <figcaption>
-          picture of me at{" "}
-          <a
-            href="https://maps.app.goo.gl/HQVb5fpzGrYu7AyJ7"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Parable House
-          </a>
-          , August 2025
-        </figcaption>
-      </figure>
-
-      {/* The four ids below are rail rows — see app/scroll/outline.ts. */}
-      <h1 id="about-me">
-        about me<span>:</span>
-      </h1>
-      <p>
-        you are visiting the site of <em>Eric Zheng</em>, an undergraduate
-        student studying <b>Mathematics</b> and <b>Computer Science</b> in
-        Auckland, New Zealand.
-      </p>
-      <p>like many of his peers, he:</p>
-      <ul className="sidebar">
-        <li>
-          is a <i>little</i> below average height on a good day
-        </li>
-        <li>
-          dreams about becoming a fabled '<b>10x developer</b>'
-        </li>
-        <li>
-          worries about getting replaced by the next{" "}
-          <a
-            href="https://en.wikipedia.org/wiki/Devin_AI"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Devin
-          </a>
-        </li>
-        <li>
-          possesses a{" "}
-          <a
-            href="https://www.instagram.com/ericzhengfanpage/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            fan page
-          </a>{" "}
-          boasting 60+ followers !?
-        </li>
-        <li>
-          muses over the <Link href="/leetcode">daily Leetcode</Link> on his
-          journey to class
-        </li>
-      </ul>
-      <p>outside of university, he:</p>
-      <ul className="sidebar">
-        <li>
-          is an aspiring runner, hoping that running 80km per week will be
-          enoug-
-        </li>
-        <li>
-          maximises development card production in Catan, by employing the{" "}
-          <b>Ore-Wheat-Sheep (OWS)</b> Strategy
-        </li>
-        <li>
-          is a professional light-mode user (
-          <a
-            href="https://catppuccin.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            catppuccin latte
-          </a>
-          )
-        </li>
-        <li>
-          enjoys playing badminton and intends to develop a killer cross-court
-          drop
-        </li>
-        <li>
-          hopes to maintain a semi-active semi-academic <a href="#blog">blog</a>
-        </li>
-      </ul>
-
-      <div className="important">
-        <h2 id="fun-fact">
-          fun fact<span>:</span>
+      <div className={styles.intro}>
+        <h2 id="about-me" className={styles.heading}>
+          about me<span>:</span>
         </h2>
-        <p>
-          when I was 11, I did so happen to write in my yearbook that "
-          <em>I want[ed] to be a computer scientist</em>" when I grow up.
-          Apparently <b>dreams</b> do come true...
+        <p className={styles.biography}>
+          you are visiting the site of Eric Zheng, an undergraduate student
+          studying Mathematics and Computer Science in Auckland, New Zealand.
         </p>
+        <figure className={styles.portrait}>
+          <Image
+            src={ericPhoto}
+            alt="Eric at Parable House, August 2025"
+            sizes="(max-width: 599px) 96px, 160px"
+          />
+          <figcaption>
+            <a href="https://maps.app.goo.gl/HQVb5fpzGrYu7AyJ7">
+              Parable House
+            </a>
+            <br />
+            August 2025
+          </figcaption>
+        </figure>
+        <div className={styles.peers}>
+          <p>like many of his peers, he:</p>
+          <ul className={styles.list}>
+            <li>is a little below average height on a good day</li>
+            <li>dreams about becoming a fabled &apos;10x developer&apos;</li>
+            <li>
+              worries about getting replaced by the next{" "}
+              <a href="https://en.wikipedia.org/wiki/Devin_AI">Devin</a>
+            </li>
+            <li>
+              muses over the <a href="/leetcode">daily Leetcode</a> on his
+              journey to class
+            </li>
+          </ul>
+        </div>
       </div>
-
-      <hr />
-
-      <h1 id="about-this-site">
-        about this site<span>:</span>
-      </h1>
-      <p>
-        now, all antics aside, the website itself was created with{" "}
-        <b>pure HTML, CSS and Javascript</b>, and was heavily inspired by{" "}
-        <a
-          href="https://www.ericzheng.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Eric Zheng
-        </a>
-        . However, unlike Eric Zheng Sr., hosting is done on GitHub purely due
-        to <i>preference</i>. Deployment using the GitHub Actions workflow also
-        allows me to <i>run the bash scripts</i>,{" "}
-        <i>generating the site as an artifact</i> which then gets{" "}
-        <i>deployed</i> as a Github Pages site (meaning I can only store the
-        `./src` files in the repository, without having to worry about{" "}
-        <b>storing duplicate files</b> in `./public`).
-      </p>
-      <p>
-        coming from a life-long Windows user with <i>limited understanding</i>{" "}
-        about unix commands, understanding the original workflow did have its
-        challenges but development so far has been suprisingly quite smooth.
-        (other Eric's bash scripts have been easy enough to follow and Bash is
-        also suprisingly readable). For the purposes of keeping the tradition
-        going (<i>no ulterior motives I swear</i>), I have made the executive
-        decision to continue to maintain this "static site generator" using{" "}
-        <b>pure HTML, CSS and Javascript</b> with a few bash scripts.
-      </p>
-
-      <hr />
-
-      <h1 id="footnote">
-        footnote<span>:</span>
-      </h1>
-      <p>
-        to be completely transparent, the creation of this blog/website was
-        quite spontaneous, but there were <b>2 main reasons</b> why I decided to
-        follow through:
-      </p>
-      <ol className="sidebar">
-        <li>
-          As my career as a full-time undergraduate student is coming to an end,
-          I have came to the shocking realisation that{" "}
-          <em>
-            I might not ever have as great of an opportunity to learn ever again
-          </em>{" "}
-          (slightly exaggerated for comedic effect). In order to combat this
-          looming stagnation in my learning, I thought it would be quite useful
-          to have a custom platform to post my writings on topics that interest
-          me (so far, just leetcode and group theory). I hoped that this will
-          then encourage me to <i>deepen my knowledge</i> on whatever I so
-          happen to write about (otherwise, I might just end up spreading
-          misinformation on the internet).
-        </li>
-        <br />
-        <li>
-          I was also looking to migrate my editor set-up from VS-Code to Neovim
-          and wanted a project to complete in order to help ease the transition.
-          I did hope that upon deployment, I would eventually be able to come up
-          with a good excuse for why it was imperative to swap editors, but
-          realistically I just thought Neovim looked <em>fun</em>.
-        </li>
-      </ol>
-      <p>
-        Consequently, as I do hope to remain employed, it is probably an
-        adequate time to say that "
-        <em>
-          All opinions expressed on this website are my own and do not reflect
-          the views or positions of any current or past employers.
-        </em>
-        "
-      </p>
+      <div className={styles.interests}>
+        <p>outside of university, he:</p>
+        <ul className={styles.list}>
+          <li>
+            is an aspiring runner, hoping that his weekly mileage shows some
+            consistency
+          </li>
+          <li>
+            maximises development card production in Catan, by employing the
+            Ore-Wheat-Sheep Strategy
+          </li>
+          <li>
+            professionally uses light-mode (
+            <a href="https://catppuccin.com/">catppuccin latte</a>)
+          </li>
+          <li>
+            hopes to maintain a semi-active semi-academic{" "}
+            <a href="#blog">blog</a>
+          </li>
+        </ul>
+      </div>
+      <div className="small-links">
+        <a href="mailto:theericzheng@gmail.com">email me</a>
+        <a href="https://github.com/monoclonalAb">GitHub</a>
+      </div>
+      <Footnote />
     </>
   );
 }

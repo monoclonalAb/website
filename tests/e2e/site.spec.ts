@@ -1,191 +1,152 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-const HOME_TILES = ["top", "about", "blog", "contents", "changelog"] as const;
-const LEGACY_REDIRECTS = HOME_TILES.slice(1);
+const sections = ["top", "about", "blog", "contents", "changelog"];
+const headings = [
+  "about-me",
+  "fun-fact",
+  "about-this-site",
+  "footnote",
+  "internal-links",
+  "external-links",
+  "emails",
+  "social-media",
+];
 
-async function waitForFonts(page: Page) {
-  await page.evaluate(() => document.fonts.ready);
-}
-
-async function distanceFromViewportTop(page: Page, id: string) {
-  return page
-    .locator(`#${id}`)
-    .evaluate((element) => element.getBoundingClientRect().top);
-}
-
-test("home renders its canonical content and every outline target", async ({
+test("home has semantic content, metadata and working fragment targets", async ({
   page,
 }) => {
-  const pageErrors: string[] = [];
-  page.on("pageerror", (error) => pageErrors.push(error.message));
-
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
-  await waitForFonts(page);
-
   await expect(page).toHaveTitle("Eric Zheng");
   await expect(
     page.getByRole("heading", { level: 1, name: "Eric Zheng", exact: true }),
-  ).toBeVisible();
-  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(
-    1,
+  ).toHaveCount(1);
+  await expect(page.getByRole("main")).toHaveCount(1);
+  await expect(page.locator('head link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://ericzheng.nz",
   );
-
-  for (const id of HOME_TILES)
+  const person = JSON.parse(
+    await page.locator('script[type="application/ld+json"]').innerText(),
+  );
+  expect(person.name).toBe("Eric Zheng");
+  expect(person.sameAs).toContain("https://github.com/monoclonalAb");
+  for (const id of [...sections, ...headings])
     await expect(page.locator(`#${id}`)).toHaveCount(1);
-
-  const missingTargets = await page
-    .getByRole("navigation", { name: "site tree" })
-    .locator('a[href^="#"]')
-    .evaluateAll((anchors) =>
-      anchors
-        .map((anchor) => anchor.getAttribute("href"))
-        .filter(
-          (href): href is string =>
-            Boolean(href) && document.querySelector(href as string) === null,
-        ),
-    );
-  expect(missingTargets).toEqual([]);
-  expect(pageErrors).toEqual([]);
+  expect(
+    await page
+      .locator("header[id], main > section[id]")
+      .evaluateAll((els) => els.map((el) => el.id)),
+  ).toEqual(sections);
+  expect(
+    await page
+      .locator('a[href^="#"]')
+      .evaluateAll((links) =>
+        links
+          .map((el) => el.getAttribute("href")!.slice(1))
+          .filter((id) => !document.getElementById(id)),
+      ),
+  ).toEqual([]);
+  await expect(page.locator("main h2")).toHaveText([
+    "about me:",
+    "blog:",
+    "contents:",
+    "changelog:",
+  ]);
+  await expect(page.locator("#about img")).toHaveAttribute(
+    "alt",
+    "Eric at Parable House, August 2025",
+  );
+  expect(errors).toEqual([]);
 });
 
-test("the changelog advertises a valid RSS feed", async ({ page, request }) => {
+test("changelog keeps valid shared RSS and discovery", async ({
+  page,
+  request,
+}) => {
   await page.goto("/");
-
   await expect(
     page.locator('head link[rel="alternate"][type="application/rss+xml"]'),
   ).toHaveAttribute("href", "https://ericzheng.nz/changelog.xml");
   await expect(page.locator('#changelog a[href="/changelog.xml"]')).toHaveText(
     "RSS",
   );
-
   const response = await request.get("/changelog.xml");
   expect(response.ok()).toBe(true);
   expect(response.headers()["content-type"]).toContain("application/rss+xml");
-
   const xml = await response.text();
-  const parseError = await page.evaluate((feed) => {
-    const document = new DOMParser().parseFromString(feed, "application/xml");
-    return document.querySelector("parsererror")?.textContent ?? null;
-  }, xml);
-
-  expect(parseError).toBeNull();
+  expect(
+    await page.evaluate(
+      (feed) =>
+        new DOMParser()
+          .parseFromString(feed, "application/xml")
+          .querySelector("parsererror")?.textContent ?? null,
+      xml,
+    ),
+  ).toBeNull();
   expect(xml).toContain('<rss version="2.0"');
   expect(xml).toContain(
     '<atom:link href="https://ericzheng.nz/changelog.xml" rel="self" type="application/rss+xml" />',
   );
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  expect(sitemap).toContain("https://ericzheng.nz/leetcode");
+  for (const obsolete of ["/test", "/explore"]) {
+    expect(sitemap).not.toContain(obsolete);
+    expect((await request.get(obsolete)).status()).toBe(404);
+  }
 });
 
-test("legacy section routes are permanent fragment redirects", async ({
+test("legacy routes remain permanent fragment redirects", async ({
   request,
   baseURL,
 }) => {
-  for (const section of LEGACY_REDIRECTS) {
+  for (const section of sections.slice(1)) {
     const response = await request.get(`/${section}`, { maxRedirects: 0 });
-    expect(response.status(), `/${section} status`).toBe(308);
-
-    const location = response.headers().location;
-    expect(location, `/${section} Location header`).toBeTruthy();
-    const destination = new URL(location as string, baseURL);
+    expect(response.status()).toBe(308);
+    const destination = new URL(response.headers().location, baseURL);
     expect(destination.pathname).toBe("/");
     expect(destination.hash).toBe(`#${section}`);
   }
 });
 
-test("a cold fragment load lands on the requested tile", async ({ page }) => {
-  await page.goto("/#contents");
-  await waitForFonts(page);
-
-  await expect(page).toHaveURL(/\/#contents$/);
-  await expect
-    .poll(() => distanceFromViewportTop(page, "contents"), { timeout: 3_000 })
-    .toBeCloseTo(0, 0);
-
-  const breadcrumb = page.getByRole("navigation", { name: "Breadcrumb" });
-  await expect(
-    breadcrumb.getByRole("link", { name: "ez", exact: true }),
-  ).toHaveAttribute("href", "/#top");
-  await expect(
-    breadcrumb.getByRole("link", { name: "contents.html", exact: true }),
-  ).toHaveAttribute("href", "/#contents");
-});
-
-test("the standalone Leetcode route keeps its own metadata and route home", async ({
+test("Leetcode keeps independent metadata and a semantic route home", async ({
   page,
 }) => {
-  const pageErrors: string[] = [];
-  page.on("pageerror", (error) => pageErrors.push(error.message));
-
   await page.goto("/leetcode");
   await expect(page).toHaveTitle("Leetcode | Eric Zheng");
   await expect(
-    page.getByRole("heading", { level: 1, name: /leetcode/i }),
+    page.getByRole("heading", { level: 1, name: "leetcode:" }),
   ).toBeVisible();
-  const breadcrumb = page.getByRole("navigation", { name: "Breadcrumb" });
-  await expect(
-    breadcrumb.getByRole("link", { name: "ez", exact: true }),
-  ).toHaveAttribute("href", "/#top");
-  await expect(
-    breadcrumb.getByRole("link", { name: "leetcode.html", exact: true }),
-  ).toHaveAttribute("href", "/leetcode");
-  expect(pageErrors).toEqual([]);
-});
-
-test("the academic style study covers every surface without entering search", async ({
-  page,
-}) => {
-  const pageErrors: string[] = [];
-  page.on("pageerror", (error) => pageErrors.push(error.message));
-
-  await page.goto("/explore");
-  await waitForFonts(page);
-
-  await expect(page).toHaveTitle("Academic style study | Eric Zheng");
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    "content",
-    "noindex, nofollow",
+  await expect(page.locator('head link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://ericzheng.nz/leetcode",
   );
-  await expect(
-    page.getByRole("navigation", { name: "Style study index" }),
-  ).toBeVisible();
-
-  for (const id of [
-    "study-index",
-    "study-about",
-    "study-blog",
-    "study-contents",
-    "study-changelog",
-    "study-leetcode",
-  ]) {
-    await expect(page.locator(`#${id}`)).toHaveCount(1);
-  }
-
-  await expect(
-    page.getByRole("link", { name: /return to current site/i }),
-  ).toHaveAttribute("href", "/#top");
-  expect(pageErrors).toEqual([]);
+  await page.getByRole("link", { name: "Eric Zheng — home" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator("#top")).toBeVisible();
 });
 
-test.describe("reduced motion", () => {
-  test.use({ contextOptions: { reducedMotion: "reduce" } });
-
-  test("uses native scrolling with equivalent fragment navigation", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await waitForFonts(page);
-
-    await expect
-      .poll(() =>
-        page.evaluate(() =>
-          document.documentElement.classList.contains("lenis"),
-        ),
-      )
-      .toBe(false);
-
-    await page.locator('h1 a[href="#contents"]').click();
-    await expect(page).toHaveURL(/\/#contents$/);
-    await expect
-      .poll(() => distanceFromViewportTop(page, "contents"))
-      .toBeCloseTo(0, 0);
+for (const javaScriptEnabled of [true, false]) {
+  test.describe(`native disclosure / JavaScript ${javaScriptEnabled}`, () => {
+    test.use({ javaScriptEnabled });
+    test("footnote works with keyboard and cold hidden fragments", async ({
+      page,
+    }) => {
+      await page.goto("/");
+      const details = page.locator("details");
+      await expect(details).not.toHaveAttribute("open");
+      await page.locator("summary").focus();
+      await page.keyboard.press("Enter");
+      await expect(details).toHaveAttribute("open", "");
+      await expect(page.locator("#footnote")).toBeVisible();
+      await page.keyboard.press("Enter");
+      await expect(details).not.toHaveAttribute("open");
+      for (const id of ["footnote", "fun-fact", "about-this-site"]) {
+        await page.goto(`/#${id}`);
+        await expect(details).toHaveAttribute("open", "");
+        await expect(page.locator(`#${id}`)).toBeInViewport();
+      }
+    });
   });
-});
+}

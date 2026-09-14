@@ -14,20 +14,22 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("en-NZ", {
 export default function Changelog() {
   return (
     <>
-      <h1>
-        changelog<span>:</span>
-      </h1>
-      <p>
-        the update log!! subscribe via <a href="/changelog.xml">RSS</a>.
-      </p>
+      <div className="section-title">
+        <h2>
+          changelog<span>:</span>
+        </h2>
+        <a className="small-links" href="/changelog.xml">
+          RSS
+        </a>
+      </div>
       {CHANGELOG_ENTRIES.length === 0 ? (
-        <p>no entries yet.</p>
+        <p className="muted">the update log!! no entries yet.</p>
       ) : (
-        <ol className="sidebar">
+        <ol>
           {CHANGELOG_ENTRIES.map((entry) => (
             <li id={changelogEntryId(entry)} key={entry.id}>
               <p>
-                <span className="release">{entry.title}</span>{" "}
+                <strong>{entry.title}</strong>{" "}
                 <time dateTime={entry.publishedOn}>
                   {DATE_FORMATTER.format(changelogEntryDate(entry))}
                 </time>

@@ -1,0 +1,32 @@
+.directory {
+  display: grid;
+  gap: 12px;
+}
+.directory > div {
+  display: grid;
+  grid-template-columns: 122px minmax(0, 1fr);
+}
+.directory dd {
+  color: var(--color-text-muted);
+}
+.emails {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+}
+.emails p {
+  color: var(--color-text-muted);
+  font-size: 15px;
+  line-height: 24px;
+}
+.emails a {
+  width: fit-content;
+  max-width: 100%;
+  color: var(--color-text);
+}
+
+@media (max-width: 599px) {
+  .directory > div {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+}

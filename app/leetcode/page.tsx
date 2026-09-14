@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import SiteChrome from "@/components/SiteChrome";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import { OPEN_GRAPH_BASE, TWITTER_BASE } from "../shared-metadata";
 
 const DESCRIPTION =
@@ -29,20 +30,21 @@ export const metadata: Metadata = {
 
 export default function LeetcodePage() {
   return (
-    <SiteChrome>
-      <h1 id="leetcode">
-        leetcode<span>:</span>
-      </h1>
-      <p>
-        for me to conveniently <b>group</b> and post my solutions to the daily
-        leetcode question... hopefully I do not end up missing any... right...
-      </p>
-      {/* Empty state — leaves room for a future web-based editor / solution log. */}
-      <div className="sidebar">
+    <div className="reading-column">
+      <SiteHeader />
+      <main className="standalone">
+        <h1 id="leetcode">
+          leetcode<span>:</span>
+        </h1>
         <p>
+          for me to conveniently <b>group</b> and post my solutions to the daily
+          leetcode question... hopefully I do not end up missing any... right...
+        </p>
+        <p className="muted">
           <i>daily solutions coming soon.</i>
         </p>
-      </div>
-    </SiteChrome>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

@@ -1,9 +1,8 @@
 import type { MetadataRoute } from "next";
 
 /**
- * Two canonical, indexable HTML URLs. The unlisted `/test` dial playground is
- * deliberately `noindex`, and `/changelog.xml` is a feed rather than a page, so
- * neither belongs here.
+ * Two canonical, indexable HTML URLs. Retired studies and the non-HTML
+ * changelog feed do not belong in the sitemap.
  *
  * The four sections (#about, #blog, #contents, #changelog) are fragments of `/`,
  * not URLs — crawlers discard the hash, so listing them would just repeat `/`.
@@ -19,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: "https://ericzheng.nz",
-      lastModified: new Date("2026-09-04"),
+      lastModified: new Date("2026-09-14"),
       changeFrequency: "monthly",
       priority: 1,
     },

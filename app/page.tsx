@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import HomePage from "./HomePage";
-import SmoothScroll from "./SmoothScroll";
-import SiteChrome from "@/components/SiteChrome";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import About from "./_sections/About";
 import Blog from "./_sections/Blog";
 import Contents from "./_sections/Contents";
@@ -37,28 +37,21 @@ const personJsonLd = {
   ],
 };
 
-/**
- * The whole site on one scroll: the interactive splash hero, then the shared
- * chrome (fixed crumb/rail + centred content column) wrapping every prose section,
- * tiled into full-height panels you glide between via <SmoothScroll/> (Lenis).
- * <HomePage/> and <SmoothScroll/> own the page-level client behavior; SiteChrome's
- * shell and the prose sections stay server-rendered while the crumb and rail keep
- * their own narrow client boundaries.
- */
+/** One server-rendered document. Scrolling and disclosures belong to the browser. */
 export default function Home() {
   return (
     <>
-      {/* Outside <SmoothScroll/> deliberately: its reduced-motion and Lenis
-          branches must render identical DOM, so nothing conditional may gain a
-          sibling. A JSON-LD script is display:none per the UA stylesheet, so it
-          costs the tile layout nothing. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
       />
-      <SmoothScroll>
-        <HomePage />
-        <SiteChrome>
+      <a className="skip-link" href="#about">
+        Skip to content
+      </a>
+      <HomePage />
+      <div className="reading-column">
+        <SiteHeader home />
+        <main className="content">
           <section id="about">
             <About />
           </section>
@@ -71,8 +64,9 @@ export default function Home() {
           <section id="changelog">
             <Changelog />
           </section>
-        </SiteChrome>
-      </SmoothScroll>
+        </main>
+        <SiteFooter home />
+      </div>
     </>
   );
 }

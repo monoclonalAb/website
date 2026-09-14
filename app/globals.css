@@ -1,362 +1,185 @@
 @import "tailwindcss";
 
-/* ── Design tokens ───────────────────────────────────────────────────────
-   Palette + fonts from the original site (main.css :root + @font-face).
-   Exposed as Tailwind v4 theme tokens (also emitted as :root custom props,
-   so `var(--color-red)` works in global CSS and CSS Modules alike). */
 @theme {
-  --color-black: #16171b; /* nav links — sampled from reference image */
-  --color-navy: #1c2129; /* source --color */
+  --color-paper: #f0eee8;
+  --color-black: #16171b;
+  --color-navy: #1c2129;
   --color-dark-gray: #374151;
   --color-gray: #666666;
-  --color-light-gray: #c8c5bc; /* alphabet speckle — sampled from reference image */
-  --color-stone: #8f8b80; /* chrome at rest — rail rows, crumb separator */
-  --color-paper: #f0eee8; /* page background — sampled from reference image */
-  --color-red: #d91620; /* ERIC/ZHENG accent — sampled from reference image */
-
-  --font-body: var(--font-helvetica);
+  --color-light-gray: #c8c5bc;
+  --color-stone: #8f8b80;
+  --color-red: #d91620;
+  --color-surface: var(--color-paper);
+  --color-text: var(--color-black);
+  --color-heading: var(--color-black);
+  --color-text-muted: var(--color-gray);
+  --color-caption: var(--color-gray);
+  --color-link: #7c4147;
+  --color-accent: var(--color-red);
+  --color-rule: var(--color-light-gray);
+  --color-selection: #ffd987;
+  --color-focus: var(--color-red);
+  --font-body: Georgia, "Times New Roman", serif;
   --font-display: var(--font-eiko);
   --font-serif: var(--font-baskerville);
   --font-mono: var(--font-fira-code);
-
-  --breakpoint-sm: 600px;
-  --breakpoint-md: 768px;
-  --breakpoint-lg: 992px;
-  --breakpoint-xl: 1200px;
 }
 
-/* ── Base ────────────────────────────────────────────────────────────── */
-* {
-  margin: 0;
-  padding: 0;
+:root {
+  color-scheme: light;
 }
 
 body {
-  color: var(--color-dark-gray);
-  background-color: var(--color-paper);
-  font-family: var(--font-body), "Helvetica", sans-serif;
-  width: 100vw;
-  overflow-x: hidden;
-}
-
-/* ── Single-page scroll: every tile lands flush with the viewport ─────────
-   Chrome clearance is padding INSIDE each tile (see `.content > section`), not
-   a scroll offset. A tile's top edge therefore lands exactly on the viewport's
-   top edge and no neighbouring tile can appear above or below it.
-
-   This also makes --nav-h forgiving. When it was scroll-padding-top for the former
-   navbar, 4.5rem against a 46px bar parked the viewport 26px too high and leaked
-   a strip of the previous tile. As interior padding it only has to be >= what the
-   current fixed chrome occupies.
-
-   The bar is gone, but this band is NOT: the crumb floats in it. Zero it and the
-   crumb lands on the h1 of `about`, the one tile taller than the viewport, whose
-   prose starts at exactly this padding. */
-:root {
-  --nav-h: 4.5rem;
-  /* Closing space at the foot of every tile — see `.content > section`. Scales with
-     the viewport so it stays a visible share of the screen on a laptop and doesn't
-     eat a short tile on a small one, with a floor of a few lines of prose. */
-  --tile-end: clamp(4.5rem, 16vh, 11rem);
-}
-@media (max-width: 600px) {
-  :root {
-    --nav-h: 3rem;
-    --tile-end: clamp(3rem, 12vh, 6rem);
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    /* Native snap backstop for input the JS pager doesn't drive (scrollbar, touch,
-       zoom/resize reflow). proximity — never mandatory — so it can't fight Lenis'
-       per-frame scrollTo and can't trap the reader inside the tall About/Contents
-       tiles. The JS pager (app/scroll/PagerScroll.tsx) still provides the hard
-       one-gesture-per-section feel for wheel + keyboard.
-
-       Deliberately NO `scroll-behavior: smooth` here. Lenis owns anchor easing, and
-       lenis 1.3 dropped the `.lenis-smooth { scroll-behavior: auto }` reset that older
-       versions shipped — so declaring it would leave the browser's own smooth-scroll
-       animator running alongside Lenis, two authorities on the same scroll position.
-       /leetcode loses nothing: it renders no <section> children and has no in-page
-       anchors, and mobile taps still glide through the pager's click handler. */
-    scroll-snap-type: y proximity;
-  }
-  /* While Lenis is actively scrolling it sets `lenis-scrolling` on <html> (its root
-     element in `root` mode); disable native snap for that window so it never
-     contends with an in-flight pager glide. The class is added synchronously inside
-     scrollTo (Animate.fromTo calls onStart before the first frame), so there is no
-     window in which a glide runs with snap still armed. This matters beyond feel:
-     Lenis resolves element targets against its own animatedScroll, so a native snap
-     correction landing mid-glide would desync the two and skew every later target. */
-  html.lenis-scrolling {
-    scroll-snap-type: none;
-  }
+  margin: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 29px;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background-color: #ffd987;
+  background: var(--color-selection);
 }
 
-/* ── Headings — Eiko, with red <span> accent ─────────────────────────────
-   Tailwind preflight strips heading size/weight; restore browser defaults
-   so the ported markup keeps its visual hierarchy. */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-display), serif;
-  color: var(--color-black);
-  font-weight: 500; /* Eiko Medium — the file's own weight, see fonts.ts */
-  line-height: 1.1;
+  color: var(--color-heading);
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 500;
 }
+
 h1 {
-  font-size: 2em;
+  font-size: 42px;
+  line-height: 50px;
 }
 h2 {
-  font-size: 1.5em;
+  font-size: 28px;
+  line-height: 36px;
 }
 h3 {
-  font-size: 1.17em;
-}
-h4 {
-  font-size: 1em;
-}
-h5 {
-  font-size: 0.83em;
-}
-h6 {
-  font-size: 0.67em;
+  font-size: 24px;
+  line-height: 32px;
 }
 h1 > span,
 h2 > span,
-h3 > span,
-h4 > span,
-h5 > span,
-h6 > span {
-  color: var(--color-red);
+h3 > span {
+  color: var(--color-accent);
 }
 
-/* ── Links + hover italic ────────────────────────────────────────────── */
 a {
-  color: var(--color-navy);
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
+
 a:hover {
-  color: var(--color-red);
-  font-style: italic;
+  text-decoration-thickness: 2px;
 }
 
-/* ── Text ────────────────────────────────────────────────────────────── */
-p,
-li {
-  line-height: 1.4rem;
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
 }
 
-tt {
-  font-family: var(--font-mono), monospace;
-}
-cite {
-  font-style: italic;
-}
-sup {
-  vertical-align: top;
-}
-sub {
-  vertical-align: bottom;
-}
-
-time {
-  color: var(--color-gray);
-  font-style: italic;
-  font-family: var(--font-serif), serif;
-  font-size: 75%;
-  font-weight: normal;
-  white-space: nowrap;
-}
-
-.release {
-  color: var(--color-black);
-  font-family: var(--font-body), sans-serif;
-  font-weight: 700;
-  font-size: 125%;
-}
-
-code {
-  font-family: var(--font-mono), monospace;
-  font-size: 10pt;
-}
-
-.code {
-  color: var(--color-black);
-  font-family: var(--font-mono), monospace;
-  background-color: #cee1ff;
-  border-radius: 2px;
-  padding: 2px;
-  text-decoration: none;
-}
-
-/* ── Content container (about / contents / changelog / blog / leetcode) ── */
-.content {
-  max-width: 650px;
-  display: flex;
-  flex-direction: column;
-  row-gap: 10px;
-  margin: 0 auto;
-  padding: 10px;
-  /* Chrome clearance for the standalone /leetcode route, whose prose is a direct child
-     here rather than a <section> and so gets none of the tile padding. The bar used to
-     supply this by simply being in the flow above it. The tiled home page zeroes it
-     again below — there the band belongs to each tile, not to the column. */
-  padding-top: var(--nav-h);
-  /* Bottom breathing room for the standalone /leetcode route. The tiled home
-     page zeroes this below — there, trailing padding would show under the last
-     tile once it is scrolled flush. */
-  padding-bottom: 4vh;
-  /* The rail's disclosure below 1160px pushes the column aside rather than fading
-     the page out, so closing it restores the reading position with no bookkeeping.
-     This is the one transform the scroll engine tolerates: the "never wrap the
-     scroll root in a transform" rule exists to keep window.scrollY and pageX/Y
-     honest for the splash physics, and `.content` is a SIBLING of the hero, not an
-     ancestor of it or of the document scroller. It is, however, a containing block
-     for fixed descendants once transformed — which is why the crumb and rail live
-     outside it (components/SiteChrome.tsx). */
-  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-html.rail-open .content {
-  transform: translateX(200px);
-}
-/* Where the 650px column reaches the viewport edge there is no gutter left for the
-   tick column, so the prose gives it one: 34px puts the text clear of a dash that
-   starts at 6 and runs at most to 20. Above this width the ticks sit in the gutter
-   and the column is left centred and untouched. */
-@media (max-width: 680px) {
-  .content {
-    padding-left: 34px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .content {
-    transition: none;
-  }
-}
-/* Each page's content is now a <section> child of .content, tiled into a
-   full-height panel for the Lenis transport pager (app/scroll/PagerScroll.tsx).
-   Re-declare the flex column so intra-section spacing survives (the reset zeroes
-   element margins), and keep the heading padding one level deeper as a direct
-   child so nested callout headings (.important > h2) are still excluded.
-   min-height (never fixed height) lets the tall About tile grow past one screen. */
-.content > section {
-  display: flex;
-  flex-direction: column;
-  row-gap: 10px;
-  min-height: 100svh; /* full-height tile; svh avoids mobile URL-bar reflow */
-  justify-content: center; /* short tiles (blog) centre → look intentional */
-  /* Chrome clearance, applied inside the tile. border-box (the Tailwind reset
-     default) keeps it within the 100svh, so the tile stays exactly one viewport
-     tall and its top edge can sit flush at scroll-top. Do NOT move this back out
-     to scroll-padding-top / scroll-margin-top — an offset landing is precisely
-     what let the previous tile show above the fixed chrome. */
-  padding-top: var(--nav-h);
-  /* Closing space, so the end of a section reads as an end. Without it a tall
-     tile's last line sits hard against the bottom of the viewport, which looks
-     exactly like text that carries on below the fold — the reader can't tell
-     they have reached the bottom of the section and the pager is waiting.
-
-     INSIDE the tile, not between tiles: the tiles have to keep butting directly
-     against each other (see `.content:has(> section)` below), and border-box
-     keeps this within the 100svh so a short tile is still exactly one viewport
-     tall and still lands flush. On a tall tile it simply extends the tile, so
-     its last screen ends in blank rather than in a cropped line. */
-  padding-bottom: var(--tile-end);
-  scroll-snap-align: start; /* snap point = tile top = viewport top */
-  scroll-snap-stop: always; /* fast native scroll / touch can't skip a section */
-}
-.content > section > :is(h1, h2, h3, h4, h5, h6) {
-  padding-top: 1em;
-}
-/* Rail rows are real anchors (app/scroll/outline.ts on the home page; ids scanned or
-   assigned by components/useHeadingOutline.ts on standalone routes). This is the
-   native fallback for fragment landings without Lenis to take an explicit offset. Not
-   scoped to `.content > section`: standalone prose sits directly in the column. It
-   applies to headings ONLY — never to the sections themselves, where an offset
-   landing is what let the previous tile show above the chrome. */
-.content :is(h1, h2, h3, h4, h5, h6)[id] {
-  scroll-margin-top: var(--nav-h);
-}
-/* The tiled home column. Tiles have to butt directly against each other and
-   against the ends of the document: `.content`'s own row-gap and block padding
-   would otherwise sit inside the viewport at a tile's scroll limit, showing a
-   strip of the neighbouring tile past the gap. `:has(> section)` scopes this to
-   the home page, so the standalone /leetcode route keeps the normal prose gap
-   and bottom padding. */
-.content:has(> section) {
-  row-gap: 0;
-  padding-block: 0;
-}
-.content > section + section {
-  margin-top: 0;
-}
-
-/* Restore list markers (preflight removes them) for prose lists only. */
-.content :is(ul, ol) {
-  padding-left: 25px;
-}
-.content ul {
-  list-style: disc;
-}
-.content ol {
-  list-style: decimal;
-}
-dt > a {
-  color: inherit;
-  font-weight: bold;
-}
-
-/* ── Sidebar / important callouts ────────────────────────────────────── */
-.sidebar {
-  border-left: 3px solid var(--color-red);
-  border-radius: 0;
-  row-gap: 10px;
-}
-.sidebar:not(.row):not(:has(row)):not(ol):not(:has(ol)):not(ul):not(:has(ul)) {
-  padding-left: 15px;
-}
-
-.important {
-  display: flex;
-  flex-direction: column;
-  row-gap: 10px;
-  background-color: color-mix(in srgb, var(--color-red) 20%, transparent);
-  border-left: 3px solid var(--color-red);
-  border-radius: 0;
-  padding: 20px 20px 20px 15px;
-}
-
-/* ── Figures + horizontal rule ───────────────────────────────────────── */
-figure {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
-  padding: 1em 0;
-}
-figure img {
-  padding-bottom: 0.5em;
+img {
   max-width: 100%;
   height: auto;
-  align-self: center;
 }
-figure figcaption,
-figure figcaption a {
-  color: gray;
-  font-family: var(--font-display), serif;
+button,
+input,
+textarea {
+  font: inherit;
+}
+code,
+pre {
+  font-family: var(--font-mono), monospace;
+}
+pre {
+  overflow-x: auto;
 }
 
-hr {
-  border: none;
-  border-top: 2px solid var(--color-black);
-  margin: 10px 0;
-  width: 102%;
-  align-self: center;
+.skip-link {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  clip-path: inset(50%);
+}
+.skip-link:focus {
+  clip-path: none;
+}
+
+.reading-column {
+  width: min(720px, calc(100% - 48px));
+  margin-inline: auto;
+  padding-block: 64px 48px;
+}
+
+.content > section {
+  padding-top: 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.content > section:first-child {
+  padding-top: 44px;
+}
+.content > section:last-child {
+  padding-bottom: 52px;
+}
+.content :is(p, li, dd, a) {
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.small-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-family: var(--font-helvetica), Arial, sans-serif;
+  font-size: 15px;
+  line-height: 26px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.standalone {
+  padding-block: 44px 80px;
+  display: grid;
+  gap: 22px;
+}
+
+@media (max-width: 599px) {
+  .reading-column {
+    padding-block: 16px 32px;
+  }
+  .content > section {
+    padding-top: 40px;
+  }
+  .content > section:first-child {
+    padding-top: 32px;
+  }
+  .content > section:last-child {
+    padding-bottom: 52px;
+  }
+  h1 {
+    font-size: 36px;
+    line-height: 44px;
+  }
 }
