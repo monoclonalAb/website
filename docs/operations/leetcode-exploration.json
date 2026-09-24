@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "id": "leetcode-exploration",
+  "outcome": "Explore a compact Leetcode archive in the current Paper theme, with original-style difficulty colors and scalable search/date/difficulty/many-to-many collection filters; provide desktop, mobile and recovery states using real entry metadata.",
+  "contract": "docs/plans/active/2026-09-16-leetcode-design-exploration.md",
+  "boundary": [
+    "Only the exploration page is writable; preserve its previous direction as archive copies before revision. All other Paper pages, artboards and file-wide tokens are protected.",
+    "Combine current Paper warm-paper colors, Eiko/Georgia typography, 720px reading column, masthead, footer and waves with the original site's compact title/date/difficulty layout and colored difficulty labels.",
+    "Categories are overlapping author-defined collections, not algorithm topics. Explore any/all collection matching and options derived from content/collection metadata rather than hardcoded years or a closed taxonomy.",
+    "Preserve application source, published writing and all inherited local work; no coded route, dependencies, commit or deployment.",
+    "Use actual live titles, dates and difficulties. Clearly label illustrative collection memberships and filter states; do not imply implemented behavior, fabricated publications or new production metadata.",
+    "Review desktop/mobile renders and compare protected main-page serialized content; local workflow receipts do not fingerprint remote state.",
+    "Retain native scrolling and accessibility intentions; static renders are not browser or assistive-technology certification."
+  ],
+  "inputs": [
+    "docs/plans/active/2026-09-16-leetcode-design-exploration.md",
+    "docs/design.md",
+    "content/leetcode"
+  ],
+  "boundaryInputs": ["AGENTS.md", "docs/agent-workflow.md"],
+  "ownerInput": [],
+  "outOfScope": [
+    "Changes to existing design pages or application code",
+    "Publishing, commit and deployment",
+    "Runtime interaction and physical-device certification"
+  ],
+  "checks": [
+    {
+      "id": "docs",
+      "phase": "fast",
+      "argv": ["pnpm", "docs:check"],
+      "timeoutSeconds": 30,
+      "cleanupSeconds": 5
+    },
+    {
+      "id": "repository",
+      "phase": "full",
+      "argv": ["pnpm", "validate"],
+      "timeoutSeconds": 600,
+      "cleanupSeconds": 30,
+      "inputs": ["."]
+    }
+  ]
+}

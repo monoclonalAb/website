@@ -33,6 +33,8 @@ An active plan is an open record, not permission for Astra to start it during an
 
 ## Active
 
+- [2026-09-16 — Leetcode design exploration](active/2026-09-16-leetcode-design-exploration.md) — current Paper theme with original-style compact rows, coloured difficulties and overlapping collection filters; desktop/mobile, combined and empty states. Earlier versions archived; owner/independent review pending.
+
 - [2026-09-16 — Homepage alphabet hover](active/2026-09-16-home-hover.md) — Paper07.1–07.3 implemented with recovered old-site easing; repository and browser checks pass, independent/manual review pending.
 
 - [2026-09-14 — Paper design parity](active/2026-09-14-paper-parity.md) — current About/footer composition and populated Blog/Leetcode/Changelog list styling implemented locally; Contents retains its matching directory. Manual/independent review pending.
