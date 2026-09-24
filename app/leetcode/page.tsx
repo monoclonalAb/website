@@ -32,9 +32,6 @@ export default async function LeetcodePage() {
           <i>daily solutions coming soon.</i>
         </p>
       )}
-      <p className="rss-subscribe">
-        subscribe with <a href="/writing.xml">rss</a>
-      </p>
     </ReadingPage>
   );
 }

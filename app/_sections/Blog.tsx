@@ -18,9 +18,6 @@ export default async function Blog() {
           <i>turns out this bit requires writing-</i>
         </p>
       )}
-      <p className="rss-subscribe">
-        subscribe with <a href="/writing.xml">rss</a>
-      </p>
     </>
   );
 }
