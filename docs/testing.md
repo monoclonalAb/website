@@ -69,6 +69,8 @@ The [separate-page implementation](plans/active/2026-09-14-separate-pages.md) up
 
 `theme-tokens.spec.ts` checks all six pages at 390/768/1440 in both motion modes: palette, live Eiko/Georgia typography, column/portrait geometry, close current-nav underline, social-icon/name-free footer geometry and hit areas, RSS alignment, opening bounds and skip focus. It attaches full-page screenshots and checks root role overrides plus all-page 320px/200%-sized body text reflow. These are not golden-image comparisons, actual browser-chrome zoom, screen-reader or physical-device proof. Current outcomes and unrun manual checks live in the [page-split record](plans/active/2026-09-14-separate-pages.md).
 
+`entry-lists.spec.ts` covers the populated Blog/Leetcode/Changelog Paper adaptation at390/768/1440: semantic Eiko entry headings, muted Georgia dates, fine rules, desktop metadata-column alignment, stacked mobile rows,44px article targets and keyboard Link/history. It also checks Contents and the populated lists at320px with enlarged headings/metadata/prose, with and without JavaScript, plus native changelog fragments and RSS. The [Paper follow-up](plans/active/2026-09-14-paper-parity.md#remaining-page-follow-up) records visual comparison and exact results; this is not physical-device or browser-chrome zoom proof.
+
 ### Browser server and focused runs
 
 `playwright.config.ts` uses Chromium at `1440 × 900` and `http://127.0.0.1:3100`. Local runs reuse a server already at that URL or start `next dev -p 3100`; CI requires a free port and starts the already-built app with `next start -p 3100`.

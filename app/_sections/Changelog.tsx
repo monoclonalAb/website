@@ -4,6 +4,7 @@ import {
   changelogEntryId,
   type ChangelogEntry,
 } from "@/app/_content/changelog";
+import styles from "@/components/EntryList.module.css";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("en-NZ", {
   day: "2-digit",
@@ -41,16 +42,16 @@ export default function Changelog() {
       {CHANGELOG_ENTRIES.length === 0 ? (
         <p className="muted">the update log!! no entries yet.</p>
       ) : (
-        <ol>
+        <ol className={styles.list} aria-label="Updates">
           {CHANGELOG_ENTRIES.map((entry) => (
             <li id={changelogEntryId(entry)} key={entry.id}>
-              <p>
-                <strong>{entry.title}</strong>{" "}
-                <time dateTime={entry.publishedOn}>
-                  {DATE_FORMATTER.format(changelogEntryDate(entry))}
-                </time>
-              </p>
-              <Summary entry={entry} />
+              <time className={styles.date} dateTime={entry.publishedOn}>
+                {DATE_FORMATTER.format(changelogEntryDate(entry))}
+              </time>
+              <div className={styles.body}>
+                <h2 className={styles.title}>{entry.title}</h2>
+                <Summary entry={entry} />
+              </div>
             </li>
           ))}
         </ol>

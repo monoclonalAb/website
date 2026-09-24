@@ -1,7 +1,7 @@
 {
   "version": 1,
   "id": "paper-parity",
-  "outcome": "Carry the current Paper composition through the local reading pages without discarding published content.",
+  "outcome": "Carry the current Paper composition through the local reading pages, including populated Blog, Leetcode and Changelog lists, without discarding published content.",
   "contract": "docs/plans/active/2026-09-14-paper-parity.md",
   "boundary": [
     "Paper supplies layout; verified local biography, published Markdown and changelog entries remain intact.",
@@ -9,6 +9,7 @@
     "Footer reuses Paper SVG glyphs and verified Contents URLs, with accessible names, visible focus and native per-page back-to-top links.",
     "No added client boundary, scrolling control, dependencies, remote writes, commit or deployment.",
     "Native article outline disclosures retain dynamic document-length wave-progress coverage.",
+    "Contents retains its matching Paper directory; populated archives extend its 132px metadata column, 24px gutter, fine rules and Eiko/Georgia hierarchy, stacking below 600px.",
     "Keep every entry, date, draft label, topic, summary, article link, changelog ID and RSS destination unchanged; no pagination or client filtering."
   ],
   "inputs": [
