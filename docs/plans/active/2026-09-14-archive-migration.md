@@ -43,6 +43,10 @@ No independent-review tool is exposed in this session; do not fabricate review a
 - Validation also caught a test-only Playwright media option in the wrong fixture location, and the no-JavaScript enlarged-text fixture's `addStyleTag` load helper could not settle. Media is now set explicitly with `emulateMedia`; direct body-style mutation exercises reflow with JavaScript disabled too. The resulting typed archive suite passes all4 cases.
 - The old contract checker prohibited any redirect table. It now checks the actual configured redirects, allowing only historical archive `.html` paths to reading destinations while rejecting canonical/path-to-home redirects. Canonical200/retired404 and all archive redirect destinations are browser-tested.
 
+## Performance follow-up
+
+The owner's subsequent slow-navigation report prompted a [dedicated investigation](../completed/2026-09-14-writing-performance-investigation.md). It found that the fresh-read loader renders the entire archive before selecting an index/detail/asset, making dev navigation take roughly2s even after compilation. The earlier corpus/build timings did not establish acceptable navigation latency; the statement that no loader changes were necessary was too broad. Local production remains fast through prerendering. No optimization is included in this migration or the investigation. The later owner-requested [writing-performance implementation](2026-09-14-writing-performance.md) implements/measures the metadata/detail/asset split and records its own validation; [DEBT-008](../../debt.md) is resolved with independent source review still pending.
+
 ## Final verification
 
 - `pnpm validate`:passed at the integrated final-source checkpoint, including content/tests, docs/contracts, workspace formatting, lint, generated types, workflow tests and the populated production build. Re-run after this evidence-only record edit before handoff.

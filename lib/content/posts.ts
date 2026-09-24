@@ -2,7 +2,7 @@ import { readdir, readFile, lstat } from "node:fs/promises";
 import { resolve, relative, sep } from "node:path";
 import { parseDocument } from "yaml";
 import { z } from "zod";
-import { renderMarkdown } from "./markdown.ts";
+import type { renderMarkdown, Asset } from "./markdown.ts";
 
 export type Collection = "blog" | "leetcode";
 export const collections: Collection[] = ["blog", "leetcode"];
@@ -62,13 +62,14 @@ const leetcodeSchema = z
       }
   });
 export type PostMetadata = z.infer<typeof leetcodeSchema>;
-export type Post = PostMetadata & {
+export type PostSummary = PostMetadata & {
   collection: Collection;
   slug: string;
   url: string;
   identity: string;
-  source: string;
-  body: string;
+};
+type PostSource = PostSummary & { source: string; body: string };
+export type Post = PostSource & {
   html: string;
   headings: Awaited<ReturnType<typeof renderMarkdown>>["headings"];
   assets: Awaited<ReturnType<typeof renderMarkdown>>["assets"];
@@ -125,15 +126,48 @@ async function files(directory: string): Promise<string[]> {
   return result.sort();
 }
 
-/** Fresh reads in dev: edits/new files are visible on refresh, never module-cached. */
-export async function loadPosts({
+type LoadOptions = { root?: string; includeDrafts?: boolean };
+type DiscoveryOptions = LoadOptions & { collection?: Collection };
+
+function sourceError(root: string, source: string, error: unknown) {
+  return new Error(
+    `${relative(root, source)}: ${error instanceof Error ? error.message : "Invalid content"}`,
+    { cause: error },
+  );
+}
+
+async function realPath(path: string, directory: boolean) {
+  const stat = await lstat(path);
+  if (stat.isSymbolicLink())
+    throw new Error(`Symlinks are not supported: ${path}`);
+  if (directory ? !stat.isDirectory() : !stat.isFile())
+    throw new Error(
+      `Not a real content ${directory ? "directory" : "file"}: ${path}`,
+    );
+}
+
+async function readSource(
+  source: string,
+  collection: Collection,
+  slug: string,
+) {
+  return {
+    ...parsePost(await readFile(source, "utf8"), collection, slug),
+    source,
+  };
+}
+
+/** Fresh source discovery, without Markdown rendering or a process-global cache. */
+async function loadSources({
   root = contentRoot,
   includeDrafts = false,
-}: { root?: string; includeDrafts?: boolean } = {}): Promise<Post[]> {
-  if ((await lstat(root)).isSymbolicLink())
-    throw new Error("Symlink content roots are not supported");
-  const posts: Post[] = [];
-  for (const collection of collections) {
+  collection: selected,
+}: DiscoveryOptions = {}): Promise<PostSource[]> {
+  await realPath(root, true);
+  if (selected !== undefined && !collections.includes(selected))
+    throw new Error("Unknown content collection");
+  const posts: PostSource[] = [];
+  for (const collection of selected ? [selected] : collections) {
     for (const source of await files(resolve(root, collection))) {
       const path = relative(resolve(root, collection), source)
         .split(sep)
@@ -151,28 +185,105 @@ export async function loadPosts({
           );
         const slug =
           collection === "blog" ? path.split("/")[0] : path.slice(0, -3);
-        const parsed = parsePost(
-          await readFile(source, "utf8"),
-          collection,
-          slug,
-        );
-        if (!includeDrafts && parsed.draft) continue;
-        posts.push({
-          ...parsed,
-          source,
-          ...(await renderMarkdown(parsed.body, source, root, parsed.identity)),
-        });
+        await realPath(source, false);
+        const post = await readSource(source, collection, slug);
+        if (includeDrafts || !post.draft) posts.push(post);
       } catch (error) {
-        throw new Error(
-          `${relative(root, source)}: ${error instanceof Error ? error.message : "Invalid content"}`,
-          { cause: error },
-        );
+        throw sourceError(root, source, error);
       }
     }
   }
   return posts.sort(
     (a, b) => b.date.localeCompare(a.date) || a.url.localeCompare(b.url),
   );
+}
+
+/** Indexes, feeds, sitemap and static params receive no body/rendered payload. */
+export async function loadPostSummaries(
+  options: DiscoveryOptions = {},
+): Promise<PostSummary[]> {
+  return (await loadSources(options)).map(({ body, source, ...summary }) => {
+    void body;
+    void source;
+    return summary;
+  });
+}
+
+async function renderPost(post: PostSource, root: string): Promise<Post> {
+  try {
+    const { renderMarkdown } = await import("./markdown.ts");
+    return {
+      ...post,
+      ...(await renderMarkdown(post.body, post.source, root, post.identity)),
+    };
+  } catch (error) {
+    throw sourceError(root, post.source, error);
+  }
+}
+
+/** Validate the route before touching disk; never scan/render unrelated articles. */
+export async function loadPost(
+  collection: Collection,
+  slug: string,
+  { root = contentRoot, includeDrafts = false }: LoadOptions = {},
+): Promise<Post | undefined> {
+  if (
+    !collections.includes(collection) ||
+    !slugPattern.test(slug) ||
+    (collection === "leetcode" && !isDate(slug))
+  )
+    return undefined;
+  await realPath(root, true);
+  await realPath(resolve(root, collection), true);
+  const source =
+    collection === "blog"
+      ? resolve(root, collection, slug, "index.md")
+      : resolve(root, collection, `${slug}.md`);
+  try {
+    if (collection === "blog")
+      await realPath(resolve(root, collection, slug), true);
+    await realPath(source, false);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
+    throw sourceError(root, source, error);
+  }
+  let post: PostSource;
+  try {
+    post = await readSource(source, collection, slug);
+  } catch (error) {
+    throw sourceError(root, source, error);
+  }
+  if (!includeDrafts && post.draft) return undefined;
+  return renderPost(post, root);
+}
+
+/** Referenced-image allowlist: parse Markdown references, never highlight or render maths. */
+export async function loadWritingAssets(
+  options: DiscoveryOptions = {},
+): Promise<Asset[]> {
+  const { collectMarkdownAssets } = await import("./markdown.ts");
+  const assets = new Map<string, Asset>();
+  for (const post of await loadSources(options)) {
+    try {
+      for (const asset of await collectMarkdownAssets(
+        post.body,
+        post.source,
+        options.root ?? contentRoot,
+      ))
+        assets.set(asset.path, asset);
+    } catch (error) {
+      throw sourceError(options.root ?? contentRoot, post.source, error);
+    }
+  }
+  return [...assets.values()];
+}
+
+/** Full corpus validation stays explicit in content:check/build, including drafts. */
+export async function loadPosts(options: LoadOptions = {}): Promise<Post[]> {
+  const posts: Post[] = [];
+  for (const post of await loadSources(options))
+    posts.push(await renderPost(post, options.root ?? contentRoot));
+  return posts;
 }
 
 export function formatDate(value: string) {
@@ -184,7 +295,7 @@ export function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-export function description(post: Post) {
+export function description(post: PostSummary) {
   return (
     post.summary ??
     `${post.title} — ${post.collection === "blog" ? "writing" : "Leetcode notes"} by Eric Zheng.`

@@ -80,15 +80,14 @@ function textContent(node: Element): string {
     .join("");
 }
 
-export async function renderMarkdown(
-  body: string,
+// One source parser/validator for rendering and the asset allowlist, including
+// reference-style images. Code examples and unused definitions are not assets.
+function sourceProcessor(
   source: string,
   root: string,
-  identity: string,
+  assets: Map<string, Asset>,
 ) {
-  const assets = new Map<string, Asset>();
-  const headings: Heading[] = [];
-  const processor = unified()
+  return unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkMath)
@@ -141,7 +140,29 @@ export async function renderMarkdown(
         assets.set(asset.path, asset);
         node.url = `/writing-assets/${asset.path.split("/").map(encodeURIComponent).join("/")}`;
       }
-    })
+    });
+}
+
+export async function collectMarkdownAssets(
+  body: string,
+  source: string,
+  root: string,
+) {
+  const assets = new Map<string, Asset>();
+  const processor = sourceProcessor(source, root, assets);
+  await processor.run(processor.parse(body));
+  return [...assets.values()];
+}
+
+export async function renderMarkdown(
+  body: string,
+  source: string,
+  root: string,
+  identity: string,
+) {
+  const assets = new Map<string, Asset>();
+  const headings: Heading[] = [];
+  const processor = sourceProcessor(source, root, assets)
     .use(remarkRehype, { clobberPrefix: `${identity}--fn-` })
     .use(() => async (tree: Root) => {
       const used = new Set<string>();

@@ -1,4 +1,4 @@
-import { description, type Post } from "./posts.ts";
+import { description, type PostSummary } from "./posts.ts";
 export const siteUrl = "https://ericzheng.nz";
 export function escapeXml(value: string) {
   return value.replace(
@@ -13,7 +13,7 @@ export function escapeXml(value: string) {
       })[character]!,
   );
 }
-export function writingFeed(posts: Post[]) {
+export function writingFeed(posts: PostSummary[]) {
   const items = posts
     .filter((post) => !post.draft)
     .map((post) => {

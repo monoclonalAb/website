@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { formatDate, type Post } from "@/lib/content/posts";
+import { formatDate, type PostSummary } from "@/lib/content/posts";
 import styles from "./Writing.module.css";
 
-export default function PostList({ posts }: { posts: Post[] }) {
+export default function PostList({ posts }: { posts: PostSummary[] }) {
   return (
     <ul className={styles.list} aria-label="Writing">
       {posts.map((post) => (

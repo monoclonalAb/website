@@ -40,6 +40,8 @@ The [page-split record](plans/active/2026-09-14-separate-pages.md) owns current 
 
 ## Resolution log
 
+- **2026-09-14 — DEBT-008:** replaced archive-wide request rendering with metadata summaries, validated selected-post rendering and shared non-rendering image-reference discovery. [Implementation evidence](plans/active/2026-09-14-writing-performance.md) records measured warm-dev/navigation gains, count/freshness/safeguard regressions and passing repository/browser/authoring checks. Independent source review remains pending there. The separate pre-existing preview HMR/transport issue was not repaired; it was absent in the owned clean preview and is not evidence of a remaining archive-rendering bottleneck.
+
 - **2026-09-14 — DEBT-001/005:** removed pager, physics, outline scanner and app-to-chrome dependency; no timing constants or shared scroll model remain.
 - **2026-09-14 — DEBT-002:** removed inaccurate stack/hosting story. Proposed biography remains a separate owner confirmation, not an inferred employment claim.
 - **2026-09-14 — DEBT-006:** retired motion/dial coverage obligations with the subsystem; native-scroll/history/fragment/browser geometry checks now cover the selected public behavior. Manual device/zoom and accessibility gaps remain as stated above.

@@ -10,7 +10,7 @@ This is an evidence-based view—not a target-state checklist or a claim that ev
 
 ## Markdown publishing — 2026-09-14
 
-[ADR-0004](decisions/0004-markdown-publishing.md) defines file-based publishing. The public reading shell includes generated articles, code/math/local images and published-only discovery; draft preview is local only, not private storage. [The Markdown plan](plans/active/2026-09-14-markdown-publishing.md) owns fresh checks, discovered defects and manual/independent limits. No hosted availability, deployment, physical-device, screen-reader or independent-review grade improves from a local build.
+[ADR-0004](decisions/0004-markdown-publishing.md) defines file-based publishing. The public reading shell includes generated articles, code/math/local images and published-only discovery; draft preview is local only, not private storage. [The Markdown plan](plans/active/2026-09-14-markdown-publishing.md) owns fresh checks, discovered defects and manual/independent limits. No hosted availability, deployment, physical-device, screen-reader or independent-review grade improves from a local build. The [writing-performance implementation](plans/active/2026-09-14-writing-performance.md) adds metadata/detail separation, non-rendering asset discovery and count/freshness regressions; its measured local timings and review limits are recorded separately.
 
 ## Grades
 

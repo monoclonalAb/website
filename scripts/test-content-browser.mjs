@@ -241,6 +241,78 @@ try {
   await run(["new:blog", "newly-created", "New scaffold specimen"]);
   await page.goto(`${baseURL}/blog/newly-created`);
   assert.equal(await page.locator("h1").textContent(), "New scaffold specimen");
+  await page.goto(`${baseURL}/blog`);
+  assert.match(
+    await page.locator("main").textContent(),
+    /New scaffold specimen/,
+  );
+  assert.match(
+    await page.locator("main").textContent(),
+    /Edited draft specimen/,
+  );
+  for (const route of ["/writing.xml", "/sitemap.xml"])
+    assert.doesNotMatch(
+      await (await fetch(`${baseURL}${route}`)).text(),
+      /private-specimen|newly-created/,
+    );
+
+  // Fresh assets use the same reference parser as the article, without a stale
+  // process allowlist. New paths work even after static params have been read.
+  const editedDraft = await readFile(privateFile, "utf8");
+  const assetURL = `${baseURL}/writing-assets/blog/private-specimen/private.png`;
+  assert.equal((await fetch(assetURL)).status, 200);
+  const changedPng = Buffer.concat([
+    png,
+    Buffer.from("test-only changed bytes"),
+  ]);
+  await writeFile(join(privateFolder, "private.png"), changedPng);
+  assert.deepEqual(
+    Buffer.from(await (await fetch(assetURL)).arrayBuffer()),
+    changedPng,
+  );
+  await writeFile(join(privateFolder, "private.png"), png);
+  await writeFile(
+    privateFile,
+    editedDraft.replace(
+      "![Private test image](private.png)",
+      "Image reference removed.",
+    ),
+  );
+  assert.equal((await fetch(assetURL)).status, 404);
+  await writeFile(join(privateFolder, "new.png"), png);
+  await writeFile(
+    privateFile,
+    editedDraft.replace(
+      "![Private test image](private.png)",
+      "Fresh body edit.\n\n![New reference][new]\n\n[new]: new.png",
+    ),
+  );
+  await page.goto(`${baseURL}/blog/private-specimen`);
+  assert.match(await page.locator("main").textContent(), /Fresh body edit/);
+  assert.equal(
+    await page.locator("main img").getAttribute("src"),
+    "/writing-assets/blog/private-specimen/new.png",
+  );
+  assert.equal(
+    (await fetch(`${baseURL}/writing-assets/blog/private-specimen/new.png`))
+      .status,
+    200,
+  );
+  assert.equal((await fetch(assetURL)).status, 404);
+  await writeFile(privateFile, editedDraft);
+  assert.equal((await fetch(assetURL)).status, 200);
+  assert.equal(
+    (await fetch(`${baseURL}/writing-assets/blog/private-specimen/new.png`))
+      .status,
+    404,
+  );
+  await rm(resolve(scratch, "content/blog/newly-created/index.md"));
+  assert.equal((await fetch(`${baseURL}/blog/newly-created`)).status, 404);
+  await page.goto(`${baseURL}/blog`);
+  assert.doesNotMatch(
+    await page.locator("main").textContent(),
+    /New scaffold specimen/,
+  );
   await page.close();
   await stopServer();
   // A real publish/rebuild, then unpublish/rebuild; no runtime switch or fake reader.

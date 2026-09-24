@@ -33,6 +33,8 @@ An active plan is an open record, not permission for Astra to start it during an
 
 ## Active
 
+- [2026-09-14 — Writing performance](active/2026-09-14-writing-performance.md) — metadata/detail/asset split implemented and measured; repository/browser/authoring checks pass, independent source review pending.
+
 - [2026-09-14 — Archive migration](active/2026-09-14-archive-migration.md) — owner-requested import of all static-site blogs, Leetcode entries and changelog releases.
 
 - [2026-09-14 — Scroll waves](active/2026-09-14-scroll-waves.md) — adapt Paper12–18 to passive per-page progress while preserving native scrolling and the separate-page layout.
@@ -44,6 +46,8 @@ An active plan is an open record, not permission for Astra to start it during an
 - [2026-09-14 — Markdown publishing](active/2026-09-14-markdown-publishing.md) — file-based authoring, local draft preview, static pages and generated discovery. [Writing guide](../writing.md).
 
 ## Completed
+
+- [2026-09-14 — Investigate writing navigation performance](completed/2026-09-14-writing-performance-investigation.md) — measured dev/production navigation and identified full-archive rendering plus a separate preview HMR failure; the later implementation is tracked in the active writing-performance plan.
 
 - [2026-09-09 — Add the task-completion workflow](completed/2026-09-09-task-completion-workflow.md) — explicit checks, early/final review records and current-source status; source-reviewed and exercised, not a general efficiency claim.
 - [2026-09-09 — Review delegation and tighten task context](completed/2026-09-09-delegation-context.md) — startup routing and worker/integration ownership clarified; cost/speed gains not yet measured.

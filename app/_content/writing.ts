@@ -1,17 +1,22 @@
 import "server-only";
 import { cache } from "react";
-import { loadPosts, type Collection } from "../../lib/content/posts";
+import {
+  loadPost,
+  loadPostSummaries,
+  loadWritingAssets,
+  type Collection,
+} from "../../lib/content/posts";
 
-// React cache shares metadata/body within one render, not stale content across dev refreshes.
-export const writing = cache(() =>
-  loadPosts({ includeDrafts: process.env.NODE_ENV === "development" }),
+const includeDrafts = () => process.env.NODE_ENV === "development";
+// Request-scoped only: refreshes always read fresh source and asset references.
+export const publishedWriting = cache(() => loadPostSummaries());
+export const writingCollection = cache((collection: Collection) =>
+  loadPostSummaries({ collection, includeDrafts: includeDrafts() }),
 );
-export const publishedWriting = cache(() => loadPosts());
-export async function writingCollection(collection: Collection) {
-  return (await writing()).filter((post) => post.collection === collection);
-}
-export async function writingPost(collection: Collection, slug: string) {
-  return (await writingCollection(collection)).find(
-    (post) => post.slug === slug,
-  );
-}
+// Metadata and body share the same selected post within a render pass.
+export const writingPost = cache((collection: Collection, slug: string) =>
+  loadPost(collection, slug, { includeDrafts: includeDrafts() }),
+);
+export const writingAssets = cache((collection?: Collection) =>
+  loadWritingAssets({ collection, includeDrafts: includeDrafts() }),
+);

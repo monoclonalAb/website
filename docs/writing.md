@@ -69,7 +69,7 @@ No JSX, MDX, raw HTML, remote images, arbitrary scripts or Pandoc directives. Yo
 ## Preview, publish and correct
 
 1. Write and preview with `pnpm dev` (drafts included locally).
-2. Run `pnpm content:check` for source-file diagnostics, including draft syntax/assets.
+2. Run `pnpm content:check` for source-file diagnostics, including draft syntax/assets. Indexes/discovery read metadata only and a detail preview renders only that article; opening one page does not validate the rest of the archive.
 3. Set `draft: false` when ready; fill all required Leetcode metadata.
 4. Run `pnpm validate`; optionally inspect production via `pnpm start` after the build. A successful build generates the pages, `/writing.xml`, and post sitemap entries. The separate `/changelog.xml` remains unchanged.
 5. Commit/push when you choose. If Git-connected hosting is configured, that triggers its build/deploy. This repository change has not configured or invoked it; publishing is not instantaneous and a failed deploy leaves the previous version live.

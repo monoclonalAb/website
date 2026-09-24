@@ -1,23 +1,26 @@
-import { writing } from "@/app/_content/writing";
+import { writingAssets } from "@/app/_content/writing";
 import { readAsset } from "@/lib/content/markdown";
 
 export const dynamic = "force-static";
 // The allowlist below, not arbitrary filesystem paths, controls asset access.
 export const dynamicParams = true;
 export async function generateStaticParams() {
-  const paths = new Set(
-    (await writing()).flatMap((post) => post.assets.map((asset) => asset.path)),
-  );
-  return [...paths].map((path) => ({ path: path.split("/") }));
+  return (await writingAssets()).map((asset) => ({
+    path: asset.path.split("/"),
+  }));
 }
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ path: string[] }> },
 ) {
-  const path = (await params).path.join("/");
-  const asset = (await writing())
-    .flatMap((post) => post.assets)
-    .find((asset) => asset.path === path);
+  const segments = (await params).path;
+  const path = segments.join("/");
+  const collection = segments[0];
+  // References cannot cross collections; still require an exact allowlist match.
+  const asset =
+    collection === "blog" || collection === "leetcode"
+      ? (await writingAssets(collection)).find((asset) => asset.path === path)
+      : undefined;
   if (!asset)
     return new Response("Not found", {
       status: 404,
