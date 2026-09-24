@@ -127,14 +127,30 @@ for (const file of [
   ...filesIn("app/_sections", ".css"),
   ...filesIn("components", ".css"),
 ]) {
-  const source = read(file).replace(/\/\*[\s\S]*?\*\//g, "");
+  const source = read(file)
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\btransition\s*:\s*([^;]+);/g, (declaration, value) => {
+      // Paper07: allow only the opening's bounded, CSS-only letter spread.
+      const openingTransition =
+        file === "app/HomePage.module.css" &&
+        (value.trim() === "none" ||
+          value
+            .replace(/cubic-bezier\(0\.22,\s*1,\s*0\.36,\s*1\)/g, "home-easing")
+            .split(",")
+            .every((part) =>
+              /^(?:letter-spacing|transform)\s+var\(--duration\)\s+home-easing$/.test(
+                part.trim(),
+              ),
+            ));
+      return openingTransition ? "" : declaration;
+    });
   if (
     /scroll-behavior\s*:\s*smooth|scroll-snap-|@keyframes|\banimation\s*:|\btransition\s*:/.test(
       source,
     )
   )
     errors.push(
-      `${file}: native scrolling; only the isolated wave canvas may animate`,
+      `${file}: native scrolling; only the wave canvas and opening letter spread may animate`,
     );
 }
 for (const redirect of (await nextConfig.redirects?.()) ?? []) {

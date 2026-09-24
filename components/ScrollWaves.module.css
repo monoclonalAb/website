@@ -86,6 +86,10 @@
     /* Keep even the widest swell clear of the opening's longest alphabet row. */
     max-width: calc(50vw - 6 * clamp(2rem, 5.556vw, 5rem) - 16px);
   }
+  .field[data-opening][data-side="right"] {
+    /* Reserve room for Paper07's fully expanded changelog label, even at rest. */
+    max-width: calc(50vw - 6.25 * clamp(2rem, 5.556vw, 5rem) - 16px);
+  }
 }
 
 @media print, (forced-colors: active) {

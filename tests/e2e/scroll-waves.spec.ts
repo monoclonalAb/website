@@ -109,19 +109,15 @@ for (const viewport of [
         const leftEdge = await field(page, "left").evaluate(
           (el) => el.getBoundingClientRect().right,
         );
-        const textLeft = await page.evaluate(() => {
-          const name =
-            document.getElementById("pages")!.previousElementSibling!;
-          const walker = document.createTreeWalker(name, NodeFilter.SHOW_TEXT);
-          let minimum = Infinity;
-          while (walker.nextNode()) {
-            if (!walker.currentNode.textContent?.trim()) continue;
-            const range = document.createRange();
-            range.selectNodeContents(walker.currentNode);
-            minimum = Math.min(minimum, range.getBoundingClientRect().left);
-          }
-          return minimum;
-        });
+        const textLeft = await page
+          .locator("#pages > div > div:first-child > span")
+          .evaluateAll((letters) =>
+            Math.min(
+              ...letters
+                .filter((el) => el.textContent?.trim())
+                .map((el) => el.getBoundingClientRect().left),
+            ),
+          );
         expect(textLeft - leftEdge).toBeGreaterThanOrEqual(16);
       }
       await testInfo.attach(`opening-${viewport.width}`, {

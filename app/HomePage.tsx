@@ -1,55 +1,114 @@
+import type { CSSProperties, ReactNode } from "react";
 import styles from "./HomePage.module.css";
 import ScrollWaves from "@/components/ScrollWaves";
 
-/** Static alphabet artwork; only the four real links enter the accessibility tree. */
+type AlphabetRowProps = {
+  upper?: ReactNode;
+  before?: string;
+  after?: string;
+  href?: string;
+  children?: string;
+};
+
+/** Keep the hit box at rest; only its visual label and neighbouring letters move. */
+function AlphabetRow({
+  upper,
+  before = "",
+  after,
+  href,
+  children = "",
+}: AlphabetRowProps) {
+  return (
+    <div
+      className={styles.row}
+      style={
+        {
+          "--half-gaps": (children.length - 1) / 2,
+          "--prefix-letters": before.length,
+        } as CSSProperties
+      }
+    >
+      <div className={styles.upper} aria-hidden="true">
+        <span className={styles.upperText}>{upper}</span>
+      </div>
+      <div className={styles.lower}>
+        {href ? (
+          <>
+            <span className={styles.prefix} aria-hidden="true">
+              <span className={styles.measure}>{before}</span>
+              {/* Fixed clips recolour crossing letters at the background split. */}
+              <span className={styles.lightPrefix}>
+                <span className={styles.prefixText}>{before}</span>
+              </span>
+              <span className={styles.darkPrefix}>
+                <span className={styles.prefixText}>{before}</span>
+              </span>
+            </span>
+            <a href={href} className={styles.link}>
+              <span className={styles.measure} aria-hidden="true">
+                {children}
+              </span>
+              <span className={styles.word}>{children}</span>
+            </a>
+            <span className={styles.suffix} aria-hidden="true">
+              {after}
+            </span>
+          </>
+        ) : (
+          <span aria-hidden="true">{children}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Server-rendered alphabet artwork with four native, CSS-enhanced page links. */
 export default function HomePage() {
   return (
     <main id="top" className={styles.hero}>
       <ScrollWaves opening />
       <ScrollWaves opening side="left" />
       <h1 className="sr-only">Eric Zheng</h1>
-      <div className={styles.alphabet}>
-        <div className={styles.name} aria-hidden="true">
-          <div>ABCDEF</div>
-          <div>GHIJKL</div>
-          <div>
-            M<span>ERIC</span>N
-          </div>
-          <div>
-            O<span>ZHENG</span>
-          </div>
-          <div>PQRSTU</div>
-          <div>VWXYZ</div>
-        </div>
-        <nav
-          id="pages"
-          tabIndex={-1}
-          className={styles.links}
-          aria-label="Introduction"
+      <nav
+        id="pages"
+        tabIndex={-1}
+        className={styles.alphabet}
+        aria-label="Introduction"
+      >
+        <AlphabetRow upper="ABCDEF" />
+        <AlphabetRow upper="GHIJKL" />
+        <AlphabetRow
+          upper={
+            <>
+              M<span className={styles.accent}>ERIC</span>N
+            </>
+          }
         >
-          <div aria-hidden="true">abcdefg</div>
-          <div>
-            <span aria-hidden="true">h</span>
-            <a href="/about">about</a>
-            <span aria-hidden="true">ij</span>
-          </div>
-          <div>
-            <span aria-hidden="true">klm</span>
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Home-boundary links deliberately load a fresh document for legacy fragment isolation. */}
-            <a href="/blog">blog</a>
-            <span aria-hidden="true">n</span>
-          </div>
-          <div>
-            <span aria-hidden="true">o</span>
-            <a href="/contents">contents</a>
-          </div>
-          <div>
-            <span aria-hidden="true">p</span>
-            <a href="/changelog">changelog</a>
-          </div>
-          <div aria-hidden="true">qrstuvwxyz</div>
-        </nav>
-      </div>
+          abcdefg
+        </AlphabetRow>
+        <AlphabetRow
+          upper={
+            <>
+              O<span className={styles.accent}>ZHENG</span>
+            </>
+          }
+          before="h"
+          after="ij"
+          href="/about"
+        >
+          about
+        </AlphabetRow>
+        <AlphabetRow upper="PQRSTU" before="klm" after="n" href="/blog">
+          blog
+        </AlphabetRow>
+        <AlphabetRow upper="VWXYZ" before="o" href="/contents">
+          contents
+        </AlphabetRow>
+        <AlphabetRow before="p" href="/changelog">
+          changelog
+        </AlphabetRow>
+        <AlphabetRow>qrstuvwxyz</AlphabetRow>
+      </nav>
     </main>
   );
 }

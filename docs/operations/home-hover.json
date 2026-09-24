@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "id": "home-hover",
+  "outcome": "Implement Paper07.1–07.3 as a CSS-only centred alphabet-row hover on all four existing homepage links.",
+  "contract": "docs/plans/active/2026-09-16-home-hover.md",
+  "boundary": [
+    "Only the active horizontal row spreads to 0.15em; the word's visual centre and original pointer target stay fixed.",
+    "Recover the previous Next.js homepage's 280ms cubic-bezier(0.22, 1, 0.36, 1) enter/leave feel; reduced motion has no tween and coarse/touch input keeps the resting layout.",
+    "Keep four uniquely named native links, keyboard focus, no-JavaScript behavior and responsive rest geometry.",
+    "No client boundary, scrolling control, dependency, remote design write, content edit, commit or deployment.",
+    "Preserve inherited archive/parity/performance work; permit only letter-spacing and transform transitions in the opening CSS Module."
+  ],
+  "inputs": [
+    "app/HomePage.tsx",
+    "app/HomePage.module.css",
+    "app/page.tsx",
+    "app/globals.css",
+    "components/ScrollWaves.module.css",
+    "scripts/check-site-contracts.mjs",
+    "tests/e2e",
+    "docs/design.md",
+    "docs/architecture.md",
+    "docs/testing.md",
+    "AGENTS.md"
+  ],
+  "boundaryInputs": [],
+  "ownerInput": [
+    "Physical input, screen reader and browser-chrome zoom verification."
+  ],
+  "outOfScope": [
+    "Remote design mutations",
+    "Commit, push or deployment",
+    "Unrelated in-progress repository work"
+  ],
+  "checks": [
+    {
+      "id": "contracts",
+      "phase": "fast",
+      "argv": ["pnpm", "contracts:check"],
+      "timeoutSeconds": 30,
+      "cleanupSeconds": 5
+    },
+    {
+      "id": "repository",
+      "phase": "full",
+      "argv": ["pnpm", "validate"],
+      "timeoutSeconds": 600,
+      "cleanupSeconds": 30,
+      "inputs": ["."]
+    },
+    {
+      "id": "browser",
+      "phase": "full",
+      "argv": ["env", "CI=1", "pnpm", "test:e2e", "--retries=0"],
+      "timeoutSeconds": 600,
+      "cleanupSeconds": 30
+    }
+  ]
+}

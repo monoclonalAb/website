@@ -40,7 +40,10 @@ test("home is the standalone accessible opening, not duplicated reading content"
   await expect(page.locator("#top")).not.toContainText("Auckland, NZ");
   await expect(page.locator("#top")).not.toContainText("choose a page");
   const nav = page.getByRole("navigation", { name: "Introduction" });
-  await expect(nav.getByRole("link")).toHaveText(pages.slice(0, 4));
+  // Ignore aria-hidden sizing copies used by the CSS-only centred hover.
+  await expect(nav.getByRole("link")).toHaveText(pages.slice(0, 4), {
+    useInnerText: true,
+  });
   for (const route of pages.slice(0, 4)) {
     await expect(
       nav.getByRole("link", { name: route, exact: true }),
