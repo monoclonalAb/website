@@ -189,11 +189,28 @@ for (const viewport of [
       await page.waitForTimeout(150);
       expect(await field(page).getAttribute("style")).toBe(stationary);
 
-      // Native details changes document length without navigating the route.
+      // About is now always visible. Native article outlines still change document length.
+      await page.goto("/blog/group-theory");
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+        await Promise.all(
+          [...document.images].map((image) => {
+            image.loading = "eager";
+            return image.decode();
+          }),
+        );
+      });
+      const closedHeight = await page.evaluate(
+        () => document.documentElement.scrollHeight,
+      );
       await page.locator("summary").click();
       await expect(page.locator("details")).toHaveAttribute("open", "");
+      expect(
+        await page.evaluate(() => document.documentElement.scrollHeight),
+      ).toBeGreaterThan(closedHeight);
       await expectProgress(page);
-      expect(await progress(page)).toBeLessThan(100);
+      await page.keyboard.press("End");
+      await expect.poll(() => progress(page)).toBeCloseTo(100, 0);
       await page.getByRole("link", { name: "back to top ↑" }).click();
       await expect.poll(() => progress(page)).toBe(0);
       await page.setViewportSize({ width: 320, height: 640 });
@@ -212,7 +229,7 @@ test("Activity navigation, history, direct fragments and short pages resynchroni
   page,
 }) => {
   await page.goto("/about#about-this-site");
-  await expect(page.locator("details")).toHaveAttribute("open", "");
+  await expect(page.locator("#about-this-site")).toBeInViewport();
   await expectProgress(page);
   expect(await progress(page)).toBeGreaterThan(0);
   const previousCanvases = await page
@@ -419,9 +436,12 @@ test("left waves animate independently and keep their fixed color across routes,
 
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
-  test("static waves leave links and disclosure usable", async ({ page }) => {
+  test("static waves leave visible About content and links usable", async ({
+    page,
+  }) => {
     await page.goto("/about#about-this-site");
-    await expect(page.locator("details")).toHaveAttribute("open", "");
+    await expect(page.locator("#about-this-site")).toBeInViewport();
+    await expect(page.locator("#footnote")).toBeVisible();
     await expect(field(page)).not.toHaveAttribute("data-tracking");
     await expect(field(page, "left")).toHaveCSS("color", "rgb(200, 197, 188)");
     await expect(field(page, "left").locator("canvas")).toBeHidden();

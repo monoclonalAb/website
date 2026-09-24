@@ -10,13 +10,13 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(resolve(root, path), "utf8");
 const errors = [];
 const pages = ["about", "blog", "contents", "changelog", "leetcode"];
-const headings = {
+const fragmentTargets = {
   about: ["about-me", "footnote", "fun-fact", "about-this-site"],
   contents: ["internal-links", "external-links", "social-media", "emails"],
 };
 const expectedLegacy = [
   ...pages.slice(0, 4).map((page) => [page, `/${page}`]),
-  ...Object.entries(headings).flatMap(([page, ids]) =>
+  ...Object.entries(fragmentTargets).flatMap(([page, ids]) =>
     ids.map((id) => [id, `/${page}#${id}`]),
   ),
 ];
@@ -37,7 +37,7 @@ const targets = new Map([
   ["/", new Set(["top", "pages", ...expectedLegacy.map(([id]) => id)])],
   ...pages.map((page) => [
     `/${page}`,
-    new Set([`${page}-top`, page, ...(headings[page] ?? [])]),
+    new Set([`${page}-top`, page, ...(fragmentTargets[page] ?? [])]),
   ]),
 ]);
 
@@ -70,7 +70,7 @@ for (const page of pages.slice(0, 4)) {
   if ((read(section).match(/<h1(?:\s|>)/g) ?? []).length !== 1)
     errors.push(`${section}: exactly one page h1 required`);
 }
-for (const [page, ids] of Object.entries(headings)) {
+for (const [page, ids] of Object.entries(fragmentTargets)) {
   const sources = page === "about" ? ["About", "Footnote"] : ["Contents"];
   const actual = sources.flatMap((name) =>
     [...read(`app/_sections/${name}.tsx`).matchAll(/\bid="([^"]+)"/g)].map(
@@ -79,7 +79,7 @@ for (const [page, ids] of Object.entries(headings)) {
   );
   for (const id of ids)
     if (actual.filter((value) => value === id).length !== 1)
-      errors.push(`Missing/duplicate ${page} heading target: ${id}`);
+      errors.push(`Missing/duplicate ${page} fragment target: ${id}`);
 }
 const legacySource = read("app/LegacyHomeFragments.tsx");
 for (const [id, destination] of expectedLegacy) {
@@ -155,7 +155,31 @@ if (
   !footer.includes("<a href={`#${page}-top`}>back to top ↑</a>") ||
   /Eric Zheng|home/.test(footer)
 )
-  errors.push("Footer must contain only the native back-to-top link");
+  errors.push(
+    "Footer must retain the native back-to-top link without identity/home copy",
+  );
+for (const [name, href] of [
+  ["GitHub", "https://github.com/monoclonalAb"],
+  ["LinkedIn", "https://www.linkedin.com/in/eric-zheng-nz/"],
+  ["Strava", "https://www.strava.com/athletes/130332761"],
+]) {
+  if (
+    !footer.includes(`aria-label="${name}"`) ||
+    !footer.includes(`href="${href}"`) ||
+    !read("app/_sections/Contents.tsx").includes(`href="${href}"`)
+  )
+    errors.push(
+      `Footer must use the named, verified Contents profile: ${name}`,
+    );
+}
+const footnote = read("app/_sections/Footnote.tsx");
+if (
+  /<(?:details|summary)\b/.test(footnote) ||
+  footnote.indexOf('id="about-this-site"') > footnote.indexOf('id="footnote"')
+)
+  errors.push(
+    "About must show about-this-site before footnote without a disclosure",
+  );
 if (
   !read("app/_sections/Changelog.tsx").includes(
     'subscribe with <a href="/changelog.xml">rss</a>',

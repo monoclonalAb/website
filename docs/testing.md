@@ -39,7 +39,7 @@ The public suite runs with `CI=1 pnpm test:e2e --retries=0` after a build. `arch
 `pnpm check` first runs `content:check` and `test:content`, then:
 
 1. `docs:check` — knowledge metadata, 184-day freshness, relative file links, reachability, and entry-point shape. It does not validate heading fragments, external links, or semantic accuracy.
-2. `contracts:check` — six canonical pages, eight reading heading targets, twelve legacy home notices, shared navigation/footer/RSS links, server-rendered public composition with only the isolated passive ScrollWaves client leaf, and no retired motion/dependencies. It is a source-shape parser, not a crawler of all routes.
+2. `contracts:check` — six canonical pages, eight reading fragment targets, twelve legacy home notices, shared navigation/footer/RSS links, server-rendered public composition with only the isolated passive ScrollWaves client leaf, and no retired motion/dependencies. It is a source-shape parser, not a crawler of all routes.
 3. `format:check` — read-only workspace Prettier verification.
 4. `lint` — React, accessibility, Next.js, and TypeScript lint rules.
 5. `typecheck` — generated route types plus strict TypeScript.
@@ -65,9 +65,9 @@ Run the relevant narrow baseline/checks during iteration, then the full required
 - reduced-motion navigation,
 - uncaught browser errors.
 
-The [separate-page implementation](plans/active/2026-09-14-separate-pages.md) updates the native regressions for the approved route model. `site.spec.ts` checks separate main/h1 content, all canonical/social/RSS metadata, 200 responses, the canonical sitemap base, legacy-home notice links and native keyboard/cold-fragment disclosures with JavaScript both on and off. `native-scroll.spec.ts` proves no input cancellation or snap, ordinary reading-page wheel/keyboard movement, top links and native fragment clamping. `route-return.spec.ts` exercises actual reading Link/Back/Forward, one visible main, current-page state, unique IDs, per-route top links, home-boundary document navigation and a CDP touch gesture.
+The [separate-page implementation](plans/active/2026-09-14-separate-pages.md) updates the native regressions for the approved route model. `site.spec.ts` checks separate main/h1 content, all canonical/social/RSS metadata, 200 responses, the canonical sitemap base, legacy-home notice links, visible About section order, named footer profile links and cold fragments with JavaScript both on and off. `native-scroll.spec.ts` proves no input cancellation or snap, ordinary reading-page wheel/keyboard movement, top links and native fragment clamping. `route-return.spec.ts` exercises actual reading Link/Back/Forward, one visible main, current-page state, unique IDs, per-route top links, home-boundary document navigation and a CDP touch gesture.
 
-`theme-tokens.spec.ts` checks all six pages at 390/768/1440 in both motion modes: palette, live Eiko/Georgia typography, column/portrait geometry, close current-nav underline, name-free footer, RSS alignment, opening bounds and skip focus. It attaches full-page screenshots and checks root role overrides plus all-page 320px/200%-sized body text reflow. These are not golden-image comparisons, actual browser-chrome zoom, screen-reader or physical-device proof. Current outcomes and unrun manual checks live in the [page-split record](plans/active/2026-09-14-separate-pages.md).
+`theme-tokens.spec.ts` checks all six pages at 390/768/1440 in both motion modes: palette, live Eiko/Georgia typography, column/portrait geometry, close current-nav underline, social-icon/name-free footer geometry and hit areas, RSS alignment, opening bounds and skip focus. It attaches full-page screenshots and checks root role overrides plus all-page 320px/200%-sized body text reflow. These are not golden-image comparisons, actual browser-chrome zoom, screen-reader or physical-device proof. Current outcomes and unrun manual checks live in the [page-split record](plans/active/2026-09-14-separate-pages.md).
 
 ### Browser server and focused runs
 
@@ -90,24 +90,24 @@ Failure traces, screenshots, and videos are written under `test-results/`; the H
 
 ## Native-scroll regression method
 
-Do not restore the retired pager to satisfy old alignment tests. Verify native wheel/key events are not cancelled, short wheel movement does not snap to another section, and normal links/history restore useful reading positions. A near-bottom fragment clamps to the document's maximum offset; this is correct native behavior. Hidden legacy heading fragments must reveal the footnote disclosure. Run `native-scroll.spec.ts` and the actual route-return suite after changes; keep physical hardware and browser-chrome zoom evidence separate.
+Do not restore the retired pager to satisfy old alignment tests. Verify native wheel/key events are not cancelled, short wheel movement does not snap to another section, and normal links/history restore useful reading positions. A near-bottom fragment clamps to the document's maximum offset; this is correct native behavior. About heading fragments land on always-visible content; native article outlines retain disclosure coverage. Run `native-scroll.spec.ts` and the actual route-return suite after changes; keep physical hardware and browser-chrome zoom evidence separate.
 
 ## Manual browser matrix
 
 For changes that affect output or interaction, exercise the relevant cells:
 
-| State                 | What to verify                                                                                        |
-| --------------------- | ----------------------------------------------------------------------------------------------------- |
-| `390 × 844`, touch    | Split opening, stacked masthead, portrait and native touch scroll                                     |
-| `768 × 1024`          | Readable 720px column, side portrait and unclipped navigation                                         |
-| `1440 × 900`          | Paper desktop composition and ordinary mouse/trackpad scrolling                                       |
-| Reduced motion        | Identical static content, links and disclosure behavior                                               |
-| Keyboard only         | Skip link, visible focus, all links, summary Enter/Space and scroll keys                              |
-| 80%, 125%, 200% zoom  | Reflow without clipping; no forced repositioning                                                      |
-| Direct page/hash load | Canonical heading arrival/clamping, `/about#footnote` disclosure and old `/#section` page-moved links |
-| `/leetcode`           | Working metadata, Link/history and route home                                                         |
-| JavaScript disabled   | Complete content, links and native disclosure                                                         |
-| Screen reader         | Meaningful landmarks, heading order, link names and disclosure state                                  |
+| State                 | What to verify                                                                                     |
+| --------------------- | -------------------------------------------------------------------------------------------------- |
+| `390 × 844`, touch    | Split opening, stacked masthead, portrait and native touch scroll                                  |
+| `768 × 1024`          | Readable 720px column, side portrait and unclipped navigation                                      |
+| `1440 × 900`          | Paper desktop composition and ordinary mouse/trackpad scrolling                                    |
+| Reduced motion        | Identical static content, links and article-outline behavior                                       |
+| Keyboard only         | Skip link, visible focus, profile icons, article summary Enter/Space and scroll keys               |
+| 80%, 125%, 200% zoom  | Reflow without clipping; no forced repositioning                                                   |
+| Direct page/hash load | Canonical heading arrival/clamping, visible `/about#footnote` and old `/#section` page-moved links |
+| `/leetcode`           | Working metadata, Link/history and route home                                                      |
+| JavaScript disabled   | Complete About content, profile links and native article outlines                                  |
+| Screen reader         | Meaningful landmarks, heading order, link names and disclosure state                               |
 
 ## Content and metadata changes
 

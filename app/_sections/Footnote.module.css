@@ -1,25 +1,10 @@
 .footnote {
-  margin-top: 4px;
-}
-.footnote summary {
-  color: var(--color-link);
-  cursor: pointer;
-  font-size: 17px;
-  line-height: 28px;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-.footnote summary::marker {
-  color: var(--color-accent);
-  font-size: 12px;
-}
-.body {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 22px;
-  padding-top: 24px;
+  padding-top: 2px;
 }
-.body h2 {
+.footnote h2 {
   font-size: 24px;
   line-height: 32px;
 }

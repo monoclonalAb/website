@@ -9,7 +9,6 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       const errors: string[] = [];
       page.on("pageerror", (error) => errors.push(error.message));
       await page.goto("/about");
-      await page.locator("summary").click();
       await page.evaluate(() => scrollTo(0, 300));
       await page
         .getByRole("navigation")
@@ -43,7 +42,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await expect(
           page.locator('nav:visible a[aria-current="page"]'),
         ).toHaveText(route);
-        await page.locator("footer:visible a").click();
+        await page
+          .locator("footer:visible")
+          .getByRole("link", { name: "back to top ↑" })
+          .click();
         await expect(page).toHaveURL(new RegExp(`#${route}-top$`));
         await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
         expect(
@@ -65,7 +67,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         .click();
       // Hash-only address changes must not target inactive home notice IDs.
       await page.goto("/about#footnote");
-      await expect(page.locator("details")).toHaveAttribute("open", "");
+      await expect(page.locator("main:visible details")).toHaveCount(0);
       await expect(page.locator("#footnote")).toBeInViewport();
       await expect(page.locator("html")).not.toHaveClass(/rail-open|lenis/);
       expect(errors).toEqual([]);

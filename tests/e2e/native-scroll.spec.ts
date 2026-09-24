@@ -7,7 +7,6 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       page,
     }) => {
       await page.goto("/about");
-      await page.locator("summary").click();
       await page.evaluate(() => document.fonts.ready);
       const uncancelled = await page.evaluate(() => [
         document.dispatchEvent(

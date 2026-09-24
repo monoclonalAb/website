@@ -95,10 +95,9 @@ test("canonical reading routes return 200 with distinct metadata and current nav
     if (route === "leetcode") await expect(current).toHaveCount(0);
     else await expect(current).toHaveText(route);
     await expect(page.locator("footer")).toHaveText("back to top ↑");
-    await expect(page.locator("footer a")).toHaveAttribute(
-      "href",
-      `#${route}-top`,
-    );
+    await expect(
+      page.getByRole("link", { name: "back to top ↑" }),
+    ).toHaveAttribute("href", `#${route}-top`);
     expect(
       await page
         .locator('a[href^="#"]')
@@ -177,24 +176,84 @@ test("only rss is linked; feed and sitemap use the canonical pages", async ({
 });
 
 for (const javaScriptEnabled of [true, false]) {
-  test.describe(`native links and disclosure / JavaScript ${javaScriptEnabled}`, () => {
+  test.describe(`native links and visible About / JavaScript ${javaScriptEnabled}`, () => {
     test.use({ javaScriptEnabled });
-    test("footnote works with keyboard and cold hidden fragments", async ({
+    test("About follows Paper's visible section order and retains every cold fragment", async ({
       page,
     }) => {
       await page.goto("/about");
-      const details = page.locator("details");
-      await expect(details).not.toHaveAttribute("open");
-      await page.locator("summary").focus();
-      await page.keyboard.press("Enter");
-      await expect(details).toHaveAttribute("open", "");
-      await expect(page.locator("#footnote")).toBeVisible();
-      await page.keyboard.press("Enter");
-      await expect(details).not.toHaveAttribute("open");
-      for (const id of ["footnote", "fun-fact", "about-this-site"]) {
+      await expect(page.locator("main details, main summary")).toHaveCount(0);
+      await expect(page.locator("main h1, main h2")).toHaveText([
+        "about me:",
+        "about this site:",
+        "footnote:",
+      ]);
+      await expect(page.locator("#fun-fact")).toBeVisible();
+      await expect(page.locator("#about-this-site + p")).toContainText(
+        "This site is built with Next.js",
+      );
+      await expect(page.locator("#footnote + p")).toContainText(
+        "2 main reasons",
+      );
+      await expect(page.locator("main ol li")).toHaveCount(2);
+      await expect(page.locator("main")).not.toContainText("email me");
+      expect(
+        await page
+          .locator("#fun-fact")
+          .evaluate((el) =>
+            Boolean(
+              el.compareDocumentPosition(
+                document.getElementById("about-this-site")!,
+              ) & Node.DOCUMENT_POSITION_FOLLOWING,
+            ),
+          ),
+      ).toBe(true);
+      for (const id of [
+        "about-me",
+        "fun-fact",
+        "about-this-site",
+        "footnote",
+      ]) {
         await page.goto(`/about#${id}`);
-        await expect(details).toHaveAttribute("open", "");
         await expect(page.locator(`#${id}`)).toBeInViewport();
+      }
+    });
+    test("Paper footer icons use verified URLs and remain keyboard accessible", async ({
+      page,
+    }) => {
+      const profiles = [
+        ["GitHub", "https://github.com/monoclonalAb"],
+        ["LinkedIn", "https://www.linkedin.com/in/eric-zheng-nz/"],
+        ["Strava", "https://www.strava.com/athletes/130332761"],
+      ];
+      for (const route of [...pages, "blog/group-theory"]) {
+        await page.goto(`/${route}`);
+        const footer = page.locator("footer");
+        await expect(footer.getByRole("link")).toHaveCount(4);
+        for (const [name, href] of profiles) {
+          const link = footer.getByRole("link", { name, exact: true });
+          await expect(link).toHaveAttribute("href", href);
+          await expect(link.locator("svg")).toHaveAttribute(
+            "aria-hidden",
+            "true",
+          );
+          await expect(link).not.toHaveAttribute("target", "_blank");
+        }
+      }
+      const links = page.locator("footer a");
+      await links.first().focus();
+      for (let i = 0; i < 4; i++) {
+        await expect(links.nth(i)).toBeFocused();
+        await expect(links.nth(i)).toHaveCSS("outline-style", "solid");
+        if (i < 3) await page.keyboard.press("Tab");
+      }
+      await page.keyboard.press("Enter");
+      await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+      await page.goto("/contents");
+      for (const [name, href] of profiles) {
+        await expect(
+          page.locator("main").getByRole("link", { name, exact: false }),
+        ).toHaveAttribute("href", href);
       }
     });
     test("old home bookmarks offer a native link to the exact new destination", async ({
@@ -228,7 +287,16 @@ for (const javaScriptEnabled of [true, false]) {
         .getByRole("link", { name: "about", exact: true })
         .click();
       await expect(page).toHaveURL(/\/about$/);
-      await page.locator("summary").click();
+      await page.keyboard.press("End");
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            Math.abs(
+              scrollY - (document.documentElement.scrollHeight - innerHeight),
+            ),
+          ),
+        )
+        .toBeLessThan(1);
       await page.getByRole("link", { name: "back to top ↑" }).click();
       await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
       await page.getByRole("link", { name: "Eric Zheng — home" }).click();

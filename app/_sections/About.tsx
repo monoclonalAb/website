@@ -66,10 +66,10 @@ export default function About() {
           </li>
         </ul>
       </div>
-      <div className="small-links">
-        <a href="mailto:theericzheng@gmail.com">email me</a>
-        <a href="https://github.com/monoclonalAb">GitHub</a>
-      </div>
+      <blockquote id="fun-fact" className={styles.quote}>
+        when I was 11, I wrote in my yearbook that I wanted to be a computer
+        scientist. Apparently dreams do come true...
+      </blockquote>
       <Footnote />
     </>
   );

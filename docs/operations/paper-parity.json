@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "id": "paper-parity",
+  "outcome": "Carry the current Paper composition through the local reading pages without discarding published content.",
+  "contract": "docs/plans/active/2026-09-14-paper-parity.md",
+  "boundary": [
+    "Paper supplies layout; verified local biography, published Markdown and changelog entries remain intact.",
+    "About sections are always visible: yearbook quote, about this site, footnote; historical IDs and native fragment behavior remain.",
+    "Footer reuses Paper SVG glyphs and verified Contents URLs, with accessible names, visible focus and native per-page back-to-top links.",
+    "No added client boundary, scrolling control, dependencies, remote writes, commit or deployment.",
+    "Native article outline disclosures retain dynamic document-length wave-progress coverage.",
+    "Keep every entry, date, draft label, topic, summary, article link, changelog ID and RSS destination unchanged; no pagination or client filtering."
+  ],
+  "inputs": [
+    "app",
+    "components",
+    "tests/e2e",
+    "scripts/check-site-contracts.mjs",
+    "next.config.ts",
+    "docs/product.md",
+    "docs/architecture.md",
+    "docs/design.md",
+    "docs/testing.md",
+    "docs/quality.md",
+    "AGENTS.md"
+  ],
+  "boundaryInputs": [],
+  "ownerInput": [
+    "Physical touch/trackpad, screen reader and actual browser-chrome zoom verification."
+  ],
+  "outOfScope": [
+    "Deployment and commit",
+    "Remote design edits",
+    "Article-content changes or emptying populated indexes"
+  ],
+  "checks": [
+    {
+      "id": "contracts",
+      "phase": "fast",
+      "argv": ["pnpm", "contracts:check"],
+      "timeoutSeconds": 30,
+      "cleanupSeconds": 5
+    },
+    {
+      "id": "repository",
+      "phase": "full",
+      "argv": ["pnpm", "validate"],
+      "timeoutSeconds": 600,
+      "cleanupSeconds": 30,
+      "inputs": ["."]
+    },
+    {
+      "id": "browser",
+      "phase": "full",
+      "argv": ["env", "CI=1", "pnpm", "test:e2e", "--retries=0"],
+      "timeoutSeconds": 600,
+      "cleanupSeconds": 30
+    }
+  ]
+}

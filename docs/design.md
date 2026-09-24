@@ -10,7 +10,7 @@ last_verified: 2026-09-14
 
 Paper's **01.1–01.5 desktop** and **02.1–02.5 mobile** are the selected Home/About/Blog/Contents/Changelog page sets. Eric approved propagating the separate-page design and final navigation/footer/RSS refinements to the website; the [implementation plan](plans/active/2026-09-14-separate-pages.md) records scope and evidence. This supersedes the consolidated page from the [earlier overhaul](plans/active/2026-09-14-public-overhaul.md), not its removal of scrolling machinery and animations.
 
-The static split alphabet opening keeps red ERIC/ZHENG and four semantic page links. Each reading destination has its own warm-paper canvas and compact column with live Eiko headings, Georgia prose, an inline portrait, a normal masthead and a native footnote disclosure. Do not ship the design's outlined heading images or its simulated mobile status bar.
+The static split alphabet opening keeps red ERIC/ZHENG and four semantic page links. Each reading destination has its own warm-paper canvas and compact column with live Eiko headings, Georgia prose, an inline portrait, a normal masthead and always-visible About details. The owner-confirmed [Paper parity follow-up](plans/active/2026-09-14-paper-parity.md) replaces the earlier footnote disclosure and back-to-top-only footer with the current Paper composition. Do not ship the design's outlined heading images or its simulated mobile status bar.
 
 ## Source of truth
 
@@ -37,7 +37,7 @@ Semantic roles are emitted on `:root`; root overrides remain supported. No theme
 - Self-hosted Helvetica Bold for the alphabet and logo; Helvetica regular for portrait captions and contact metadata.
 - The opening uses 80px/88px at 1440px, 32px/35.2px at 390px, with responsive intermediate sizing and narrower-screen reflow.
 - Eiko navigation uses its native Medium 500 weight at 16px/24px, tilde separators, and a 1.5px red active underline at 2px offset. Mobile link hit areas are at least 44px high; below 360px the nav reduces to 14px to fit.
-- Footer is only “back to top ↑”, right-aligned Eiko Medium 500 at 16px/36px. RSS is Georgia 16px/24px: plain muted “subscribe with” followed by the underlined link “rss”.
+- Footer text is “back to top ↑”, right-aligned Eiko Medium 500 at 16px/36px beside the left-aligned profile icons. RSS is Georgia 16px/24px: plain muted “subscribe with” followed by the underlined link “rss”.
 - Existing Libre Baskerville and Fira Code remain available to other retained surfaces. Fonts are declared in `app/fonts.ts`; no external font requests.
 
 ## Layout
@@ -45,13 +45,13 @@ Semantic roles are emitted on `:root`; root overrides remain supported. No theme
 - Home is the standalone `100svh`-minimum opening. Reading pages have separate `100svh`-minimum flex shells with the footer pushed toward the page end; prose remains natural flow, not full-screen tiles.
 - Reading column: maximum 720px; 24px side gutters; 64px desktop / 16px mobile page-top clearance; 40px / 32px bottom padding.
 - Masthead: the archived 01/02 Eiko/tilde navigation and home logo; stacks below 600px with a 10px gap and 12px bottom clearance. Desktop has 22px bottom clearance. No fixed navigation crumb, tree rail, drawer or scrollspy.
-- About: 160px portrait at desktop, 96px on mobile, with native image sizing and a real caption. Mobile peers list spans both columns.
+- About: 160px portrait at desktop, 96px on mobile, with native image sizing and a real caption. The visible yearbook memory is an italic, left-ruled quote, followed by “about this site:” and then “footnote:”. Both sections stay visible, with24px/32px Eiko headings,22px gaps and2px top padding. The old contact row is replaced by the footer profiles; email addresses remain in Contents. Mobile peers list spans both columns.
 - Contents: a directory of all six main pages (individual articles remain in Blog/Leetcode), followed by lowercase social profile links (github, linkedin, strava, instagram), the Discord username as plain text (no guessed profile URL), and the three existing email addresses. Eiko section headings and a fine rule separate internal/external links; descriptive rows use two columns on desktop and stack below 600px. Links have at least 44px hit height. The four historical Contents fragment IDs now belong to their matching headings.
 - Reading content: 64px desktop / 40px mobile clearance after the masthead, then 24px content gaps (22px on About). About has 48px / 40px before the footer; other pages have at least 64px.
-- Footer: a simple rule and only the back-to-top link, with 20px top padding. No identity credit or home link. The separate opening has no bottom identity or page-invitation caption.
+- Footer: a simple rule with20px top padding; GitHub, LinkedIn and Strava icons on the left and the native back-to-top link on the right. The Paper SVG glyphs are20px, separated by16px gaps in a36px-high row. Named links use verified Contents URLs and inherit the link color; invisible32px×44px pointer targets preserve the glyph positions. No identity credit or home link. The separate opening has no bottom identity or page-invitation caption.
 - RSS remains right-aligned beside the Changelog title at supported widths; its group wraps to a right-aligned second line rather than colliding at narrower/enlarged layouts.
 
-The existing verified undergraduate biography is retained instead of the proposed employment wording. This intentionally changes wrapping relative to the static boards. Do not invent biography, employment or published posts to match a screenshot.
+The verified undergraduate biography is retained, as in the current Paper boards. Do not invent biography, employment or published posts to match a screenshot.
 
 ## Markdown reading pages
 
@@ -65,7 +65,7 @@ The owner-requested Paper12–18 right-edge waves are a passive progress tint, n
 
 The left companion reuses the same renderer, speed, soft width bounds and eight-cell desktop base, but samples separate field/contour coordinates. It is not a flipped texture or synchronized mirror: only its edge dissolve faces the opposite direction. Its ink is always exactly `#c8c5bc`, including Home, scrolling, short pages, root theme overrides and static fallbacks. Both sides stay pointer-transparent and inside the existing gutters. Independent left fallback masks are generated at8s with the site's Helvetica font by `pnpm exec node scripts/generate-left-wave-masks.mjs`; the original Paper right masks remain unchanged.
 
-Use one main/h1 per page, subordinate h2s, lists, figures and visible focus. Decorative alphabet spans are hidden from accessibility APIs; all four opening links remain readable and focusable. Home's skip link targets its page navigation; reading skip links focus the main. `aria-current="page"` supplements the active underline. Each reading page has its own top fragment to avoid retained-DOM collisions. Historical home fragments reveal a native page-moved link. The footnote uses native `details`/`summary`; direct `/about#…` hidden heading fragments reveal the disclosure even without JavaScript. Pinch zoom remains unrestricted.
+Use one main/h1 per page, subordinate h2s, lists, figures and visible focus. Decorative alphabet spans are hidden from accessibility APIs; all four opening links remain readable and focusable. Home's skip link targets its page navigation; reading skip links focus the main. `aria-current="page"` supplements the active underline. Each reading page has its own top fragment to avoid retained-DOM collisions. Historical home fragments reveal a native page-moved link. About's `fun-fact`, `about-this-site` and `footnote` targets are always visible; direct fragments use native arrival/clamping even without JavaScript. Article outlines retain native `details`/`summary`. Pinch zoom remains unrestricted.
 
 ## Responsive verification
 

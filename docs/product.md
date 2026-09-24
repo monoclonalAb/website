@@ -23,7 +23,7 @@ The selected Paper01/02 page sets keep a standalone alphabet opening and separat
 | Changelog             | `/changelog`, `/changelog.xml`      | Shared hand-authored changelog and RSS               |
 | Writing RSS           | `/writing.xml`                      | Published Blog and Leetcode summaries                |
 | Discovery             | `/robots.txt`, `/sitemap.xml`       | Canonical pages and published article URLs           |
-| Legacy home fragments | `/#about`, `/#footnote`, etc.       | Native page-moved links to current pages/headings    |
+| Legacy home fragments | `/#about`, `/#footnote`, etc.       | Native page-moved links to current pages/targets     |
 
 The owner-requested [archive migration](plans/active/2026-09-14-archive-migration.md) imports the original site's blogs, daily Leetcode entries and changelog releases. One metadata-only daily entry is explicitly labelled as having no recorded solution. Empty collections remain supported; no design specimens or invented solutions are publications. `/test` and `/explore` remain retired404s.
 
@@ -43,7 +43,7 @@ Eric previously confirmed Vercel and requires $0 spending. Static writing needs 
 
 - About/Contents prose lives in `app/_sections/`; Blog/Leetcode writing lives in `content/`.
 - Changelog records live only in `app/_content/changelog.ts`, shared by HTML/RSS. Preserve Eric's voice, real links and intentional empty states.
-- Keep the verified undergraduate biography. The proposed employment copy from Paper still needs owner confirmation. The native footnote contains only the factual Next.js stack description, not the old Bash/GitHub Pages story or an unverified hosting claim.
+- Keep the verified undergraduate biography. About shows the yearbook memory, factual Next.js stack description and original site rationale, with “about this site:” before “footnote:” as in the current Paper design. These sections are always visible; do not restore the old Bash/GitHub Pages story or infer a hosting claim. The footer profiles reuse the verified Contents URLs.
 - Sitemap article dates come from authored `date`/`updated`; fixed page dates change only with actual canonical content edits, not because a build ran.
 
 ## Experience principles and invariants

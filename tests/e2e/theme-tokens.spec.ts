@@ -76,6 +76,44 @@ for (const viewport of [
           );
           await expect(page.locator("footer")).toHaveCSS("font-weight", "500");
           await expect(page.locator("footer")).toHaveText("back to top ↑");
+          const icons = page.locator("footer svg");
+          await expect(icons).toHaveCount(3);
+          const footerGeometry = await icons.evaluateAll((els) => {
+            const boxes = els.map((el) => el.getBoundingClientRect());
+            const footer = els[0].closest("footer")!.getBoundingClientRect();
+            return {
+              sizes: boxes.map((box) => [box.width, box.height]),
+              offsets: boxes.map((box) => box.left - footer.left),
+              aligned: boxes.every((box) => box.top === boxes[0].top),
+              height: footer.height,
+            };
+          });
+          expect(footerGeometry).toEqual({
+            sizes: [
+              [20, 20],
+              [20, 20],
+              [20, 20],
+            ],
+            offsets: [0, 36, 72],
+            aligned: true,
+            height: 57,
+          });
+          // Invisible padding enlarges each 20×36 link to a nonoverlapping 32×44 target.
+          await page.locator("footer").scrollIntoViewIfNeeded();
+          expect(
+            await icons.evaluateAll((els) =>
+              els.every((el) => {
+                const link = el.closest("a")!;
+                const box = link.getBoundingClientRect();
+                return (
+                  document.elementFromPoint(box.left - 5, box.top + 1) ===
+                    link &&
+                  document.elementFromPoint(box.left + 1, box.top - 3) === link
+                );
+              }),
+            ),
+          ).toBe(true);
+          await page.evaluate(() => scrollTo(0, 0));
           expect(
             await page
               .locator(".reading-column")
@@ -172,7 +210,10 @@ test("semantic roles remain themeable", async ({ page }) => {
     "color",
     "rgb(69, 103, 137)",
   );
-  await expect(page.locator("footer a")).toHaveCSS("color", "rgb(52, 86, 120)");
+  for (const link of await page.locator("footer a").all())
+    await expect(link).toHaveCSS("color", "rgb(52, 86, 120)");
+  for (const icon of await page.locator("footer svg").all())
+    await expect(icon).toHaveCSS("fill", "rgb(52, 86, 120)");
 });
 
 test("all pages reflow at 320px and with enlarged body text", async ({
@@ -185,7 +226,7 @@ test("all pages reflow at 320px and with enlarged body text", async ({
       content: "body { font-size: 36px; line-height: 1.6; }",
     });
     if (route === "about") {
-      await page.locator("summary").click();
+      await expect(page.locator("#about-this-site")).toBeVisible();
       await expect(page.locator("#footnote")).toBeVisible();
     }
     expect(

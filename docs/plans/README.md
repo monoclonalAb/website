@@ -33,6 +33,8 @@ An active plan is an open record, not permission for Astra to start it during an
 
 ## Active
 
+- [2026-09-14 — Paper design parity](active/2026-09-14-paper-parity.md) — current About/footer composition implemented locally; Contents retains its matching directory. Manual/independent review pending.
+
 - [2026-09-14 — Writing performance](active/2026-09-14-writing-performance.md) — metadata/detail/asset split implemented and measured; repository/browser/authoring checks pass, independent source review pending.
 
 - [2026-09-14 — Archive migration](active/2026-09-14-archive-migration.md) — owner-requested import of all static-site blogs, Leetcode entries and changelog releases.

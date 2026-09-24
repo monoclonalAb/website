@@ -22,7 +22,7 @@ Current public gaps: proposed employment biography needs owner confirmation; phy
 
 ## Separate-page follow-up — 2026-09-14
 
-The [page-split record](plans/active/2026-09-14-separate-pages.md) owns current public implementation and verification. Old home fragments deliberately offer native links to their new page/heading, not automatic script redirects. Browsers may cache the previous permanent path-to-home redirects; canonical server 200 checks do not prove client-cache eviction. Physical touch/trackpad, actual browser-chrome zoom, screen-reader and independent-source-review gaps remain open. No public security grade advances from this UI change.
+The [page-split record](plans/active/2026-09-14-separate-pages.md) records the original public implementation; the [Paper parity follow-up](plans/active/2026-09-14-paper-parity.md) owns the current visible About sections and profile footer evidence. Old home fragments deliberately offer native links to their new page/heading, not automatic script redirects. Browsers may cache the previous permanent path-to-home redirects; canonical server 200 checks do not prove client-cache eviction. Physical touch/trackpad, actual browser-chrome zoom, screen-reader and independent-source-review gaps remain open. No public security grade advances from this UI change.
 
 ## Open records
 

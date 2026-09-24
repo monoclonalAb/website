@@ -135,15 +135,6 @@ pre {
   color: var(--color-text-muted);
 }
 
-.small-links {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  font-family: var(--font-helvetica), Arial, sans-serif;
-  font-size: 15px;
-  line-height: 26px;
-}
-
 .section-title {
   display: flex;
   flex-wrap: wrap;
