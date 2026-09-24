@@ -33,6 +33,8 @@ An active plan is an open record, not permission for Astra to start it during an
 
 ## Active
 
+- [2026-09-22 — Remove both edge waves](active/2026-09-22-remove-scroll-waves.md) — owner-requested complete removal from the website and current Paper compositions; preserve archived design history.
+
 - [2026-09-16 — Leetcode design exploration](active/2026-09-16-leetcode-design-exploration.md) — current Paper theme with original-style compact rows, coloured difficulties and overlapping collection filters; desktop/mobile, combined and empty states. Earlier versions archived; owner/independent review pending.
 
 - [2026-09-16 — Homepage alphabet hover](active/2026-09-16-home-hover.md) — Paper07.1–07.3 implemented with recovered old-site easing; repository and browser checks pass, independent/manual review pending.
@@ -43,8 +45,6 @@ An active plan is an open record, not permission for Astra to start it during an
 
 - [2026-09-14 — Archive migration](active/2026-09-14-archive-migration.md) — owner-requested import of all static-site blogs, Leetcode entries and changelog releases.
 
-- [2026-09-14 — Scroll waves](active/2026-09-14-scroll-waves.md) — adapt Paper12–18 to passive per-page progress while preserving native scrolling and the separate-page layout.
-
 - [2026-09-14 — Separate public pages](active/2026-09-14-separate-pages.md) — implement the refined Paper 01/02 page sets, canonical routes, native compatibility links and shared chrome; supersedes the consolidated-document model.
 
 - [2026-09-14 — Public site overhaul](active/2026-09-14-public-overhaul.md) — Paper 01/02 responsive implementation; remove public motion while preserving unrelated work.
@@ -52,6 +52,8 @@ An active plan is an open record, not permission for Astra to start it during an
 - [2026-09-14 — Markdown publishing](active/2026-09-14-markdown-publishing.md) — file-based authoring, local draft preview, static pages and generated discovery. [Writing guide](../writing.md).
 
 ## Completed
+
+- [2026-09-14 — Scroll waves](completed/2026-09-14-scroll-waves.md) — retired at the owner's request on2026-09-22; historical implementation evidence, not instructions to restore the feature.
 
 - [2026-09-14 — Investigate writing navigation performance](completed/2026-09-14-writing-performance-investigation.md) — measured dev/production navigation and identified full-archive rendering plus a separate preview HMR failure; the later implementation is tracked in the active writing-performance plan.
 

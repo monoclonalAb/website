@@ -10,6 +10,10 @@ last_verified: 2026-09-17
 - **Owner:** Eric Zheng
 - **Created:** 2026-09-16
 
+## Later edge-wave removal — 2026-09-22
+
+Eric subsequently requested [complete edge-wave removal](2026-09-22-remove-scroll-waves.md). Both decorations are removed from the four current composition boards and the rationale now describes clean gutters. Pre-removal current boards are preserved in a separate archive; the six earlier archived boards, filters and content remain unchanged. Historical references to retaining waves below are superseded.
+
 ## Scope and acceptance
 
 Eric requested a separate Paper exploration inspired by `https://ericzheng.nz/leetcode`, then clarified the hybrid direction: **the current Paper theme**, with the original site's compact layout and coloured difficulties. Categories mean overlapping collections—daily questions, competition questions, NeetCode 150 and future author-defined lists—not algorithm topics. Explore search, date, difficulty and collection filtering without hardcoding 2025 or a closed category list. Use real titles, dates and difficulties; label proposed memberships and states as illustrative. Keep other Paper pages, tokens, website code and writing unchanged; archive superseded versions before revision. No publishing, deployment, dependencies or new route. [Design safety](../../design.md#paper-first-exploration) and the [completion packet](../../operations/leetcode-exploration.json) govern scope.

@@ -37,7 +37,7 @@ Draft flags/noindex are not confidentiality. Repository readers can read committ
 app/layout.tsx — metadata, viewport, global CSS and local fonts
 ├── /: HomePage + LegacyHomeFragments
 ├── /about, /blog, /contents, /changelog, /leetcode
-│   └── ReadingPage — top target, skip link, SiteHeader, main, SiteFooter, ScrollWaves
+│   └── ReadingPage — top target, skip link, SiteHeader, main, SiteFooter
 ├── /blog/[slug], /leetcode/[slug]
 │   └── ArticlePage → ReadingPage — unique article targets, outline and rendered prose
 ├── /writing-assets/[...path] — allowlisted referenced raster images
@@ -47,7 +47,7 @@ app/layout.tsx — metadata, viewport, global CSS and local fonts
 
 The selected Paper 01.1–01.5 /02.1–02.5 page set uses Eiko headings/navigation, Georgia prose, a720px maximum column and native scrolling. [Design](design.md) owns responsive tokens and [separate-page evidence](plans/active/2026-09-14-separate-pages.md) records implementation history. Home remains the standalone alphabet opening; no recent-post widget or additional dashboard was added there. Its server-rendered horizontal rows use CSS-only hover/focus tracking with stable link centres, split-colour decoration, reduced-motion support and resting compact/touch layouts ([Paper07 evidence](plans/active/2026-09-16-home-hover.md)). No additional client boundary is needed.
 
-`ScrollWaves` remains the sole authored public client component, mounted once per edge in HomePage/ReadingPage, never the root layout. Each pointer-transparent canvas changes characters in a fixed grid, independently owns/cancels frames and observers, pauses in hidden tabs and respects reduced motion. The right tint reads document progress; the independently sampled left stays `#c8c5bc`. No scroll writes, interception or per-frame React state. Static local Paper masks support no-JavaScript/reduced-motion; print/forced-colors hide decoration. Source-derived noise/Bayer fields, soft contour widths, visible-cell base, mask generation and lifecycle evidence remain in [the wave plan](plans/active/2026-09-14-scroll-waves.md) and `components/scroll-wave-field.ts`; no wave algorithm changed for publishing.
+Public composition has no authored client component. Both decorative edge waves, their animation/progress lifecycle, field math and fallback masks were removed at Eric's request. Home and ReadingPage remain Server Components with clean gutters; native links and the CSS-only alphabet hover are unchanged. [Removal evidence](plans/active/2026-09-22-remove-scroll-waves.md).
 
 ## Routes and contracts
 

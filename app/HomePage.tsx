@@ -1,6 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
 import styles from "./HomePage.module.css";
-import ScrollWaves from "@/components/ScrollWaves";
 
 type AlphabetRowProps = {
   upper?: ReactNode;
@@ -66,8 +65,6 @@ function AlphabetRow({
 export default function HomePage() {
   return (
     <main id="top" className={styles.hero}>
-      <ScrollWaves opening />
-      <ScrollWaves opening side="left" />
       <h1 className="sr-only">Eric Zheng</h1>
       <nav
         id="pages"

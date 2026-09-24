@@ -97,13 +97,8 @@ for (const file of publicFiles) {
     if (!targets.has(route) || (hash && !targets.get(route).has(hash)))
       errors.push(`${file}: unknown public destination ${href}`);
   }
-  if (
-    /^["']use client["']/m.test(source) &&
-    file !== "components/ScrollWaves.tsx"
-  )
-    errors.push(
-      `${file}: only the passive ScrollWaves leaf may use a client boundary`,
-    );
+  if (/^["']use client["']/m.test(source))
+    errors.push(`${file}: public composition must remain server-rendered`);
   if (
     /\bpreventDefault\s*\(|\bscrollTo\s*\(|\bscrollBy\s*\(|\bsetInterval\s*\(|addEventListener\(["'](?:wheel|touchmove|keydown)["']/.test(
       source,
@@ -113,11 +108,10 @@ for (const file of publicFiles) {
       `${file}: public UI must not control scrolling or run an idle loop`,
     );
   if (
-    /\b(?:SmoothScroll|useCursorRepel|SiteRail|SiteCrumb)\b|from ["'](?:lenis|motion)/.test(
+    /\b(?:SmoothScroll|useCursorRepel|SiteRail|SiteCrumb|ScrollWaves)\b|data-scroll-waves|\/waves\/|from ["'](?:lenis|motion)/.test(
       source,
     ) ||
-    (file !== "components/ScrollWaves.tsx" &&
-      /\brequestAnimationFrame\b/.test(source))
+    /\brequestAnimationFrame\b/.test(source)
   )
     errors.push(`${file}: retired motion/chrome must not return`);
 }
@@ -150,7 +144,7 @@ for (const file of [
     )
   )
     errors.push(
-      `${file}: native scrolling; only the wave canvas and opening letter spread may animate`,
+      `${file}: native scrolling; only the opening letter spread may animate`,
     );
 }
 for (const redirect of (await nextConfig.redirects?.()) ?? []) {
@@ -214,6 +208,11 @@ for (const file of [
   "app/useCursorRepel.ts",
   "app/test/page.tsx",
   "app/explore/page.tsx",
+  "components/ScrollWaves.tsx",
+  "components/ScrollWaves.module.css",
+  "components/scroll-wave-field.ts",
+  "public/waves",
+  "scripts/generate-left-wave-masks.mjs",
 ]) {
   if (existsSync(resolve(root, file)))
     errors.push(`Obsolete public surface remains: ${file}`);

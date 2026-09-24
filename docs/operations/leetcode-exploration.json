@@ -5,7 +5,7 @@
   "contract": "docs/plans/active/2026-09-16-leetcode-design-exploration.md",
   "boundary": [
     "Only the exploration page is writable; preserve its previous direction as archive copies before revision. All other Paper pages, artboards and file-wide tokens are protected.",
-    "Combine current Paper warm-paper colors, Eiko/Georgia typography, 720px reading column, masthead, footer and waves with the original site's compact title/date/difficulty layout and colored difficulty labels.",
+    "Combine current Paper warm-paper colors, Eiko/Georgia typography, 720px reading column, masthead, footer and clean side gutters with the original site's compact title/date/difficulty layout and colored difficulty labels.",
     "Categories are overlapping author-defined collections, not algorithm topics. Explore any/all collection matching and options derived from content/collection metadata rather than hardcoded years or a closed taxonomy.",
     "Preserve application source, published writing and all inherited local work; no coded route, dependencies, commit or deployment.",
     "Use actual live titles, dates and difficulties. Clearly label illustrative collection memberships and filter states; do not imply implemented behavior, fabricated publications or new production metadata.",

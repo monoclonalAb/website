@@ -90,12 +90,6 @@ for (const width of [768, 1440]) {
           );
         }),
       ).toBe(true);
-      if (width === 1440) {
-        const waveLeft = await page
-          .locator('[data-scroll-waves][data-side="right"]')
-          .evaluate((el) => el.getBoundingClientRect().left);
-        expect(waveLeft - (active.x + active.width)).toBeGreaterThanOrEqual(16);
-      }
       await testInfo.attach(`hover-${name}-${width}`, {
         body: await page.screenshot(),
         contentType: "image/png",

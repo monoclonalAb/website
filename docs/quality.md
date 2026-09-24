@@ -41,15 +41,15 @@ The [2026-09-14 public overhaul](plans/active/2026-09-14-public-overhaul.md) rep
 
 ## Architecture layers
 
-| Layer                            | Grade | Evidence                                                                                                           | Risk                                                                        |
-| -------------------------------- | :---: | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| Product and repository knowledge |   A   | Shared Astra workflow, task map, indexed/dated docs, file-link/freshness/reachability checks                       | Checks do not establish semantic truth, live tool state, or owner approval  |
-| Server/client boundaries         |   B   | Server-first composition and production build                                                                      | No custom import-boundary linter                                            |
-| Static content and metadata      |   B   | Local Markdown/JSX/assets, shared typed changelog records, typed framework APIs                                    | Content facts require human review                                          |
-| Public interaction state         |   B   | Native links/details; isolated owner-requested wave canvas with progress, reduced-motion and route-lifecycle tests | Manual device/performance review remains; never restore scroll interception |
-| Styling and design tokens        |   B   | CSS-first tokens, local fonts, CSS Modules                                                                         | Preserve root semantic overrides and responsive geometry                    |
-| Test harness                     |   B   | Content/workflow regressions, contract checks, Chromium native-scroll/history and writing cases                    | Manual gaps remain; local checks are not hosted CI evidence                 |
-| Delivery                         |   A   | Frozen install, checks, build, and browser tests in CI                                                             | Deployment configuration itself lives outside the repository                |
+| Layer                            | Grade | Evidence                                                                                         | Risk                                                                          |
+| -------------------------------- | :---: | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| Product and repository knowledge |   A   | Shared Astra workflow, task map, indexed/dated docs, file-link/freshness/reachability checks     | Checks do not establish semantic truth, live tool state, or owner approval    |
+| Server/client boundaries         |   B   | Server-first composition and production build                                                    | No custom import-boundary linter                                              |
+| Static content and metadata      |   B   | Local Markdown/JSX/assets, shared typed changelog records, typed framework APIs                  | Content facts require human review                                            |
+| Public interaction state         |   B   | Native links/details and CSS-only alphabet hover; both edge-wave renderers and fallbacks retired | Manual device review remains; never restore scroll interception or edge waves |
+| Styling and design tokens        |   B   | CSS-first tokens, local fonts, CSS Modules                                                       | Preserve root semantic overrides and responsive geometry                      |
+| Test harness                     |   B   | Content/workflow regressions, contract checks, Chromium native-scroll/history and writing cases  | Manual gaps remain; local checks are not hosted CI evidence                   |
+| Delivery                         |   A   | Frozen install, checks, build, and browser tests in CI                                           | Deployment configuration itself lives outside the repository                  |
 
 ## Design-tool evidence
 

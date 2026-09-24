@@ -8,7 +8,7 @@
     "About sections are always visible: yearbook quote, about this site, footnote; historical IDs and native fragment behavior remain.",
     "Footer reuses Paper SVG glyphs and verified Contents URLs, with accessible names, visible focus and native per-page back-to-top links.",
     "No added client boundary, scrolling control, dependencies, remote writes, commit or deployment.",
-    "Native article outline disclosures retain dynamic document-length wave-progress coverage.",
+    "Native article outline disclosures retain usable native scrolling and navigation without edge waves.",
     "Contents retains its matching Paper directory; populated archives extend its 132px metadata column, 24px gutter, fine rules and Eiko/Georgia hierarchy, stacking below 600px.",
     "Keep every entry, date, draft label, topic, summary, article link, changelog ID and RSS destination unchanged; no pagination or client filtering."
   ],

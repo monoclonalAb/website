@@ -6,6 +6,10 @@ last_verified: 2026-09-14
 
 # Recreate the current Paper design locally
 
+## Later edge-wave removal — 2026-09-22
+
+Eric subsequently requested [complete edge-wave removal](2026-09-22-remove-scroll-waves.md) from the website, current main Paper boards and current Blog/Leetcode studies. Earlier wave-preservation/progress clauses below are historical; all non-wave composition and populated-content work is retained.
+
 ## Outcome and authority
 
 Eric clarified that “consolidate” means recreate the Paper designs **in the local website**, with Paper as the layout source of truth. The initial local passes did not authorize remote design writes, commit or deployment. Preserve the imported published writing/changelog and all inherited work rather than replacing populated indexes with Paper's older empty-state copy. Eric later explicitly requested propagation back to Paper; that separately bounded design follow-up is recorded below.

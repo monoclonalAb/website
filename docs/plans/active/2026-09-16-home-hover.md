@@ -6,6 +6,10 @@ last_verified: 2026-09-16
 
 # Homepage alphabet hover
 
+## Later edge-wave removal — 2026-09-22
+
+Eric subsequently requested [complete edge-wave removal](2026-09-22-remove-scroll-waves.md), including the Paper hover-study boards. The wave renderer, clearance cap and wave-specific assertion below are historical and retired. The alphabet interaction itself is unchanged.
+
 ## Scope and acceptance
 
 Eric requested implementing Paper07.1–07.3 on the four existing home links. Fresh inspection of Personal Website and07.4 establishes: only the active horizontal line opens from0 to0.15em tracking; the link's visual centre stays fixed; surrounding letters move outward and become pale on the light half. The initial study proposed280ms ease-out in/180ms out. Eric subsequently requested a faster feel, rejected80/60ms as too fast, then explicitly requested recovering the previous site's hover. Git's last pre-overhaul `app/HomePage.module.css` (`ed5e4a0^`) uses280ms `cubic-bezier(0.22, 1, 0.36, 1)` both ways; that timing/curve supersedes the interim guesses while keeping Paper's0.15em geometry. Retain stable hit area, visible keyboard focus, no tween under reduced motion, touch at rest. Preserve native links, scrolling, wave renderer, typography and resting layout. No dependencies, client component, design writes, content edits, commit or deployment.

@@ -10,7 +10,7 @@ last_verified: 2026-09-14
 
 `ericzheng.nz` is Eric Zheng's personal website: an expressive introduction, biography/contact links, changelog, technical blog and Leetcode notes. It serves friends, recruiters, collaborators, classmates, readers arriving through shared links, and Eric as its single author.
 
-The selected Paper01/02 page sets keep a standalone alphabet opening and separate native-scrolling reading pages. The owner-requested fixed-grid edge waves decorate these surfaces without controlling scrolling: the right tracks progress and the left remains `#c8c5bc`. [Design](design.md) and [the wave plan](plans/active/2026-09-14-scroll-waves.md) own those details.
+The selected Paper01/02 page sets keep a standalone alphabet opening and separate native-scrolling reading pages, with clean side gutters. Eric requested removing both decorative edge waves from the website and current Paper designs; [the removal record](plans/active/2026-09-22-remove-scroll-waves.md) owns evidence.
 
 ## Current surfaces
 
@@ -50,7 +50,7 @@ Eric previously confirmed Vercel and requires $0 spending. Static writing needs 
 
 1. Personality without obstructing reading: lowercase voice, split alphabet, warm paper, Eiko headings and Georgia body.
 2. One main/h1 per page, unique main/top/article heading targets, semantic links and visible keyboard focus. Headings in Markdown start at h2.
-3. Native document scrolling, zoom, history, direct fragments and details/summary. No pager, scrollspy, drawer, repulsion, snap, smoothing or input interception. Waves may only read progress and animate their own fixed glyph grids with reduced-motion support.
+3. Native document scrolling, zoom, history, direct fragments and details/summary. No pager, scrollspy, drawer, repulsion, snap, smoothing or input interception. No decorative edge-wave renderer or static wave fallback remains.
 4. Content, links, code/math and disclosures remain available without JavaScript. Fonts/assets stay local and no tracking or embeds are introduced.
 5. Separate canonical pages retain shared navigation/footer; historical home bookmarks offer native links to the new targets, not old path-to-home redirects.
 6. Publishing/correcting/unpublishing requires a successful rebuild/deploy; failed deployments leave the previous site live. Removing public content cannot retract repository history, old deployments, feeds or downloaded copies.

@@ -1,10 +1,14 @@
 ---
 owner: Eric Zheng
-status: active
+status: completed
 last_verified: 2026-09-14
 ---
 
 # Adapt Paper 12–18 scroll waves
+
+## Closure — superseded on 2026-09-22
+
+Status: completed (retired, not approved for continued implementation). Eric subsequently requested removing both edge waves completely from the product and current Paper designs. The [removal record](../active/2026-09-22-remove-scroll-waves.md) supersedes all implementation instructions below. Remaining wave-specific visual/device reviews are abandoned with the feature, not marked passed. The original workflow packet is retired; source, masks, generator and positive wave tests are deleted. The following sections retain historical evidence only.
 
 ## Outcome and authority
 
@@ -16,7 +20,7 @@ Sources: inspected Paper12/13 opening,14/15 reading and18 layer specimen. Local 
 
 ## Boundary and checks
 
-One isolated client component is reused per edge; each instance reads native document progress and renders only its own canvas (left never adopts progress colors). Idle redraws are capped at12fps per field with DPR capped at2; no React render per frame, scroll writes, input interception, heading scans or global mutable styles. Glyph positions are fixed; density changes choose new characters rather than translating a bitmap. Mount inside public page shells, not the root layout. Cancel frames/listeners/ResizeObserver on Activity hide; stop animation for reduced motion or hidden tabs, and resynchronize on re-show, resize and disclosure changes. [Completion packet](../../operations/scroll-waves.json).
+One isolated client component is reused per edge; each instance reads native document progress and renders only its own canvas (left never adopts progress colors). Idle redraws are capped at12fps per field with DPR capped at2; no React render per frame, scroll writes, input interception, heading scans or global mutable styles. Glyph positions are fixed; density changes choose new characters rather than translating a bitmap. Mount inside public page shells, not the root layout. Cancel frames/listeners/ResizeObserver on Activity hide; stop animation for reduced motion or hidden tabs, and resynchronize on re-show, resize and disclosure changes. The original completion packet was retired when the feature was removed.
 
 Baseline: Node24.19.0/pnpm11.23.0; contracts, production build and four native-scroll browser cases passed. Existing contract typeless-module warning is non-failing. Startup source copies/hashes: `/var/folders/_3/qmjpz74s0kb7k127jk5mh2rw0000gn/T/website-waves-start-agka2p24`. All pre-existing changes/deletions are inherited.
 
@@ -38,7 +42,7 @@ The final diff against this follow-up's source snapshot changes only the three w
 
 Eric requested the same effect on the left, explicitly not a mirror, with constant `#c8c5bc`. Reuse the existing renderer with a side prop, independent source/contour coordinates and a left-facing dissolve; preserve the right's defaults, pattern, palette, speed and geometry. The left uses fixed CSS color for canvas and fallback alike, without the opening opacity or scroll-progress palette. Both instances retain native input, gutter clearance, reduced-motion/hidden-tab cancellation and Activity cleanup.
 
-Independent left PNG masks are sampled at8s with the actual local Helvetica font. Reproduce only those two files with [the generator](../../../scripts/generate-left-wave-masks.mjs), invoked as `pnpm exec node scripts/generate-left-wave-masks.mjs`. The script needs the existing installed Chromium but no server, environment configuration or external asset. Original right masks and all font files are preserved; MIT notices distinguish the two sources.
+Independent left PNG masks are sampled at8s with the actual local Helvetica font. Reproduce only those two files with the former `scripts/generate-left-wave-masks.mjs` generator, invoked as `pnpm exec node scripts/generate-left-wave-masks.mjs`. The script needs the existing installed Chromium but no server, environment configuration or external asset. Original right masks and all font files are preserved; MIT notices distinguish the two sources.
 
 Baseline: all13 focused cases passed. Source copies/hashes: `/var/folders/_3/qmjpz74s0kb7k127jk5mh2rw0000gn/T/website-wave-left-184g9mdq`. Right-field fingerprints captured before editing match all sampled cells at8/16/40s after adding the left variant; tests retain those fingerprints and reject copied/mirrored left output. Focused lint/types/docs/contracts/build and all15 wave tests passed. Both-edge Home/About renders at390/768/1440 plus the independent static left fallback were visually inspected: no text overlap, different contours rather than reflection, constant pale left ink and retained right progress colors. New browser coverage includes all six routes, root palette overrides, reduced/no-JavaScript states and actual cancellation of both hidden route canvases. Final `pnpm validate` passed and `CI=1 pnpm test:e2e --retries=0` passed39 tests. A second generator run produced byte-identical left masks and preserved both original right masks. Final snapshot review found only the intended wave sources/composition, tests, masks/generator/license and current records changed; no baseline file was removed or unrelated source/dependencies modified. Next: owner visual review of the independent left companion. Physical-device, browser-chrome zoom, screen-reader and independent reviews remain unavailable; automated passes do not close those gaps.
 

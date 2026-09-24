@@ -15,7 +15,6 @@
     "app/HomePage.module.css",
     "app/page.tsx",
     "app/globals.css",
-    "components/ScrollWaves.module.css",
     "scripts/check-site-contracts.mjs",
     "tests/e2e",
     "docs/design.md",

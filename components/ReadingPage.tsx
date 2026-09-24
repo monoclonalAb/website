@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import SiteHeader, { type ReadingPageId } from "./SiteHeader";
 import SiteFooter from "./SiteFooter";
-import ScrollWaves from "./ScrollWaves";
 
 export default function ReadingPage({
   page,
@@ -22,8 +21,6 @@ export default function ReadingPage({
         {children}
       </main>
       <SiteFooter page={id} />
-      <ScrollWaves />
-      <ScrollWaves side="left" />
     </div>
   );
 }
