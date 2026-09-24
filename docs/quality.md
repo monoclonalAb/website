@@ -63,7 +63,7 @@ The [task-completion workflow](operations/task-workflow.md) adds explicit curren
 
 ## Release bar
 
-A repository change should leave `pnpm validate` green. It includes formatting but excludes browser tests. User-visible, route, or interaction work should also leave `pnpm test:e2e` green and include the relevant manual matrix result in its plan or pull request. Use [the validation matrix](testing.md#choose-validation-by-change) for docs-only and Penpot-only work; report blocked/unrun checks honestly. A grade may fall when a new gap is discovered; visibility is preferable to an unsupported A.
+A repository change should leave `pnpm validate` green. It includes formatting but excludes browser tests. User-visible, route, or interaction work should also leave `pnpm test:e2e` green and include the relevant manual matrix result in its plan or pull request. Use [the validation matrix](testing.md#choose-validation-by-change) for docs-only and Paper-only work; report blocked/unrun checks honestly. A grade may fall when a new gap is discovered; visibility is preferable to an unsupported A.
 
 ## Review cadence
 

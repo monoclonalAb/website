@@ -70,8 +70,12 @@ Use one main/h1 per page, subordinate h2s, lists, figures and visible focus. Dec
 
 Inspect 390 × 844, 768 × 1024 and 1440 × 900 renders, reduced motion, keyboard navigation, direct fragments, history and no-JavaScript disclosure. Test narrower reflow and enlarged text; actual browser-chrome zoom, physical touch/trackpad input and screen-reader checks must be labelled separately from emulation. See [testing](testing.md).
 
-## Penpot-first exploration
+## Paper-first exploration
 
-For a new design exploration without an explicit request for a coded route, use Penpot first. Inspect current [MCP setup](development.md#penpot-mcp), connected file, pages, fonts and tokens; confirm scope before mutation. Save a version before destructive edits and compare protected-page serialized state, not only shape counts. Build auto-height prose and visually inspect desktop/mobile exports for clipping, overlap and reading order. Never expose design credentials or treat old session IDs as current capability.
+On 2026-09-16 Eric designated **Paper** for design work and requested that agents stop using Penpot. The owner-designated design file is [Personal Website in Paper](https://app.paper.design/file/01M2CE2B4A8CZWDBD3ZV3H7G56/1-0/32-0). This supersedes the earlier Penpot-first workflow; do not use Penpot or treat it as a fallback.
 
-Historical candidates remain in the [Penpot rebuild](plans/completed/2026-09-05-penpot-rebuild.md) and [Sightseeing article study](plans/completed/2026-09-06-sightseeing-article-design.md). Those designs do not establish current browser behavior. The `/explore` and `/test` coded studies have been retired; remote designs were not changed by this overhaul.
+For a new design exploration without an explicit request for a coded route, use a new, clearly named page in that Paper file. Preserve existing pages/artboards and the live website unless the request explicitly includes them. Inspect current [MCP setup](development.md#paper-mcp), the connected file, pages, artboards, fonts and styles; confirm scope before mutation. Discover current IDs through the tools rather than assuming the link's page/selection or old session IDs are valid mutation targets.
+
+Before destructive edits, preserve a restorable version or archived copy using supported tools; stop if that protection is unavailable. Compare protected-page serialized state, not only shape counts. Build auto-height prose and visually inspect desktop/mobile renders for clipping, overlap and reading order. Record font substitutions or outlines as design-tool limitations, not permission to replace live website text. Never expose design credentials. If Paper is unavailable, report the blocker rather than switching tools or creating a route.
+
+Historical candidates remain in the [Penpot rebuild](plans/completed/2026-09-05-penpot-rebuild.md) and [Sightseeing article study](plans/completed/2026-09-06-sightseeing-article-design.md). Retain these as historical evidence only, not instructions to resume Penpot work. Those designs do not establish current browser behavior. The `/explore` and `/test` coded studies remain retired.

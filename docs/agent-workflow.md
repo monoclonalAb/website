@@ -100,18 +100,18 @@ For context changes, installed Pi documentation describes `/compact [instruction
 
 ### Design and other external state
 
-For Penpot, follow [setup](development.md#penpot-mcp) and [design safety](design.md#penpot-first-exploration).
+Use Paper for design work in the [owner-designated file](design.md#paper-first-exploration); follow [setup](development.md#paper-mcp) and [design safety](design.md#paper-first-exploration). Do not use, enable or reconnect Penpot; references in historical plans do not override this direction.
 
 - Discover the current tools and inspect their schemas before invoking unfamiliar operations. Do not copy a tool name or object ID from an old plan and assume it still exists.
 - Check connection status before concluding a tool is unavailable. Confirm the intended file/page and inspect existing content before a mutation.
-- Treat remote design edits as shared-state changes even though they do not appear in `git diff`. Save a version before destructive work and stay within the authorized pages.
+- Treat remote design edits as shared-state changes even though they do not appear in `git diff`. Preserve a restorable version or archived copy before destructive work and stay within the authorized pages.
 - Treat credentials as secrets, including URLs with tokens. Check presence/status without dumping environment variables, ignored env files, or credential-bearing configuration into output.
-- A missing design connection is not permission to implement a web route instead. Record the blocker and required user action without requesting credentials in chat.
+- A missing Paper connection is not permission to switch to Penpot or implement a web route instead. Record the blocker and required user action without requesting credentials in chat.
 - Session variables, tool storage, selected objects, and process IDs are temporary. Put resumable source/scripts in the repository when appropriate, or describe how to reconstruct temporary state in the plan; never persist secrets.
 
 ## Evidence and stopping conditions
 
-`pnpm validate` excludes Playwright. Use the [validation matrix](testing.md#choose-validation-by-change) to select checks; no lint/build result proves responsive layout, hardware timing, or Penpot containment.
+`pnpm validate` excludes Playwright. Use the [validation matrix](testing.md#choose-validation-by-change) to select checks; no lint/build result proves responsive layout, hardware timing, or Paper layout containment.
 
 For each required check, record **passed**, **failed**, **blocked**, or **not run**, with the command or observation and a reason when needed. Mark a check **N/A** only when it is irrelevant to the change. Do not turn a pre-existing failure into a passing result or claim a manual check based only on source inspection.
 

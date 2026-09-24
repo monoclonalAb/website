@@ -34,7 +34,7 @@ For a new session, use [the Astra workflow](agent-workflow.md). For resumed work
 
 Every non-template document **under `docs/`** has an owner, status, and `last_verified` date. Root entry points and the PR template do not require frontmatter. `pnpm docs:check` enforces the 100-line agent-guide limit, the `CLAUDE.md` compatibility import, metadata/status rules, 184-day freshness for `current` records, relative Markdown file links, and reachability from `AGENTS.md` or the root README.
 
-The checker does not validate heading fragments, external URLs, prose accuracy, live Penpot state, or whether a claimed test ran. Review those separately; source and observed behavior establish implementation, while accepted decisions establish intent.
+The checker does not validate heading fragments, external URLs, prose accuracy, live Paper state, or whether a claimed test ran. Review those separately; source and observed behavior establish implementation, while accepted decisions establish intent.
 
 Update documentation in the same change as its subject. Set `last_verified` to the actual review date only after comparing claims with relevant sources; do not bulk-refresh dates to silence the checker. For external state, record the last observation and what still needs rechecking. Historical outcomes retain their original dates; append a dated correction or follow-up link instead of rewriting history.
 

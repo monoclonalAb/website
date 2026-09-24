@@ -15,7 +15,7 @@ For ordinary tasks, read [prerequisites](#prerequisites) and [commands](#command
 - A Chromium browser for Playwright tests (`pnpm exec playwright install chromium`).
 - Owned test commands and workflow regressions require POSIX process tools, including `ps`. Tests do not install them.
 
-No environment variables or external services are required to run/build the static app or validate its content. Penpot is optional design tooling with a separate secret.
+No environment variables or external services are required to run/build the static app or validate its content. Paper is the designated design tool, but is not required for app development or validation.
 
 ## Setup
 
@@ -62,23 +62,13 @@ Start with [writing](writing.md). `pnpm new:blog <slug> [title]` and `pnpm new:l
 
 `pnpm test:content:browser` needs installed Chromium and free loopback3199. It copies only required source into an owned ignored `.task-workflow/markdown-browser-*` directory, uses installed native Node/Next CLIs and read-only shared dependencies, and inserts labelled fixtures in that copy only. Its production/dev/publish/unpublish builds have isolated `.next` output. It closes its browser/owned processes and removes its scratch copy; labelled screenshots remain in `.task-workflow/markdown-screenshots-*` for inspection. A cleanup failure retains the exact scratch path for inspection; do not prune unrelated resources. No envfiles or owner's writing are copied. The copy's Turbopack root includes shared installed dependencies; pnpm's auto-install/repair is deliberately not invoked inside it.
 
-## Penpot MCP
+## Paper MCP
 
-Penpot is optional and independent of `pnpm dev`/`pnpm validate`; no local Penpot server or plugin is required. Astra should first inspect the current session's MCP status and available tool schemas. Connection state is session-specific: an old plan's connection failure is not evidence that today's connection is blocked.
+Paper is the designated design tool, independent of `pnpm dev`/`pnpm validate`. Use the owner-designated file linked in [Paper-first exploration](design.md#paper-first-exploration). Do not use, enable or reconnect Penpot for this project; its older setup and design records are historical, not current instructions.
 
-Pi's MCP adapter and Penpot server definition are user-global machine configuration, not repository files. The adapter is installed in the default Pi agent directory, and `~/.config/mcp/mcp.json` supplies the server to Pi sessions in every project for the same user. A new machine can install the pinned adapter with:
+Inspect the current session's MCP status and available Paper tool schemas before use. Confirm the connected file matches the designated file, then inspect its pages, artboards, fonts and styles before mutation. The file link identifies the intended destination; it does not prove the current connection or authorize edits to every page.
 
-```bash
-pi install npm:pi-mcp-adapter@2.32.1
-```
-
-Copy the full server URL from **Penpot → Settings → Integrations → MCP Server** into the `penpot.url` field in `~/.config/mcp/mcp.json`, then restrict that file to the current user:
-
-```bash
-chmod 600 ~/.config/mcp/mcp.json
-```
-
-The URL contains a non-expiring credential. Never commit it or paste it into chat; regenerate the MCP key in Penpot if it is exposed. Pi instances using a custom `PI_CODING_AGENT_DIR` need the adapter installed in that agent directory too, although they still discover the shared global MCP file. Use `/mcp reconnect penpot` to connect and `/mcp` to inspect status.
+If Paper is unavailable or connected to a different file, report the blocker and ask the owner to open/connect the designated file using the supported workflow. Do not fall back to Penpot or implement a coded route without an explicit request. Do not invent setup commands or change user-global MCP configuration as part of a design task. Never commit or paste credentials or credential-bearing MCP URLs. See [design safety](design.md#paper-first-exploration) for scoped edits and evidence.
 
 ## Change workflow
 

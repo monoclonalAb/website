@@ -21,7 +21,7 @@ Shared entry point for Astra and other coding agents. Keep this file a map, not 
 
 - [ADR-0004](docs/decisions/0004-markdown-publishing.md) defines Markdown/frontmatter publishing. Public pages build from local files. No importing, provisioning, external writes or deployment without authorization.
 - Home is the standalone alphabet opening. `/about`, `/blog`, `/contents`, `/changelog` and `/leetcode` are separate native-scrolling pages. Paper 01.1–01.5 / 02.1–02.5 are the desktop/mobile design. Historical home fragments show page-moved links; `/test` and `/explore` are retired.
-- For design exploration on a new/separate page, start in Penpot unless the user explicitly requests a coded route. Read [design](docs/design.md) before editing either surface.
+- Use Paper for design work; do not use Penpot. For exploration on a new/separate page, start in the [designated Paper file](docs/design.md#paper-first-exploration) unless the user explicitly requests a coded route. Read [design](docs/design.md) before editing either surface.
 - Plans describe intent; completed plans describe historical evidence. Neither proves current behavior or live tool availability.
 
 ## Task map
@@ -31,7 +31,7 @@ Shared entry point for Astra and other coding agents. Keep this file a map, not 
 | Home, anchors, navigation, zoom          | [Architecture](docs/architecture.md), [testing](docs/testing.md)                                               | `app/HomePage.tsx`, `app/page.tsx`, `components/SiteHeader.tsx` |
 | Routes, metadata, images, framework APIs | [Architecture](docs/architecture.md), relevant installed Next.js guide                                         | `app/`, `next.config.ts`                                        |
 | CSS, typography, responsive UI           | [Design](docs/design.md), [testing](docs/testing.md)                                                           | `app/globals.css`, relevant CSS Module                          |
-| Penpot exploration or rebuild            | [Design](docs/design.md), [MCP setup](docs/development.md#penpot-mcp), matching [plan](docs/plans/README.md)   | Inspect the connected file before mutation                      |
+| Paper exploration or rebuild             | [Design](docs/design.md), [MCP setup](docs/development.md#paper-mcp), matching [plan](docs/plans/README.md)    | Inspect the designated file before mutation                     |
 | Copy, links, changelog/RSS               | [Product](docs/product.md), [testing](docs/testing.md)                                                         | `app/_sections/`, `app/_content/changelog.ts`                   |
 | Writing, Markdown, publishing            | [Writing](docs/writing.md), [ADR-0004](docs/decisions/0004-markdown-publishing.md), [testing](docs/testing.md) | `content/`, `lib/content/`, `scripts/new-post.mjs`              |
 | Tooling, CI, docs                        | [Development](docs/development.md), [docs index](docs/README.md), [decisions](docs/decisions/README.md)        | `package.json`, `scripts/`, `.github/`, `docs/`                 |
@@ -60,7 +60,7 @@ Use pnpm only; `package.json` pins the version and defines the scripts.
 - Canonical pages, route-local top/heading IDs, legacy home notices and shared links form one contract. Run `pnpm contracts:check` when any changes. Do not restore the old path-to-home redirects.
 - Keep native document scrolling: no pager, Lenis/Motion, repulsion, scrollspy, drawer, snapping, smooth scrolling or unrelated decorative animations. The owner-requested ScrollWaves leaf may animate changing characters in a fixed grid and tint them with document progress; it must not control scrolling and must honor reduced motion.
 - Preserve keyboard access, semantic HTML, visible focus, zoom and no-JavaScript content/disclosure behavior.
-- Never expose credentials, including the Penpot URL. Discover actual tool capabilities; do not invent commands or carry session-local tool IDs into a new session.
+- Never expose credentials, including credential-bearing MCP URLs. Discover actual tool capabilities; do not invent commands or carry session-local tool IDs into a new session.
 - Make the smallest coherent change. Do not fix unrelated debt, add dependencies, or change generated files opportunistically.
 - Commit only when asked; never push, deploy, or mutate unrelated remote designs without explicit authorization.
 
@@ -68,7 +68,7 @@ Use pnpm only; `package.json` pins the version and defines the scripts.
 
 - Run the smallest relevant baseline before editing, then validate from narrow to broad.
 - `pnpm validate` must pass for completed repository changes. User-visible/navigation/interaction changes also require `pnpm test:e2e` and the relevant [manual matrix](docs/testing.md).
-- Docs-only and Penpot-only tasks do not imply browser/device checks; mark inapplicable checks with a reason. Penpot changes need design evidence instead.
+- Docs-only and Paper-only tasks do not imply browser/device checks; mark inapplicable checks with a reason. Paper changes need design evidence instead.
 - Update docs whose meaning changed; record detailed evidence once and link it rather than copying counts across records. Record unresolved risks in [debt](docs/debt.md). Do not advance verification dates or checkboxes without evidence.
 - Review the final diff for unrelated changes, secrets, and generated output. Preserve any user work that was present at startup.
 - Finish with what changed, exact checks/results, and any blockers or checks not run. For unfinished work, update the plan's handoff with the next action and required owner input.
