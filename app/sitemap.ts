@@ -20,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     ...["about", "blog", "contents", "changelog"].map((page) => ({
       url: `https://ericzheng.nz/${page}`,
-      lastModified: new Date("2026-09-14"),
+      lastModified: new Date(page === "contents" ? "2026-09-15" : "2026-09-14"),
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),

@@ -5,7 +5,7 @@ import { readingMetadata } from "../shared-metadata";
 export const metadata = readingMetadata(
   "Contents",
   "/contents",
-  "Useful links, Leetcode notes, profiles and email addresses for Eric Zheng.",
+  "A directory of every main page on Eric Zheng’s website, plus social profiles and email addresses.",
 );
 
 export default function ContentsPage() {
