@@ -160,11 +160,16 @@ test("only rss is linked; feed and sitemap use the canonical pages", async ({
       ].map((el) => el.textContent),
     sitemap,
   );
-  expect(locations).toEqual([
+  expect(locations.slice(0, 6)).toEqual([
     "https://ericzheng.nz",
     ...pages.slice(0, 4).map((route) => `https://ericzheng.nz/${route}`),
     "https://ericzheng.nz/leetcode",
   ]);
+  expect(new Set(locations).size).toBe(locations.length);
+  for (const url of locations.slice(6))
+    expect(url).toMatch(
+      /^https:\/\/ericzheng\.nz\/(blog|leetcode)\/[a-z0-9-]+$/,
+    );
   for (const obsolete of ["/test", "/explore"]) {
     expect(sitemap).not.toContain(obsolete);
     expect((await request.get(obsolete)).status()).toBe(404);

@@ -33,6 +33,8 @@ An active plan is an open record, not permission for Astra to start it during an
 
 ## Active
 
+- [2026-09-14 — Archive migration](active/2026-09-14-archive-migration.md) — owner-requested import of all static-site blogs, Leetcode entries and changelog releases.
+
 - [2026-09-14 — Scroll waves](active/2026-09-14-scroll-waves.md) — adapt Paper12–18 to passive per-page progress while preserving native scrolling and the separate-page layout.
 
 - [2026-09-14 — Separate public pages](active/2026-09-14-separate-pages.md) — implement the refined Paper 01/02 page sets, canonical routes, native compatibility links and shared chrome; supersedes the consolidated-document model.

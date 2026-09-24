@@ -251,11 +251,16 @@ test("Activity navigation, history, direct fragments and short pages resynchroni
   await page.goForward();
   await expect(page).toHaveURL(/\/changelog$/);
   await expectProgress(page);
-  await expect(field(page)).toHaveAttribute("data-tracking", "false");
+  // The imported releases now make the changelog scrollable.
+  await expect(field(page)).toHaveAttribute("data-tracking", "true");
   await page
     .getByRole("navigation", { name: "Site navigation" })
     .getByRole("link", { name: "about", exact: true })
     .click();
+  // Both populated routes now track progress: wait for the actual route commit,
+  // not a data-tracking value that was already true on the previous page.
+  await expect(page).toHaveURL((url) => url.pathname === "/about");
+  await expect(page.locator("main:visible")).toHaveAttribute("id", "about");
   await expect(field(page)).toHaveCount(1);
   await expect(field(page)).toHaveAttribute("data-tracking", "true");
   await page.keyboard.press("End");
@@ -264,6 +269,9 @@ test("Activity navigation, history, direct fragments and short pages resynchroni
   await expect.poll(() => progress(page)).toBe(0);
   await page.goto("/leetcode");
   await expect(field(page)).toHaveCount(1);
+  await expect(field(page)).toHaveAttribute("data-tracking", "true");
+  await expectProgress(page);
+  await page.goto("/blog");
   await expect(field(page)).toHaveAttribute("data-tracking", "false");
 });
 
@@ -276,7 +284,8 @@ test("non-scrollable pages are fully inked and resize restores the progress pale
     expect(colors.ink).toBeGreaterThan(0);
     expect(colors.accent + colors.unread + colors.paper).toBe(0);
   };
-  for (const route of ["blog", "changelog", "leetcode"]) {
+  // Use genuinely short pages, not the now-populated daily/release indexes.
+  for (const route of ["blog", "leetcode/2025-01-26"]) {
     await page.goto(`/${route}`);
     await expectFullInk();
     await testInfo.attach(`fully-inked-${route}.png`, {

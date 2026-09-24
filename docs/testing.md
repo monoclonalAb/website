@@ -30,7 +30,7 @@ A fresh Chromium pass is not a physical-device, screen-reader, or manual respons
 
 `pnpm test:content:browser` owns a disposable source copy, labelled writing fixtures, isolated builds/dev server on loopback3199 and Chromium. It proves production draft/unknown/source/unreferenced-image404s, feed/sitemap exclusion, code/math/images/metadata, native outline/keyboard/no-JavaScript navigation,390/768/1440 and320px enlarged-text reflow, new-file/edit dev preview, and real publish/unpublish rebuilds. It never writes specimens into the owner's content tree. Screenshots and failure history are recorded in [the Markdown plan](plans/active/2026-09-14-markdown-publishing.md). Installed Chromium is required; no hosting credentials. Physical input, browser-chrome zoom, screen reader and independent review remain separately labelled.
 
-The public suite runs with `CI=1 pnpm test:e2e --retries=0` after a build.
+The public suite runs with `CI=1 pnpm test:e2e --retries=0` after a build. `archive.spec.ts` checks every imported article/legacy URL, index membership, sitemap and both feeds, plus real article images/math/code, keyboard outlines and responsive/no-JavaScript reading. Source provenance and conversion exceptions are recorded in [the migration plan](plans/active/2026-09-14-archive-migration.md).
 
 ## Automated layers
 
@@ -65,7 +65,7 @@ Run the relevant narrow baseline/checks during iteration, then the full required
 - reduced-motion navigation,
 - uncaught browser errors.
 
-The [separate-page implementation](plans/active/2026-09-14-separate-pages.md) updates the native regressions for the approved route model. `site.spec.ts` checks separate main/h1 content, all canonical/social/RSS metadata, 200 responses, the six-page sitemap, legacy-home notice links and native keyboard/cold-fragment disclosures with JavaScript both on and off. `native-scroll.spec.ts` proves no input cancellation or snap, ordinary reading-page wheel/keyboard movement, top links and native fragment clamping. `route-return.spec.ts` exercises actual reading Link/Back/Forward, one visible main, current-page state, unique IDs, per-route top links, home-boundary document navigation and a CDP touch gesture.
+The [separate-page implementation](plans/active/2026-09-14-separate-pages.md) updates the native regressions for the approved route model. `site.spec.ts` checks separate main/h1 content, all canonical/social/RSS metadata, 200 responses, the canonical sitemap base, legacy-home notice links and native keyboard/cold-fragment disclosures with JavaScript both on and off. `native-scroll.spec.ts` proves no input cancellation or snap, ordinary reading-page wheel/keyboard movement, top links and native fragment clamping. `route-return.spec.ts` exercises actual reading Link/Back/Forward, one visible main, current-page state, unique IDs, per-route top links, home-boundary document navigation and a CDP touch gesture.
 
 `theme-tokens.spec.ts` checks all six pages at 390/768/1440 in both motion modes: palette, live Eiko/Georgia typography, column/portrait geometry, close current-nav underline, name-free footer, RSS alignment, opening bounds and skip focus. It attaches full-page screenshots and checks root role overrides plus all-page 320px/200%-sized body text reflow. These are not golden-image comparisons, actual browser-chrome zoom, screen-reader or physical-device proof. Current outcomes and unrun manual checks live in the [page-split record](plans/active/2026-09-14-separate-pages.md).
 

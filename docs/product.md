@@ -25,7 +25,7 @@ The selected Paper01/02 page sets keep a standalone alphabet opening and separat
 | Discovery             | `/robots.txt`, `/sitemap.xml`       | Canonical pages and published article URLs           |
 | Legacy home fragments | `/#about`, `/#footnote`, etc.       | Native page-moved links to current pages/headings    |
 
-Empty writing collections are valid until Eric authors posts; no old-site posts are imported and no design specimens are presented as real publications. `/test` and `/explore` remain retired404s.
+The owner-requested [archive migration](plans/active/2026-09-14-archive-migration.md) imports the original site's blogs, daily Leetcode entries and changelog releases. One metadata-only daily entry is explicitly labelled as having no recorded solution. Empty collections remain supported; no design specimens or invented solutions are publications. `/test` and `/explore` remain retired404s.
 
 ## Authoring direction
 

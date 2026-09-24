@@ -21,7 +21,7 @@ Eric selected Vercel and a $0 budget historically. Live hosting/Git integration 
 
 ## Markdown ownership
 
-- `content/blog/<slug>/index.md` and `content/leetcode/YYYY-MM-DD.md` own writing. Collection/URL identity comes from the path; strict YAML frontmatter owns title/date/draft/tags/summary and Leetcode metadata. No old posts or invented publications are imported.
+- `content/blog/<slug>/index.md` and `content/leetcode/YYYY-MM-DD.md` own writing. Collection/URL identity comes from the path; strict YAML frontmatter owns title/date/draft/tags/summary and Leetcode metadata. The owner-authorized [archive migration](plans/active/2026-09-14-archive-migration.md) adds historical publications with pinned source provenance; no invented publications are included.
 - `lib/content/posts.ts` validates source paths/metadata and sorts records deterministically. `app/_content/writing.ts` is the server-only facade. React `cache` shares work within a render, not a process-global stale dev-content cache. Refresh reads changed files.
 - `lib/content/markdown.ts` uses unified/remark for Markdown/GFM/math, Shiki for server-only highlighting and KaTeX for server-rendered maths with local fonts. Raw HTML, unsafe links, unknown code languages and unsupported Pandoc containers/fences fail with source diagnostics. No MDX/JSX/eval or client editor is introduced.
 - Headings start at h2 and receive article-prefixed, duplicate-disambiguated IDs. Footnote references/labels are prefixed too. Article metadata/body use the same post selection. The reading shell has an optional unique article ID, while the header still marks the parent collection current.
@@ -56,7 +56,8 @@ The selected Paper 01.1–01.5 /02.1–02.5 page set uses Eiko headings/navigati
 - Reading navigation uses Next Link; home-boundary links retain full-document loads so legacy home aliases do not coexist with reading targets. Footer links remain native. Native history/scrolling and no-JavaScript content/disclosures are preserved. No pager, Lenis/Motion, scrollspy, drawer, snap or smooth-scroll controller.
 - `/test` and `/explore` stay404. No old path-to-home redirects return. Browser caches of historical308 responses remain external; server200 evidence is not client-cache eviction.
 - Metadata identifies Eric and canonical `https://ericzheng.nz` URLs. Blog/Leetcode/article feed discovery points to `/writing.xml`; other pages retain `/changelog.xml`. Writing RSS escapes summaries and omits drafts. Sitemap has the six canonical pages plus published articles with authored date/updated values, never build timestamps.
-- Changelog HTML/RSS share only `app/_content/changelog.ts`. Its GET handler is explicitly `force-static` after disabling Cache Components. No records were invented or duplicated.
+- Changelog HTML/RSS share only `app/_content/changelog.ts`, including imported historical releases. Optional linked phrases restore original article links in HTML; RSS retains the same plain-text summary. Its GET handler is explicitly `force-static` after disabling Cache Components. No records were invented or duplicated.
+- `next.config.ts` redirects historical Blog/Leetcode/Changelog `.html` indexes and article URLs to canonical reading routes. No canonical page redirects to home. Old article heading fragments are not remapped to the new prefixed IDs; use current outline links for new deep links.
 - `pnpm contracts:check` guards public composition, navigation, legacy notices and native scrolling. Content tests validate data/rendering/scaffolding; browser tests prove real output and transitions. Literal contract checks are not a general route crawler.
 
 ## Dependency and verification rules

@@ -6,7 +6,7 @@ last_verified: 2026-09-14
 
 # Writing in Markdown
 
-The site uses Markdown files as defined by [ADR-0004](decisions/0004-markdown-publishing.md). There are no imported or sample publications in `content/`.
+The site uses Markdown files as defined by [ADR-0004](decisions/0004-markdown-publishing.md). `content/` includes Eric's original-site publications from the owner-requested [archive migration](plans/active/2026-09-14-archive-migration.md), not design specimens.
 
 ## Start writing
 
@@ -64,7 +64,7 @@ Those are examples, not the metadata for your entry. The scaffold leaves them co
 
 Use ordinary site URLs in links, for example `/blog/my-post`, not filesystem `.md` paths. The content checker validates metadata, syntax and local images; it is not a general broken-link crawler. Local heading links such as `[Approach](#approach)` are resolved to the article's unique heading ID; `#top` links to its native top target. Unknown local fragments fail validation.
 
-No JSX, MDX, raw HTML, remote images, arbitrary scripts or Pandoc directives. Your previous `cod<span>e</span>`, `{.cpp}`, `:::sidebar` and `{target="_blank"}` conventions need deliberate conversion: `## Code`, plain `cpp` fences, blockquotes and ordinary links. The site owns presentation. Old posts have not been imported or their URLs redirected; migration is a separate owner choice.
+No JSX, MDX, raw HTML, remote images, arbitrary scripts or Pandoc directives. Your previous `cod<span>e</span>`, `{.cpp}`, `:::sidebar` and `{target="_blank"}` conventions need deliberate conversion: `## Code`, plain `cpp` fences, blockquotes and ordinary links. The site owns presentation. The imported archive uses these conversions, with old article `.html` URLs redirected to current paths. Old heading fragments are not remapped; copy the new outline links instead.
 
 ## Preview, publish and correct
 
@@ -75,6 +75,10 @@ No JSX, MDX, raw HTML, remote images, arbitrary scripts or Pandoc directives. Yo
 5. Commit/push when you choose. If Git-connected hosting is configured, that triggers its build/deploy. This repository change has not configured or invoked it; publishing is not instantaneous and a failed deploy leaves the previous version live.
 
 To correct a post, edit the same file, optionally set `updated`, validate and redeploy. To unpublish, change to `draft: true` and rebuild/redeploy. Old deployments, repository history, feeds, caches and downloaded copies may retain previously public content. Don't rename URLs merely to correct a title.
+
+## Archive provenance
+
+The [migration manifest](history/static-website-import.json) records the pinned source commit, every source/destination URL, original source and code hashes, image hashes and release copy. `pnpm test:content` checks imported metadata, code fidelity and local links alongside ordinary publishing regressions. For a read-only audit against a local copy of the original repository, run `node scripts/check-archive-source.mjs /path/to/static_website`; it never fetches or executes upstream scripts. The manifest is historical evidence, not a runtime content service. Intentional later metadata/code corrections should update the regression expectations with a documented exception, not silently regenerate source provenance.
 
 ## Checks and remaining scope
 

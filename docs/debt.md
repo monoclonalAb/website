@@ -12,7 +12,7 @@ Debt is a deliberate gap with a trigger and a next action, not a general wish li
 
 [ADR-0004](decisions/0004-markdown-publishing.md) defines the file-based workflow. DEBT-003 concerns that workflow and real owner-authored content.
 
-Current writing limitations: public Git history/dev preview are not private draft storage; content checks are not a general broken-link crawler; old Pandoc posts are not imported; topic filtering/pagination/metadata fetching are absent. Physical input/screen reader/browser-chrome zoom and independent review remain unperformed. [The Markdown plan](plans/active/2026-09-14-markdown-publishing.md) owns exact implementation evidence and remaining checks.
+Current writing limitations: public Git history/dev preview are not private draft storage; content checks are not a general broken-link crawler; topic filtering/pagination/metadata fetching are absent. Physical input/screen reader/browser-chrome zoom and independent review remain unperformed. [The Markdown plan](plans/active/2026-09-14-markdown-publishing.md) owns exact implementation evidence and remaining checks.
 
 ## Public overhaul status — 2026-09-14
 
@@ -26,10 +26,10 @@ The [page-split record](plans/active/2026-09-14-separate-pages.md) owns current 
 
 ## Open records
 
-| ID       | Severity | Area          | Gap and evidence                                                                                                                                                            | Trigger / next action                                                                                                                                                   |
-| -------- | :------: | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DEBT-003 |  Medium  | Product       | Blog and Leetcode remain empty collections. File-based authoring and automated publish/unpublish journeys exist; real writing and manual/independent review remain pending. | Follow [writing](writing.md) and the [Markdown plan](plans/active/2026-09-14-markdown-publishing.md). Do not invent posts or imply that local builds configure hosting. |
-| DEBT-004 |  Medium  | Accessibility | Lint, semantic review, keyboard tests, and reduced-motion tests exist, but there is no automated WCAG audit or documented screen-reader pass.                               | Add an accessibility-tree or axe-based browser check and perform VoiceOver/NVDA smoke testing before a major navigation redesign.                                       |
+| ID       | Severity | Area          | Gap and evidence                                                                                                                                           | Trigger / next action                                                                                                                                                                      |
+| -------- | :------: | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| DEBT-003 |  Medium  | Product       | The original archive is imported; manual/independent publishing review remains pending. Historical solution correctness is preserved, not newly certified. | Follow [writing](writing.md), the [migration evidence](plans/active/2026-09-14-archive-migration.md) and remaining manual/review checks. Do not imply that local builds configure hosting. |
+| DEBT-004 |  Medium  | Accessibility | Lint, semantic review, keyboard tests, and reduced-motion tests exist, but there is no automated WCAG audit or documented screen-reader pass.              | Add an accessibility-tree or axe-based browser check and perform VoiceOver/NVDA smoke testing before a major navigation redesign.                                                          |
 
 ## Historical descriptions
 

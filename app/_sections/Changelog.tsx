@@ -2,6 +2,7 @@ import {
   CHANGELOG_ENTRIES,
   changelogEntryDate,
   changelogEntryId,
+  type ChangelogEntry,
 } from "@/app/_content/changelog";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("en-NZ", {
@@ -10,6 +11,21 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("en-NZ", {
   year: "numeric",
   timeZone: "UTC",
 });
+
+function Summary({ entry }: { entry: ChangelogEntry }) {
+  const { summary, link } = entry;
+  if (!link) return <p>{summary}</p>;
+  const index = summary.indexOf(link.text);
+  if (index < 0)
+    throw new Error(`Missing linked phrase in changelog ${entry.id}`);
+  return (
+    <p>
+      {summary.slice(0, index)}
+      <a href={link.href}>{link.text}</a>
+      {summary.slice(index + link.text.length)}
+    </p>
+  );
+}
 
 export default function Changelog() {
   return (
@@ -34,7 +50,7 @@ export default function Changelog() {
                   {DATE_FORMATTER.format(changelogEntryDate(entry))}
                 </time>
               </p>
-              <p>{entry.summary}</p>
+              <Summary entry={entry} />
             </li>
           ))}
         </ol>

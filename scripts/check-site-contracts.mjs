@@ -4,6 +4,7 @@ import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { changelogEntryPath } from "../app/_content/changelog.ts";
+import nextConfig from "../next.config.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(resolve(root, path), "utf8");
@@ -136,8 +137,17 @@ for (const file of [
       `${file}: native scrolling; only the isolated wave canvas may animate`,
     );
 }
-if (/redirects\s*\(/.test(read("next.config.ts")))
-  errors.push("Canonical reading pages must not retain the old redirect table");
+for (const redirect of (await nextConfig.redirects?.()) ?? []) {
+  if (
+    !redirect.source.endsWith(".html") ||
+    !/^\/(?:blog|leetcode|changelog)(?:\/[a-z0-9:-]+)?$/.test(
+      redirect.destination,
+    )
+  )
+    errors.push(
+      "Only old archive .html URLs may redirect to canonical reading pages, never home fragments",
+    );
+}
 if (!read("components/SiteHeader.tsx").includes("aria-current="))
   errors.push("Masthead must identify the current page");
 const footer = read("components/SiteFooter.tsx");
