@@ -5,8 +5,8 @@
   display: grid;
   align-items: center;
   min-height: max(100svh, calc(var(--letter-line) * 10));
-  background: linear-gradient(to right, var(--color-surface) 50%, #30312e 50%);
-  font-family: var(--font-helvetica), Arial, sans-serif;
+  background: linear-gradient(to right, var(--paper) 50%, #30312e 50%);
+  font-family: var(--font-sans);
   font-size: var(--letter-size);
   font-weight: 700;
   line-height: 1.1;
@@ -29,7 +29,7 @@
 }
 
 .upper {
-  color: var(--color-light-gray);
+  color: var(--rule);
   text-align: right;
 }
 
@@ -45,7 +45,7 @@
 }
 
 .accent {
-  color: var(--color-accent);
+  color: var(--accent);
 }
 
 .lower {
@@ -70,7 +70,7 @@
 }
 
 .lightPrefix {
-  color: var(--color-light-gray);
+  color: var(--rule);
   clip-path: inset(-1em 100% -1em -100vw);
 }
 
@@ -79,7 +79,7 @@
 }
 
 .link {
-  color: var(--color-paper);
+  color: var(--paper);
   text-decoration: none;
 }
 
@@ -108,7 +108,7 @@
 }
 
 .link:focus-visible {
-  outline-color: var(--color-paper);
+  outline-color: var(--paper);
   outline-offset: 2px;
 }
 
@@ -126,16 +126,6 @@
   .suffix {
     transition: none;
   }
-}
-
-.legacyNotice {
-  display: none;
-  width: min(720px, calc(100% - 48px));
-  margin: 24px auto;
-  padding-block: 24px;
-}
-.legacyNotice:target {
-  display: block;
 }
 
 @media (min-width: 600px) {

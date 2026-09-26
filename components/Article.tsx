@@ -1,48 +1,46 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
 import ReadingPage from "./ReadingPage";
-import { formatDate, description, type Post } from "@/lib/content/posts";
-import { readingMetadata, OPEN_GRAPH_BASE } from "@/app/shared-metadata";
-import styles from "./Writing.module.css";
+import { openGraph, pageMetadata } from "@/lib/metadata";
+import { describe, formatDate, type Post } from "@/lib/posts";
+import styles from "./Article.module.css";
 import "katex/dist/katex.min.css";
 
 export function articleMetadata(post: Post): Metadata {
+  const description = describe(post);
   return {
-    ...readingMetadata(post.title, post.url, description(post)),
-    alternates: {
-      canonical: post.url,
-      types: { "application/rss+xml": "/writing.xml" },
-    },
-    robots: post.draft ? { index: false, follow: false } : undefined,
+    ...pageMetadata(post.title, post.url, description),
     openGraph: {
-      ...OPEN_GRAPH_BASE,
+      ...openGraph,
       type: "article",
-      title: post.title,
-      description: description(post),
       url: post.url,
+      title: post.title,
+      description,
       publishedTime: post.date,
       modifiedTime: post.updated ?? post.date,
       authors: ["Eric Zheng"],
       tags: post.tags,
     },
+    robots: post.draft ? { index: false, follow: false } : undefined,
   };
 }
 
-export default function ArticlePage({ post }: { post: Post }) {
-  const sections = post.headings.filter((heading) => heading.level === 2);
+export default function Article({ post }: { post: Post }) {
+  const outline = post.headings.filter((heading) => heading.depth === 2);
+  const { collection } = post;
   return (
-    <ReadingPage page={post.collection} id={post.identity}>
+    <ReadingPage current={collection}>
       <p className={styles.meta}>
-        <Link href={`/${post.collection}`}>← {post.collection}</Link>
+        <Link href={`/${collection}`}>← {collection}</Link>
       </p>
       {post.draft && (
-        <aside className={styles.draftNotice}>
+        <aside className={styles.draft}>
           <strong>Draft — local preview only.</strong> Not included in
           production. This file is not private if committed to a public
           repository.
         </aside>
       )}
-      <header className={styles.articleHeader}>
+      <header className={styles.header}>
         <h1>{post.title}</h1>
         <p className={styles.meta}>
           <time dateTime={post.date}>{formatDate(post.date)}</time>
@@ -64,11 +62,11 @@ export default function ArticlePage({ post }: { post: Post }) {
           <p className={styles.meta}>Topics: {post.tags.join(", ")}</p>
         )}
       </header>
-      {sections.length > 1 && (
+      {outline.length > 1 && (
         <details className={styles.outline}>
           <summary>On this page</summary>
           <ul>
-            {sections.map((heading) => (
+            {outline.map((heading) => (
               <li key={heading.id}>
                 <a href={`#${heading.id}`}>{heading.text}</a>
               </li>
@@ -76,9 +74,7 @@ export default function ArticlePage({ post }: { post: Post }) {
           </ul>
         </details>
       )}
-      {/* The non-executable Markdown pipeline rejects raw HTML and unsafe URLs. */}
       <article
-        aria-label={post.title}
         className={styles.prose}
         dangerouslySetInnerHTML={{ __html: post.html }}
       />

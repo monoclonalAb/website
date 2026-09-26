@@ -1,0 +1,140 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, calc(100% - 48px));
+  min-height: 100svh;
+  margin-inline: auto;
+  padding-block: 64px 40px;
+}
+
+.skip {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
+  padding: 8px 16px;
+  background: var(--paper);
+  clip-path: inset(50%);
+}
+.skip:focus {
+  clip-path: none;
+}
+
+/* Masthead */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.logo {
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 38px;
+  text-decoration: none;
+}
+.logo span {
+  color: var(--accent);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+.nav a {
+  color: var(--ink);
+  text-decoration: none;
+}
+.nav a:hover,
+.nav a[aria-current="page"] {
+  text-decoration: underline 1.5px var(--accent);
+}
+.nav span {
+  color: var(--muted);
+}
+
+/* Content */
+.main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 24px;
+  padding-block: 64px;
+}
+.main :is(p, li, dd, a) {
+  overflow-wrap: anywhere;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 36px;
+}
+
+.profiles {
+  display: flex;
+  gap: 16px;
+}
+.profiles a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+/* Larger touch targets without moving the 20px icons. */
+.profiles a::before {
+  content: "";
+  position: absolute;
+  inset: -4px -6px;
+}
+
+@media (max-width: 599px) {
+  .page {
+    padding-block: 16px 32px;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+  .nav {
+    justify-content: space-between;
+    width: 100%;
+    gap: 4px;
+  }
+  .nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .main {
+    padding-top: 40px;
+  }
+}
+
+@media (max-width: 359px) {
+  .nav {
+    gap: 2px;
+    font-size: 14px;
+  }
+}

@@ -1,26 +1,21 @@
-.meta,
-.draft {
-  color: var(--color-text-muted);
+.meta {
+  color: var(--muted);
   font-size: 15px;
   line-height: 24px;
 }
 .draft {
-  font-weight: normal;
-  font-style: italic;
-}
-.draftNotice {
   padding: 16px;
-  border: 1px solid var(--color-accent);
+  border: 1px solid var(--accent);
 }
-.articleHeader {
+.header {
   display: grid;
   gap: 16px;
 }
-.articleHeader h1 {
+.header h1 {
   overflow-wrap: anywhere;
 }
 .outline {
-  border-block: 1px solid var(--color-rule);
+  border-block: 1px solid var(--rule);
   padding-block: 16px;
 }
 .outline summary {
@@ -59,7 +54,7 @@
   margin-top: 12px;
 }
 .prose blockquote {
-  border-left: 2px solid var(--color-accent);
+  border-left: 2px solid var(--accent);
   padding-left: 20px;
 }
 .prose blockquote > * + * {
@@ -67,8 +62,9 @@
 }
 .prose pre {
   max-width: 100%;
+  overflow-x: auto;
   padding: 20px;
-  border: 1px solid var(--color-rule);
+  border: 1px solid var(--rule);
   font-size: 14px;
   line-height: 24px;
   tab-size: 4;
@@ -94,7 +90,7 @@
 }
 .prose :is(th, td) {
   padding: 8px 12px;
-  border: 1px solid var(--color-rule);
+  border: 1px solid var(--rule);
   text-align: left;
 }
 .prose th {
@@ -107,21 +103,12 @@
 }
 .prose hr {
   border: 0;
-  border-top: 1px solid var(--color-rule);
+  border-top: 1px solid var(--rule);
 }
 .prose :global(.footnotes) {
-  border-top: 1px solid var(--color-rule);
+  border-top: 1px solid var(--rule);
   padding-top: 24px;
   font-size: 16px;
-}
-.prose :global(.sr-only) {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
 }
 @media (max-width: 599px) {
   .prose pre {

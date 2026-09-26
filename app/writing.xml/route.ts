@@ -1,9 +1,17 @@
-import { publishedWriting } from "@/app/_content/writing";
-import { writingFeed } from "@/lib/content/feed";
+import { describe, getPosts } from "@/lib/posts";
+import { rss } from "@/lib/rss";
 
 export const dynamic = "force-static";
+
 export async function GET() {
-  return new Response(writingFeed(await publishedWriting()), {
-    headers: { "Content-Type": "application/rss+xml; charset=utf-8" },
+  const posts = [...(await getPosts("blog")), ...(await getPosts("leetcode"))]
+    .filter((post) => !post.draft)
+    .sort((a, b) => b.date.localeCompare(a.date));
+  return rss({
+    title: "Eric Zheng — writing",
+    description: "Blog posts and Leetcode notes by Eric Zheng.",
+    link: "/blog",
+    self: "/writing.xml",
+    items: posts.map((post) => ({ ...post, description: describe(post) })),
   });
 }

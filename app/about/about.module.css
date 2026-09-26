@@ -1,3 +1,8 @@
+/* About's <main> is slightly tighter than the other pages. */
+main.about {
+  gap: 22px;
+  padding-bottom: 48px;
+}
 .intro {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 160px;
@@ -7,8 +12,6 @@
 }
 .heading {
   grid-area: heading;
-  font-size: 42px;
-  line-height: 50px;
 }
 .biography {
   grid-area: biography;
@@ -24,8 +27,8 @@
 }
 .portrait figcaption {
   margin-top: 8px;
-  color: var(--color-caption);
-  font-family: var(--font-helvetica), Arial, sans-serif;
+  color: var(--muted);
+  font-family: var(--font-sans);
   font-size: 12px;
   line-height: 20px;
 }
@@ -44,6 +47,25 @@
   display: grid;
   gap: 12px;
 }
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-top: 2px;
+}
+.notes h2 {
+  font-size: 24px;
+  line-height: 32px;
+}
+.reasons {
+  display: grid;
+  gap: 22px;
+  padding-left: 30px;
+  list-style: decimal;
+}
+.reasons li::marker {
+  color: var(--muted);
+}
 .list {
   list-style: "·   ";
   padding-left: 22px;
@@ -51,7 +73,7 @@
   gap: 8px;
 }
 .list li::marker {
-  color: var(--color-text-muted);
+  color: var(--muted);
 }
 .list a {
   color: inherit;
@@ -62,15 +84,14 @@
 }
 
 @media (max-width: 599px) {
+  main.about {
+    padding-bottom: 40px;
+  }
   .intro {
     grid-template-columns: minmax(0, 1fr) 96px;
     grid-template-areas: "heading heading" "biography portrait" "peers peers";
     column-gap: 28px;
     row-gap: 20px;
-  }
-  .heading {
-    font-size: 36px;
-    line-height: 44px;
   }
   .portrait {
     margin-top: 0;

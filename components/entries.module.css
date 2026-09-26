@@ -1,47 +1,39 @@
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
+/* Ruled date/title list shared by /blog, /leetcode and /changelog. */
 .list > li {
   display: grid;
   grid-template-columns: 132px minmax(0, 1fr);
   align-items: baseline;
   gap: 8px 24px;
-  border-top: 1px solid var(--color-rule);
   padding-block: 24px;
+  border-top: 1px solid var(--rule);
 }
-
 .list > li:last-child {
   padding-bottom: 0;
 }
 
-.date,
-.meta {
-  color: var(--color-text-muted);
-  font-size: 15px;
-  line-height: 24px;
-}
-
-.date {
-  font-variant-numeric: tabular-nums;
-}
-
-.body {
+.list > li > div {
   display: grid;
   gap: 8px;
   min-width: 0;
 }
 
-.title {
+.list time,
+.meta {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 24px;
+}
+.list time {
+  font-variant-numeric: tabular-nums;
+}
+
+.list h2 {
   font-size: 24px;
   line-height: 32px;
 }
-
-.title a {
+/* 44px tap target without changing the row rhythm. */
+.list h2 a {
   display: block;
-  /* A 44px target without changing the heading's baseline or row rhythm. */
   margin-block: -6px;
   padding-block: 6px;
 }

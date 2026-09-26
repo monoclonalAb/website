@@ -1,22 +1,21 @@
 import { notFound } from "next/navigation";
-import ArticlePage, { articleMetadata } from "@/components/ArticlePage";
-import { writingCollection, writingPost } from "@/app/_content/writing";
+import Article, { articleMetadata } from "@/components/Article";
+import { getPost, getPosts } from "@/lib/posts";
 
-// Allow newly scaffolded files during dev; production lookup excludes drafts.
-export const dynamicParams = true;
-export async function generateStaticParams() {
-  return (await writingCollection("leetcode")).map((post) => ({
-    slug: post.slug,
-  }));
-}
 type Props = { params: Promise<{ slug: string }> };
+
+export async function generateStaticParams() {
+  return (await getPosts("leetcode")).map(({ slug }) => ({ slug }));
+}
+
 export async function generateMetadata({ params }: Props) {
-  const post = await writingPost("leetcode", (await params).slug);
+  const post = await getPost("leetcode", (await params).slug);
   if (!post) notFound();
   return articleMetadata(post);
 }
+
 export default async function Page({ params }: Props) {
-  const post = await writingPost("leetcode", (await params).slug);
+  const post = await getPost("leetcode", (await params).slug);
   if (!post) notFound();
-  return <ArticlePage post={post} />;
+  return <Article post={post} />;
 }

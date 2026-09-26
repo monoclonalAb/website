@@ -1,23 +1,19 @@
-import type { Metadata } from "next";
+import Link from "next/link";
 import ReadingPage from "@/components/ReadingPage";
-import PostList from "@/components/PostList";
-import { writingCollection } from "@/app/_content/writing";
-import { readingMetadata } from "../shared-metadata";
+import styles from "@/components/entries.module.css";
+import { pageMetadata } from "@/lib/metadata";
+import { formatDate, getPosts } from "@/lib/posts";
 
-const DESCRIPTION =
-  "Eric Zheng's solutions to the daily Leetcode question, grouped and posted as " +
-  "he works through them.";
-
-export const metadata: Metadata = readingMetadata(
+export const metadata = pageMetadata(
   "Leetcode",
   "/leetcode",
-  DESCRIPTION,
+  "Eric Zheng's solutions to the daily Leetcode question, grouped and posted as he works through them.",
 );
 
 export default async function LeetcodePage() {
-  const posts = await writingCollection("leetcode");
+  const posts = await getPosts("leetcode");
   return (
-    <ReadingPage page="leetcode">
+    <ReadingPage>
       <h1>
         leetcode<span>:</span>
       </h1>
@@ -25,13 +21,27 @@ export default async function LeetcodePage() {
         for me to conveniently <b>group</b> and post my solutions to the daily
         leetcode question... hopefully I do not end up missing any... right...
       </p>
-      {posts.length ? (
-        <PostList posts={posts} />
-      ) : (
-        <p className="muted">
-          <i>daily solutions coming soon.</i>
-        </p>
-      )}
+      <ul className={styles.list}>
+        {posts.map((post) => (
+          <li key={post.slug}>
+            <time dateTime={post.date}>{formatDate(post.date)}</time>
+            <div>
+              <h2>
+                <Link href={post.url}>
+                  {post.problemId && `${post.problemId}. `}
+                  {post.title}
+                </Link>
+              </h2>
+              {post.draft && (
+                <p className={styles.meta}>draft · local preview</p>
+              )}
+              {post.difficulty && (
+                <p className={styles.meta}>{post.difficulty}</p>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
     </ReadingPage>
   );
 }

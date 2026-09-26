@@ -3,36 +3,32 @@
   gap: 16px;
 }
 
-.directory {
-  display: grid;
-  gap: 8px;
-}
-
-.directory > div {
-  display: grid;
-  grid-template-columns: 132px minmax(0, 1fr);
-  column-gap: 24px;
-  align-items: baseline;
-}
-
-.directory dt a,
-.directory dt > span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  max-width: 100%;
-}
-
-.directory dd {
-  color: var(--color-text-muted);
-}
-
 .external {
   display: grid;
   gap: 28px;
   margin-top: 8px;
   padding-top: 32px;
-  border-top: 1px solid var(--color-rule);
+  border-top: 1px solid var(--rule);
+}
+
+.directory {
+  display: grid;
+  gap: 8px;
+}
+.directory > div {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 24px;
+}
+.directory dt > * {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+}
+.directory dd {
+  color: var(--muted);
 }
 
 .emails {
@@ -46,11 +42,9 @@
   .directory {
     gap: 16px;
   }
-
   .directory > div {
     grid-template-columns: minmax(0, 1fr);
   }
-
   .external {
     padding-top: 28px;
   }

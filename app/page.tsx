@@ -1,19 +1,12 @@
+import type { CSSProperties, ReactNode } from "react";
 import type { Metadata } from "next";
-import HomePage from "./HomePage";
-import LegacyHomeFragments from "./LegacyHomeFragments";
+import Link from "next/link";
+import styles from "./home.module.css";
 
-export const metadata: Metadata = {
-  // Exact "Eric Zheng" (the root template would otherwise append "| Eric Zheng").
-  title: { absolute: "Eric Zheng" },
-};
+export const metadata: Metadata = { title: { absolute: "Eric Zheng" } };
 
-/**
- * Schema.org Person. "Eric Zheng" is a shared name — the About section links to
- * a different one at ericzheng.org — so `sameAs` is the load-bearing field here:
- * it is what ties this site to these specific profiles rather than to a namesake.
- * Only accounts Eric owns belong in it (the Instagram fan page is not his).
- */
-const personJsonLd = {
+// "Eric Zheng" is a shared name; sameAs ties this site to Eric's own profiles.
+const person = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Eric Zheng",
@@ -32,19 +25,107 @@ const personJsonLd = {
   ],
 };
 
-/** The standalone opening; each reading destination has its own static page. */
+/**
+ * One row of the split alphabet. Upper-case letters sit right of centre on the
+ * light half, lower-case letters left of centre on the dark half. On hover or
+ * focus, a linked row spreads its letters while the link stays centred.
+ */
+function Row({
+  upper,
+  before = "",
+  after,
+  href,
+  children = "",
+}: {
+  upper?: ReactNode;
+  before?: string;
+  after?: string;
+  href?: string;
+  children?: string;
+}) {
+  const vars = {
+    "--half-gaps": (children.length - 1) / 2,
+    "--prefix-letters": before.length,
+  } as CSSProperties;
+  return (
+    <div className={styles.row} style={vars}>
+      <div className={styles.upper} aria-hidden="true">
+        <span className={styles.upperText}>{upper}</span>
+      </div>
+      <div className={styles.lower}>
+        {href ? (
+          <>
+            <span className={styles.prefix} aria-hidden="true">
+              <span className={styles.measure}>{before}</span>
+              {/* Two clipped copies recolour letters that cross the split. */}
+              <span className={styles.lightPrefix}>
+                <span className={styles.prefixText}>{before}</span>
+              </span>
+              <span className={styles.darkPrefix}>
+                <span className={styles.prefixText}>{before}</span>
+              </span>
+            </span>
+            <Link href={href} className={styles.link}>
+              <span className={styles.measure} aria-hidden="true">
+                {children}
+              </span>
+              <span className={styles.word}>{children}</span>
+            </Link>
+            <span className={styles.suffix} aria-hidden="true">
+              {after}
+            </span>
+          </>
+        ) : (
+          <span aria-hidden="true">{children}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
-    <>
+    <main className={styles.hero}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }}
       />
-      <a className="skip-link" href="#pages">
-        Skip to navigation
-      </a>
-      <HomePage />
-      <LegacyHomeFragments />
-    </>
+      <h1 className="sr-only">Eric Zheng</h1>
+      <nav className={styles.alphabet} aria-label="Introduction">
+        <Row upper="ABCDEF" />
+        <Row upper="GHIJKL" />
+        <Row
+          upper={
+            <>
+              M<span className={styles.accent}>ERIC</span>N
+            </>
+          }
+        >
+          abcdefg
+        </Row>
+        <Row
+          upper={
+            <>
+              O<span className={styles.accent}>ZHENG</span>
+            </>
+          }
+          before="h"
+          after="ij"
+          href="/about"
+        >
+          about
+        </Row>
+        <Row upper="PQRSTU" before="klm" after="n" href="/blog">
+          blog
+        </Row>
+        <Row upper="VWXYZ" before="o" href="/contents">
+          contents
+        </Row>
+        <Row before="p" href="/changelog">
+          changelog
+        </Row>
+        <Row>qrstuvwxyz</Row>
+      </nav>
+    </main>
   );
 }

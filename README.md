@@ -1,55 +1,52 @@
 # ericzheng.nz
 
-Eric Zheng's personal website: a standalone split-alphabet opening and separate About, Blog, Contents, Changelog and Leetcode pages. Next.js 16/React19, TypeScript, local fonts, CSS Modules and native scrolling, with isolated decorative edge waves.
-
-## Write a post
-
-Use Node24 and the pnpm version pinned in `package.json`.
+Eric Zheng's personal site: a split-alphabet home page plus About, Blog, Contents, Changelog and Leetcode pages. Next.js (App Router, fully static), CSS Modules and Markdown.
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm new:blog my-post "My post title"
-pnpm new:leetcode 2026-09-14 "Problem title"
-pnpm dev
+pnpm install
+pnpm dev        # http://localhost:3000, drafts included
+pnpm validate   # format, lint, typecheck, build
+pnpm test:e2e   # Playwright smoke tests (run `pnpm exec playwright install chromium` once)
 ```
 
-Write in `content/blog/<slug>/index.md` or `content/leetcode/YYYY-MM-DD.md`. Open the scaffold's preview URL and refresh after editing. Development binds to loopback and shows labelled drafts; production excludes them. **Draft files are not private if committed to a public repository.**
-
-Markdown supports GFM, highlighted code, maths and local images. The website supplies layout; no JSX or Pandoc generation script is needed. Set `draft: false`, validate, then commit/push when ready. Git-connected hosting can build/deploy the commit once configured; no deployment is performed by a local scaffold/build command.
-
-[Full writing guide](docs/writing.md): frontmatter, images, draft/privacy rules, preview, publishing and corrections.
-
-## Validate
+## Writing
 
 ```bash
-pnpm content:check          # source-file metadata/rendering/asset diagnostics
-pnpm test:content           # disposable Markdown and scaffold regressions
-pnpm validate               # repository checks and production build
-CI=1 pnpm test:e2e --retries=0 # production browser suite after a build, port3100 free
-pnpm test:content:browser   # isolated writing/preview/publish journey, port3199 free
+pnpm new:blog my-post "My post title"    # content/blog/my-post/index.md
+pnpm new:leetcode 2026-09-14 "Two Sum"   # content/leetcode/2026-09-14.md
 ```
 
-Install Chromium once with `pnpm exec playwright install chromium` if needed. [Development](docs/development.md) and [testing](docs/testing.md) cover prerequisites, ownership and manual limitations.
+Each file starts with YAML frontmatter:
 
-## Repository map
+```yaml
+---
+title: My post title
+date: 2026-09-14
+draft: true # shown by `pnpm dev` only; set to false to publish
+summary: one line for the blog index and RSS # optional
+updated: 2026-09-15 # optional
+tags: [cpp] # optional
+# Leetcode only:
+problemId: 1
+problemUrl: https://leetcode.com/problems/two-sum/
+difficulty: Easy # Easy | Medium | Hard
+---
+```
 
-| Path                                                     | Purpose                                                                   |
-| -------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `content/`                                               | Markdown and referenced local writing assets                              |
-| `lib/content/`                                           | Validated content loading, non-executable rendering, feed and scaffolding |
-| `app/`                                                   | Canonical routes, static reading content, metadata, styles and fonts      |
-| `components/`                                            | Reading shell, article/list rendering and isolated waves                  |
-| `public/`                                                | Always-public images/icons and wave fallbacks                             |
-| `scripts/`                                               | Content scaffolding, validation and owned test commands                   |
-| `tests/content/`, `tests/content-browser/`, `tests/e2e/` | Unit, authoring and public-browser evidence                               |
-| `docs/`                                                  | Product, architecture, writing, testing, plans and historical decisions   |
+The body is ordinary Markdown: GFM (tables, footnotes, task lists), fenced code with a language (highlighted by Shiki), `$inline$` and `$$display$$` maths (KaTeX), and local images placed next to the post (`![alt text](diagram.png)`). Start headings at `##`; the title is the page's `h1`. Raw HTML is rejected.
 
-## Publishing architecture
+A draft flag is not privacy: anything committed to a public repository is public.
 
-Markdown/frontmatter and assets become prerendered `/blog/<slug>` and `/leetcode/<date>` pages, indexes, `/writing.xml` and sitemap entries. Changelog records retain their separate hand-authored source and `/changelog.xml`. Readers need no database; content and native disclosures work without JavaScript. The Paper separate-page design, native historical-home notices, and passive waves are preserved.
+## Layout
 
-[ADR-0004](docs/decisions/0004-markdown-publishing.md) defines the file-based publishing boundary.
-
-Canonical metadata points to `https://ericzheng.nz`. Hosting configuration is external and has not been inspected or changed here. Deployment still requires a successful build and owner-controlled hosting/Git integration.
-
-Agents start at [AGENTS.md](AGENTS.md), then use the [knowledge index](docs/README.md) and [active plans](docs/plans/README.md).
+| Path                                                     | What                                                           |
+| -------------------------------------------------------- | -------------------------------------------------------------- |
+| `app/page.tsx`                                           | Home: the split alphabet                                       |
+| `app/<page>/page.tsx`                                    | About, Blog, Contents, Changelog, Leetcode (copy lives inline) |
+| `app/{blog,leetcode}/[slug]`                             | Article pages, rendered by `components/Article.tsx`            |
+| `components/ReadingPage.tsx`                             | Masthead, main column and footer                               |
+| `lib/posts.ts`, `lib/markdown.ts`                        | Load frontmatter and render Markdown                           |
+| `lib/changelog.ts`                                       | Changelog entries (page and `/changelog.xml`)                  |
+| `app/writing.xml`, `app/changelog.xml`, `app/sitemap.ts` | Feeds and sitemap                                              |
+| `app/writing-assets`                                     | Serves images from `content/`                                  |
+| `docs/design.md`                                         | Design system and the Paper design file                        |
