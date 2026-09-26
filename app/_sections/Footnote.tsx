@@ -4,12 +4,20 @@ import styles from "./Footnote.module.css";
 export default function Footnote() {
   return (
     <div className={styles.footnote}>
+      <h2 id="fun-fact">
+        fun fact<span>:</span>
+      </h2>
+      <p>
+        when I was 11, I did so happen to write in my yearbook that "
+        <em>I want[ed] to be a computer scientist</em>" when I grow up.
+        Apparently <b>dreams</b> do come true...
+      </p>
       <h2 id="about-this-site">
         about this site<span>:</span>
       </h2>
       <p>
-        This site is built with Next.js, with hand-authored content and local
-        fonts. Its original inspiration was{" "}
+        now, all antics aside, the website itself was created with{" "}
+        <b>Next.js</b>, and was heavily inspired by{" "}
         <a href="https://www.ericzheng.org/">Eric Zheng</a>.
       </p>
       <h2 id="footnote">

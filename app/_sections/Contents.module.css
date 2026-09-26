@@ -16,8 +16,7 @@
 }
 
 .directory dt a,
-.directory dt > span,
-.emails a {
+.directory dt > span {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -37,9 +36,10 @@
 }
 
 .emails {
-  display: grid;
-  justify-items: start;
   gap: 4px;
+}
+.emails > div {
+  grid-template-columns: 252px minmax(0, 1fr);
 }
 
 @media (max-width: 599px) {

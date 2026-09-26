@@ -39,6 +39,7 @@ export default function Changelog() {
           subscribe with <a href="/changelog.xml">rss</a>
         </p>
       </div>
+      <p>the update log!!</p>
       {CHANGELOG_ENTRIES.length === 0 ? (
         <p className="muted">the update log!! no entries yet.</p>
       ) : (

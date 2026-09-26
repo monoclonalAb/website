@@ -5,7 +5,7 @@ import { readingMetadata } from "../shared-metadata";
 export const metadata = readingMetadata(
   "Blog",
   "/blog",
-  "A place for Eric Zheng's thoughts on interesting topics. Writing coming soon.",
+  "A place for Eric Zheng's thoughts on interesting topics.",
 );
 
 export default function BlogPage() {

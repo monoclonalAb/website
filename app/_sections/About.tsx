@@ -22,11 +22,12 @@ export default function About() {
             sizes="(max-width: 599px) 96px, 160px"
           />
           <figcaption>
+            picture of me at
+            <br />
             <a href="https://maps.app.goo.gl/HQVb5fpzGrYu7AyJ7">
               Parable House
             </a>
-            <br />
-            August 2025
+            , August 2025
           </figcaption>
         </figure>
         <div className={styles.peers}>
@@ -66,10 +67,6 @@ export default function About() {
           </li>
         </ul>
       </div>
-      <blockquote id="fun-fact" className={styles.quote}>
-        when I was 11, I wrote in my yearbook that I wanted to be a computer
-        scientist. Apparently dreams do come true...
-      </blockquote>
       <Footnote />
     </>
   );
