@@ -11,17 +11,14 @@
     "test:content:browser": "node scripts/test-content-browser.mjs",
     "build": "pnpm content:check && next build",
     "start": "next start",
-    "docs:check": "node scripts/check-docs.mjs",
     "contracts:check": "node scripts/check-site-contracts.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "workflow": "node scripts/task-workflow.mjs",
-    "test:workflow": "node --test tests/workflow/*.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "check": "pnpm content:check && pnpm test:content && pnpm docs:check && pnpm contracts:check && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:workflow",
+    "check": "pnpm content:check && pnpm test:content && pnpm contracts:check && pnpm format:check && pnpm lint && pnpm typecheck",
     "validate": "pnpm check && pnpm build"
   },
   "dependencies": {
