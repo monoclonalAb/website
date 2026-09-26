@@ -1,28 +1,15 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const port = 3100;
-const baseURL = `http://127.0.0.1:${port}`;
-const isCI = Boolean(process.env.CI);
+const CI = Boolean(process.env.CI);
 
 export default defineConfig({
-  testDir: "./tests/e2e",
-  outputDir: "./test-results",
-  fullyParallel: true,
-  forbidOnly: isCI,
-  retries: isCI ? 1 : 0,
-  workers: isCI ? 1 : undefined,
-  timeout: 30_000,
-  expect: { timeout: 5_000 },
-  reporter: isCI
-    ? [["github"], ["html", { open: "never" }]]
-    : [["list"], ["html", { open: "never" }]],
+  testDir: "./tests",
+  forbidOnly: CI,
+  retries: CI ? 1 : 0,
+  reporter: CI ? "github" : "list",
   use: {
-    baseURL,
-    colorScheme: "light",
-    contextOptions: { reducedMotion: "no-preference" },
+    baseURL: "http://127.0.0.1:3100",
     trace: "retain-on-failure",
-    screenshot: "only-on-failure",
-    video: "retain-on-failure",
   },
   projects: [
     {
@@ -33,13 +20,10 @@ export default defineConfig({
       },
     },
   ],
+  // CI tests the production build; locally, the dev server (drafts included).
   webServer: {
-    command: isCI
-      ? `pnpm exec next start -p ${port}`
-      : `pnpm exec next dev -p ${port}`,
-    url: baseURL,
-    reuseExistingServer: !isCI,
-    timeout: 120_000,
-    env: { NEXT_TELEMETRY_DISABLED: "1" },
+    command: `pnpm exec next ${CI ? "start" : "dev"} -p 3100`,
+    url: "http://127.0.0.1:3100",
+    reuseExistingServer: !CI,
   },
 });
