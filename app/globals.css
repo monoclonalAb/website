@@ -19,7 +19,6 @@
   --color-focus: var(--color-red);
   --font-body: Georgia, "Times New Roman", serif;
   --font-display: var(--font-eiko);
-  --font-serif: var(--font-baskerville);
   --font-mono: var(--font-fira-code);
   color-scheme: light;
   -webkit-text-size-adjust: 100%;
