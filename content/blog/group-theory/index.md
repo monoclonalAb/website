@@ -2,6 +2,7 @@
 title: GROUP-ing my thoughts on GROUP theory
 date: 2025-01-09
 draft: false
+summary: '"what is Group Theory and why is it so useful?"'
 ---
 
 ## introduction

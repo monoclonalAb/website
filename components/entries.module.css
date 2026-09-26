@@ -1,4 +1,4 @@
-/* Ruled date/title list shared by /blog, /leetcode and /changelog. */
+/* Ruled date/title list shared by /leetcode and /changelog. */
 .list > li {
   display: grid;
   grid-template-columns: 132px minmax(0, 1fr);

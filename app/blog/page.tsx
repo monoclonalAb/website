@@ -1,8 +1,8 @@
 import Link from "next/link";
 import ReadingPage from "@/components/ReadingPage";
-import styles from "@/components/entries.module.css";
 import { pageMetadata } from "@/lib/metadata";
 import { formatDate, getPosts } from "@/lib/posts";
+import styles from "./blog.module.css";
 
 export const metadata = pageMetadata(
   "Blog",
@@ -26,7 +26,7 @@ export default async function BlogPage() {
         isn&apos;t), please look at this <Link href="/leetcode">leetcode</Link>{" "}
         page instead...
       </p>
-      <ul className={styles.list}>
+      <ul className={styles.posts}>
         {posts.map((post) => (
           <li key={post.slug}>
             <time dateTime={post.date}>{formatDate(post.date)}</time>
@@ -34,10 +34,8 @@ export default async function BlogPage() {
               <h2>
                 <Link href={post.url}>{post.title}</Link>
               </h2>
-              {post.draft && (
-                <p className={styles.meta}>draft · local preview</p>
-              )}
-              {post.summary && <p>{post.summary}</p>}
+              {post.draft && <p className="muted">draft · local preview</p>}
+              {post.summary && <p className={styles.summary}>{post.summary}</p>}
             </div>
           </li>
         ))}
