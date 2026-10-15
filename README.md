@@ -10,31 +10,21 @@ pnpm validate   # format, lint, typecheck, build (what CI runs)
 
 ## Writing
 
-```bash
-pnpm new:blog my-post "My post title"    # content/blog/my-post/index.md
-pnpm new:leetcode 2026-09-14 "Two Sum"   # content/leetcode/2026-09-14.md
-```
+A post is published when it's committed to `main`. Keep work in progress uncommitted or on a branch.
 
-Each file starts with YAML frontmatter:
+**Leetcode:** `pnpm daily` creates `content/leetcode/<today>.md` with the problem's title, number, link and difficulty filled in from LeetCode. The date is today in UTC, when the daily rolls over. Pass a date for an older one: `pnpm daily 2026-09-14`.
+
+**Blog:** create `content/blog/<slug>/index.md` by hand (and, optionally, a changelog entry in `lib/changelog.ts`):
 
 ```yaml
 ---
 title: My post title
 date: 2026-09-14
-draft: true # shown by `pnpm dev` only; set to false to publish
 summary: one line for the blog index and RSS # optional
-updated: 2026-09-15 # optional
-tags: [cpp] # optional
-# Leetcode only:
-problemId: 1
-problemUrl: https://leetcode.com/problems/two-sum/
-difficulty: Easy # Easy | Medium | Hard
 ---
 ```
 
-The body is ordinary Markdown: GFM (tables, footnotes, task lists), fenced code with a language (highlighted by Shiki), `$inline$` and `$$display$$` maths (KaTeX), and local images placed next to the post (`![alt text](diagram.png)`). Start headings at `##`; the title is the page's `h1`. Raw HTML is rejected.
-
-A draft flag is not privacy: anything committed to a public repository is public.
+The body is ordinary Markdown: GFM (tables, footnotes, task lists), fenced code with a language (highlighted by Shiki), `$inline$` and `$$display$$` maths (KaTeX), and local images placed next to the post (`![alt text](diagram.png)`). Start headings at `##`; the title is the page's `h1`. Raw HTML is rejected. Prettier leaves `content/` alone.
 
 ## Layout
 
