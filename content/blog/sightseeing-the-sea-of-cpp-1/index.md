@@ -1,7 +1,6 @@
 ---
 title: Sightseeing the Sea of C++ (#1)
 date: 2025-05-18
-draft: false
 summary: just me yapping about new concepts I have grasped
 ---
 

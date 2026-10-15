@@ -8,17 +8,13 @@ import { renderMarkdown } from "./markdown";
 export type Collection = "blog" | "leetcode";
 
 const contentDir = path.join(process.cwd(), "content");
-const showDrafts = process.env.NODE_ENV === "development";
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD");
 
 const frontmatter = z
   .object({
     title: z.string(),
     date,
-    updated: date.optional(),
     summary: z.string().optional(),
-    draft: z.boolean().default(false),
-    tags: z.array(z.string()).default([]),
     problemId: z.number().optional(),
     problemUrl: z.url().optional(),
     difficulty: z.enum(["Easy", "Medium", "Hard"]).optional(),
@@ -53,7 +49,7 @@ async function readPost(collection: Collection, slug: string) {
   }
 }
 
-/** Newest first. Drafts are included only by `pnpm dev`. */
+/** Newest first. */
 export const getPosts = cache(
   async (collection: Collection): Promise<PostSummary[]> => {
     const entries = await readdir(path.join(contentDir, collection), {
@@ -71,11 +67,9 @@ export const getPosts = cache(
     const posts = await Promise.all(
       slugs.map(async (slug) => (await readPost(collection, slug)).post),
     );
-    return posts
-      .filter((post) => showDrafts || !post.draft)
-      .sort(
-        (a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug),
-      );
+    return posts.sort(
+      (a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug),
+    );
   },
 );
 
@@ -85,7 +79,7 @@ export const getPost = cache(async (collection: Collection, slug: string) => {
     if (error.code === "ENOENT") return undefined;
     throw error;
   });
-  if (!found || (found.post.draft && !showDrafts)) return undefined;
+  if (!found) return undefined;
   // Images sit next to the Markdown and are served by app/writing-assets.
   const assetBase =
     collection === "blog"

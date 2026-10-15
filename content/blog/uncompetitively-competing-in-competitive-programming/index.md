@@ -1,7 +1,6 @@
 ---
 title: Uncompetitively Competing in Competitive Programming
 date: 2025-02-26
-draft: false
 summary: a write-up for every question since practice does make permanent
 ---
 

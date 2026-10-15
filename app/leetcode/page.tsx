@@ -32,9 +32,6 @@ export default async function LeetcodePage() {
                   {post.title}
                 </Link>
               </h2>
-              {post.draft && (
-                <p className={styles.meta}>draft · local preview</p>
-              )}
               {post.difficulty && (
                 <p className={styles.meta}>{post.difficulty}</p>
               )}

@@ -4,9 +4,10 @@ import { rss } from "@/lib/rss";
 export const dynamic = "force-static";
 
 export async function GET() {
-  const posts = [...(await getPosts("blog")), ...(await getPosts("leetcode"))]
-    .filter((post) => !post.draft)
-    .sort((a, b) => b.date.localeCompare(a.date));
+  const posts = [
+    ...(await getPosts("blog")),
+    ...(await getPosts("leetcode")),
+  ].sort((a, b) => b.date.localeCompare(a.date));
   return rss({
     title: "Eric Zheng — writing",
     description: "Blog posts and Leetcode notes by Eric Zheng.",

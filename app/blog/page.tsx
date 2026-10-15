@@ -34,7 +34,6 @@ export default async function BlogPage() {
               <h2>
                 <Link href={post.url}>{post.title}</Link>
               </h2>
-              {post.draft && <p className="muted">draft · local preview</p>}
               {post.summary && <p className={styles.summary}>{post.summary}</p>}
             </div>
           </li>

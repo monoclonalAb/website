@@ -4,7 +4,7 @@ Eric Zheng's personal site: a split-alphabet home page plus About, Blog, Content
 
 ```bash
 pnpm install
-pnpm dev        # http://localhost:3000, drafts included
+pnpm dev        # http://localhost:3000
 pnpm validate   # format, lint, typecheck, build (what CI runs)
 ```
 

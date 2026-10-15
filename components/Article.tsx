@@ -17,11 +17,8 @@ export function articleMetadata(post: Post): Metadata {
       title: post.title,
       description,
       publishedTime: post.date,
-      modifiedTime: post.updated ?? post.date,
       authors: ["Eric Zheng"],
-      tags: post.tags,
     },
-    robots: post.draft ? { index: false, follow: false } : undefined,
   };
 }
 
@@ -33,33 +30,16 @@ export default function Article({ post }: { post: Post }) {
       <p className={styles.meta}>
         <Link href={`/${collection}`}>← {collection}</Link>
       </p>
-      {post.draft && (
-        <aside className={styles.draft}>
-          <strong>Draft — local preview only.</strong> Not included in
-          production. This file is not private if committed to a public
-          repository.
-        </aside>
-      )}
       <header className={styles.header}>
         <h1>{post.title}</h1>
         <p className={styles.meta}>
           <time dateTime={post.date}>{formatDate(post.date)}</time>
-          {post.updated && (
-            <>
-              {" "}
-              · updated{" "}
-              <time dateTime={post.updated}>{formatDate(post.updated)}</time>
-            </>
-          )}
           {post.difficulty && ` · ${post.difficulty}`}
         </p>
         {post.problemUrl && (
           <p>
             <a href={post.problemUrl}>LeetCode problem {post.problemId}</a>
           </p>
-        )}
-        {post.tags.length > 0 && (
-          <p className={styles.meta}>Topics: {post.tags.join(", ")}</p>
         )}
       </header>
       {outline.length > 1 && (

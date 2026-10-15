@@ -8,11 +8,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...["", "/about", "/blog", "/contents", "/changelog", "/leetcode"].map(
       (page) => ({ url: SITE_URL + page }),
     ),
-    ...posts
-      .filter((post) => !post.draft)
-      .map((post) => ({
-        url: SITE_URL + post.url,
-        lastModified: post.updated ?? post.date,
-      })),
+    ...posts.map((post) => ({
+      url: SITE_URL + post.url,
+      lastModified: post.date,
+    })),
   ];
 }

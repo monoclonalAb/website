@@ -128,10 +128,6 @@ pre {
   white-space: nowrap;
 }
 
-.muted {
-  color: var(--muted);
-}
-
 @media (max-width: 599px) {
   h1 {
     font-size: 36px;
