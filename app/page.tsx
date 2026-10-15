@@ -30,24 +30,35 @@ const person = {
  * One row of the split alphabet. Upper-case letters sit right of centre on the
  * light half, lower-case letters left of centre on the dark half. On hover or
  * focus, a linked row spreads its letters while the link stays centred.
+ * Without `live`, the row is a painted copy: same layout, no link.
  */
 function Row({
   upper,
   before = "",
   after,
   href,
+  live,
   children = "",
 }: {
   upper?: ReactNode;
   before?: string;
   after?: string;
   href?: string;
+  live: boolean;
   children?: string;
 }) {
   const vars = {
     "--half-gaps": (children.length - 1) / 2,
     "--prefix-letters": before.length,
   } as CSSProperties;
+  const word = (
+    <>
+      <span className={styles.measure} aria-hidden="true">
+        {children}
+      </span>
+      <span className={styles.word}>{children}</span>
+    </>
+  );
   return (
     <div className={styles.row} style={vars}>
       <div className={styles.upper} aria-hidden="true">
@@ -66,12 +77,13 @@ function Row({
                 <span className={styles.prefixText}>{before}</span>
               </span>
             </span>
-            <Link href={href} className={styles.link}>
-              <span className={styles.measure} aria-hidden="true">
-                {children}
-              </span>
-              <span className={styles.word}>{children}</span>
-            </Link>
+            {live ? (
+              <Link href={href} className={styles.link}>
+                {word}
+              </Link>
+            ) : (
+              <span className={styles.link}>{word}</span>
+            )}
             <span className={styles.suffix} aria-hidden="true">
               {after}
             </span>
@@ -81,6 +93,48 @@ function Row({
         )}
       </div>
     </div>
+  );
+}
+
+function Alphabet({ live = false }: { live?: boolean }) {
+  return (
+    <>
+      <Row live={live} upper="ABCDEF" />
+      <Row live={live} upper="GHIJKL" />
+      <Row
+        live={live}
+        upper={
+          <>
+            M<span className={styles.accent}>ERIC</span>N
+          </>
+        }
+      >
+        abcdefg
+      </Row>
+      <Row
+        live={live}
+        upper={
+          <>
+            O<span className={styles.accent}>ZHENG</span>
+          </>
+        }
+        before="h"
+        after="ij"
+        href="/about"
+      >
+        about
+      </Row>
+      <Row live={live} upper="PQRSTU" before="klm" after="n" href="/blog">
+        blog
+      </Row>
+      <Row live={live} upper="VWXYZ" before="o" href="/contents">
+        contents
+      </Row>
+      <Row live={live} before="p" href="/changelog">
+        changelog
+      </Row>
+      <Row live={live}>qrstuvwxyz</Row>
+    </>
   );
 }
 
@@ -95,40 +149,22 @@ export default function Home() {
       <ScrollWaves opening side="left" />
       <h1 className="sr-only">Eric Zheng</h1>
       <nav className={styles.alphabet} aria-label="Introduction">
-        <Row upper="ABCDEF" />
-        <Row upper="GHIJKL" />
-        <Row
-          upper={
-            <>
-              M<span className={styles.accent}>ERIC</span>N
-            </>
-          }
-        >
-          abcdefg
-        </Row>
-        <Row
-          upper={
-            <>
-              O<span className={styles.accent}>ZHENG</span>
-            </>
-          }
-          before="h"
-          after="ij"
-          href="/about"
-        >
-          about
-        </Row>
-        <Row upper="PQRSTU" before="klm" after="n" href="/blog">
-          blog
-        </Row>
-        <Row upper="VWXYZ" before="o" href="/contents">
-          contents
-        </Row>
-        <Row before="p" href="/changelog">
-          changelog
-        </Row>
-        <Row>qrstuvwxyz</Row>
+        <Alphabet live />
       </nav>
+      {/*
+        The opening, after the first ericzheng.nz: two painted copies of the
+        alphabet are clipped away over the real one, which works throughout.
+      */}
+      <div className={styles.curtain} aria-hidden="true">
+        <div className={styles.alphabet}>
+          <Alphabet />
+        </div>
+      </div>
+      <div className={styles.cover} aria-hidden="true">
+        <div className={styles.alphabet}>
+          <Alphabet />
+        </div>
+      </div>
     </main>
   );
 }
