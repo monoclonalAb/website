@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
 import ReadingPage from "@/components/ReadingPage";
 import { pageMetadata } from "@/lib/metadata";
 import styles from "./contents.module.css";
@@ -7,59 +6,8 @@ import styles from "./contents.module.css";
 export const metadata = pageMetadata(
   "Contents",
   "/contents",
-  "A directory of every main page on Eric Zheng's website, plus social profiles and email addresses.",
+  "a directory of what you can find on eric's website and where you can find him",
 );
-
-const pages: [string, string, ReactNode][] = [
-  ["/", "home", "cause every website needs a fancy welcome page"],
-  ["/about", "about", "everything you need to know about the site"],
-  [
-    "/blog",
-    "blog",
-    <>
-      the page <b>everyone</b> is here for
-    </>,
-  ],
-  ["/contents", "contents", "this page (riveting)"],
-  [
-    "/changelog",
-    "changelog",
-    "for long time fans of the page who want to know what has changed",
-  ],
-  ["/leetcode", "leetcode", "to keep track of my daily records"],
-];
-
-const profiles = [
-  ["github", "https://github.com/monoclonalAb"],
-  ["linkedin", "https://www.linkedin.com/in/eric-zheng-nz/"],
-  ["strava", "https://www.strava.com/athletes/130332761"],
-  ["instagram", "https://www.instagram.com/erizheng/"],
-];
-
-const emails = [
-  ["theericzheng@gmail.com", "my main gmail"],
-  ["eric.zheng@outlook.com", "my main outlook"],
-  ["ezhe473@aucklanduni.ac.nz", "my current university email"],
-];
-
-function Directory({
-  rows,
-  className = "",
-}: {
-  rows: [ReactNode, ReactNode][];
-  className?: string;
-}) {
-  return (
-    <dl className={`${styles.directory} ${className}`}>
-      {rows.map(([term, description], i) => (
-        <div key={i}>
-          <dt>{term}</dt>
-          <dd>{description}</dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
 
 export default function ContentsPage() {
   return (
@@ -68,26 +16,73 @@ export default function ContentsPage() {
         contents<span>:</span>
       </h1>
       <p>
-        ideally, I wanted the website to be a bit of maze, so having a contents
-        page would be helpful to navigate the site.
+        ideally, i wanted the website to be an ever-expanding maze, so having a
+        contents page would be helpful to navigate the site
       </p>
 
       <section className={styles.group}>
         <h2 id="internal-links">
           internal links<span>:</span>
         </h2>
-        <Directory
-          rows={pages.map(([href, label, description]) => [
-            <Link
-              key={href}
-              href={href}
-              aria-current={href === "/contents" ? "page" : undefined}
-            >
-              {label}
-            </Link>,
-            description,
-          ])}
-        />
+        <dl className={styles.directory}>
+          <div>
+            <dt>
+              <Link href="/">home</Link>
+            </dt>
+            <dd>
+              cause every website needs a <em>fancy</em> welcome page
+            </dd>
+          </div>
+          <div>
+            <dt>
+              <Link href="/about">about</Link>
+            </dt>
+            <dd>everything you need to know about the site</dd>
+          </div>
+          <div>
+            <dt>
+              <Link href="/blog">blog</Link>
+            </dt>
+            <dd>
+              the page <b>everyone</b> is here for
+            </dd>
+          </div>
+          <div>
+            <dt>
+              <Link href="/contents" aria-current="page">
+                contents
+              </Link>
+            </dt>
+            <dd>
+              this page <em>(riveting)</em>
+            </dd>
+          </div>
+          <div>
+            <dt>
+              <Link href="/changelog">changelog</Link>
+            </dt>
+            <dd>
+              for long time fans (
+              <em>
+                like{" "}
+                <a
+                  href="https://koutaroyumiba.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  koutaro
+                </a>
+              </em>
+              ) who want to know what&apos;s changed
+            </dd>
+          </div>
+          <div>
+            <dt>
+              <Link href="/leetcode">leetcode</Link>
+            </dt>
+            <dd>an archive of my daily questions</dd>
+          </div>
+        </dl>
       </section>
 
       <section className={styles.external}>
@@ -95,42 +90,79 @@ export default function ContentsPage() {
           <h2 id="external-links">
             external links<span>:</span>
           </h2>
-          <p>
-            i guess this is doubling as my contacts page, as well as advertising
-            where else I am housed on the internet
-          </p>
+          <p>where else you can find me housed on the internet</p>
         </div>
 
         <section className={styles.group}>
           <h3 id="social-media">
             social media<span>:</span>
           </h3>
-          <Directory
-            rows={[
-              ...profiles.map(([label, href]): [ReactNode, ReactNode] => [
-                <a key={label} href={href}>
-                  {label}
-                </a>,
-                href.replace(/^https:\/\/(www\.)?|\/$/g, ""),
-              ]),
-              [<span key="discord">discord</span>, "monoclonalab"],
-            ]}
-          />
+          <dl className={styles.directory}>
+            <div>
+              <dt>
+                <a href="https://github.com/monoclonalAb">github</a>
+              </dt>
+              <dd>code</dd>
+            </div>
+            <div>
+              <dt>
+                <a href="https://www.linkedin.com/in/eric-zheng-nz/">
+                  linkedin
+                </a>
+              </dt>
+              <dd>unfortunately, we live in a society</dd>
+            </div>
+            <div>
+              <dt>
+                <a href="https://www.strava.com/athletes/130332761">strava</a>
+              </dt>
+              <dd>follow for only the best conversational runs</dd>
+            </div>
+            <div>
+              <dt>
+                <a href="https://www.instagram.com/erizheng/">instagram</a>
+              </dt>
+              <dd>obligatory instagram mention</dd>
+            </div>
+          </dl>
         </section>
 
         <section className={styles.group}>
           <h3 id="emails">
             emails<span>:</span>
           </h3>
-          <Directory
-            className={styles.emails}
-            rows={emails.map(([address, description]) => [
-              <a key={address} href={`mailto:${address}`}>
-                {address}
-              </a>,
-              description,
-            ])}
-          />
+          <dl className={`${styles.directory} ${styles.emails}`}>
+            <div>
+              <dt>
+                <a href="mailto:ericzheng.nz@gmail.com">
+                  ericzheng.nz@gmail.com
+                </a>
+              </dt>
+              <dd>my main gmail</dd>
+            </div>
+            <div>
+              <dt>
+                <a href="mailto:eric.zheng@outlook.com">
+                  eric.zheng@outlook.com
+                </a>
+              </dt>
+              <dd>my main outlook</dd>
+            </div>
+            <div>
+              <dt>
+                <a href="mailto:ezhe473@aucklanduni.ac.nz">
+                  ezhe473@aucklanduni.ac.nz
+                </a>
+              </dt>
+              <dd>
+                my{" "}
+                <i>
+                  <s>current</s>
+                </i>{" "}
+                previous university email
+              </dd>
+            </div>
+          </dl>
         </section>
       </section>
     </ReadingPage>
