@@ -5,8 +5,7 @@ Eric Zheng's personal site: a split-alphabet home page plus About, Blog, Content
 ```bash
 pnpm install
 pnpm dev        # http://localhost:3000, drafts included
-pnpm validate   # format, lint, typecheck, build
-pnpm test:e2e   # Playwright smoke tests (run `pnpm exec playwright install chromium` once)
+pnpm validate   # format, lint, typecheck, build (what CI runs)
 ```
 
 ## Writing

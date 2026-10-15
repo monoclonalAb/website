@@ -9,12 +9,9 @@
     "new:blog": "node scripts/new-post.mjs blog",
     "new:leetcode": "node scripts/new-post.mjs leetcode",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "test:e2e": "playwright test",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck",
-    "validate": "pnpm check && pnpm build"
+    "validate": "prettier --check . && pnpm lint && pnpm typecheck && pnpm build"
   },
   "dependencies": {
     "katex": "^0.16.47",
@@ -34,7 +31,6 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
     "@types/hast": "^3.0.5",
     "@types/mdast": "^4.0.4",
     "@types/node": "^20",

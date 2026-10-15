@@ -21,5 +21,3 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm validate
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e

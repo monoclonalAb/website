@@ -10,8 +10,6 @@ export default defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    "playwright-report/**",
-    "test-results/**",
     ".task-workflow/**",
   ]),
 ]);

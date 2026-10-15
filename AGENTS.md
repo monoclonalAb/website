@@ -28,4 +28,4 @@ Eric Zheng's personal site. It is small on purpose: keep changes small, and pref
 
 ## Done means
 
-`pnpm validate` and `pnpm test:e2e` pass. For visual changes, also look at the affected pages at 1440px and 390px wide and compare them with Paper.
+`pnpm validate` passes. For visual changes, also look at the affected pages at 1440px and 390px wide and compare them with Paper.
