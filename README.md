@@ -28,14 +28,15 @@ The body is ordinary Markdown: GFM (tables, footnotes, task lists), fenced code 
 
 ## Layout
 
-| Path                                                     | What                                                           |
-| -------------------------------------------------------- | -------------------------------------------------------------- |
-| `app/page.tsx`                                           | Home: the split alphabet                                       |
-| `app/<page>/page.tsx`                                    | About, Blog, Contents, Changelog, Leetcode (copy lives inline) |
-| `app/{blog,leetcode}/[slug]`                             | Article pages, rendered by `components/Article.tsx`            |
-| `components/ReadingPage.tsx`                             | Masthead, main column and footer                               |
-| `lib/posts.ts`, `lib/markdown.ts`                        | Load frontmatter and render Markdown                           |
-| `lib/changelog.ts`                                       | Changelog entries (page and `/changelog.xml`)                  |
-| `app/writing.xml`, `app/changelog.xml`, `app/sitemap.ts` | Feeds and sitemap                                              |
-| `app/writing-assets`                                     | Serves images from `content/`                                  |
-| `docs/design.md`                                         | Design system and the Paper design file                        |
+| Path                                                     | What                                                             |
+| -------------------------------------------------------- | ---------------------------------------------------------------- |
+| `app/page.tsx`                                           | Home: the split alphabet                                         |
+| `app/<page>/page.tsx`                                    | About, Blog, Contents, Changelog, Leetcode (copy lives inline)   |
+| `app/{blog,leetcode}/[slug]`                             | Article pages, rendered by `components/Article.tsx`              |
+| `components/ReadingPage.tsx`                             | Masthead, main column and footer                                 |
+| `components/ScrollWaves.tsx`, `scroll-wave-field.ts`     | Edge waves (the only client component); stills in `public/waves` |
+| `lib/posts.ts`, `lib/markdown.ts`                        | Load frontmatter and render Markdown                             |
+| `lib/changelog.ts`                                       | Changelog entries (page and `/changelog.xml`)                    |
+| `app/writing.xml`, `app/changelog.xml`, `app/sitemap.ts` | Feeds and sitemap                                                |
+| `app/writing-assets`                                     | Serves images from `content/`                                    |
+| `docs/design.md`                                         | Design system and the Paper design file                          |

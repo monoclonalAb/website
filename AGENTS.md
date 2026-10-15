@@ -19,8 +19,8 @@ Eric Zheng's personal site. It is small on purpose: keep changes small, and pref
 ## Rules
 
 - **Eric's words.** Copy comes from Eric or the Paper boards. Don't paraphrase it, and don't invent taglines, descriptions, summaries or biography.
-- **Server Components only.** There are no client components today; add `"use client"` only when unavoidable, at the smallest boundary.
-- **Native browsing.** Plain links, native scrolling, history and zoom. No scroll libraries, smooth scrolling, pagers, scrollspy, drawers or decorative animation. The one exception is the home page's CSS-only row hover.
+- **Server Components by default.** The only client component is `components/ScrollWaves.tsx`; add `"use client"` only when unavoidable, at the smallest boundary.
+- **Native browsing.** Plain links, native scrolling, history and zoom. No scroll libraries, smooth scrolling, pagers, scrollspy, drawers or decorative animation. Two exceptions: the home page's CSS-only row hover, and the edge waves, which change characters in place, only read scroll position and stop for reduced motion.
 - **Markdown is data.** No MDX, raw HTML or runtime authoring services.
 - **Accessible.** Semantic HTML, one `h1` per page, visible focus, keyboard access, readable without JavaScript.
 - **No new dependencies** without a concrete need.

@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import ScrollWaves from "@/components/ScrollWaves";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = { title: { absolute: "Eric Zheng" } };
@@ -90,6 +91,8 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }}
       />
+      <ScrollWaves opening />
+      <ScrollWaves opening side="left" />
       <h1 className="sr-only">Eric Zheng</h1>
       <nav className={styles.alphabet} aria-label="Introduction">
         <Row upper="ABCDEF" />

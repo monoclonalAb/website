@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 import styles from "./ReadingPage.module.css";
+import ScrollWaves from "./ScrollWaves";
 
 const pages = ["about", "blog", "contents", "changelog"];
 
@@ -79,6 +80,8 @@ export default function ReadingPage({
         </div>
         <a href="#top">back to top ↑</a>
       </footer>
+      <ScrollWaves />
+      <ScrollWaves side="left" />
     </div>
   );
 }
