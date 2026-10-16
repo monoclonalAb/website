@@ -10,7 +10,7 @@ The source of truth is the Paper file [Personal Website](https://app.paper.desig
 | 06.1                  | Edge-wave states                                                             |
 | 06.2                  | Design guidelines                                                            |
 
-The Home opening is on page **Home intro · the curtain, revisited**: 08.0 (brief and timing), 08.1–08.5 (desktop) and 09.1–09.5 (mobile). Other pages in the file are explorations and archives, not instructions. Paper lacks the Eiko font, so headings there are outlined images; the site uses live text.
+The Home opening is on page **Home intro · the curtain, revisited**: 08.0 (brief and timing), 08.1–08.5 (desktop) and 09.1–09.5 (mobile). The favicon is on page **Icon · favicon**: 10.5, the large `ez` on a paper circle (10.1–10.4 are earlier options); `app/icon.svg` and `app/favicon.ico` are exported from it, and `app/apple-icon.png` from the same drawing on a full paper square. Other pages in the file are explorations and archives, not instructions. Paper lacks the Eiko font, so headings there are outlined images; the site uses live text.
 
 ## Tokens
 
