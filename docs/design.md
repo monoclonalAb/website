@@ -30,7 +30,7 @@ Type: Georgia 18/29 for body; PP Eiko Medium for headings (h1 42/50, 36/44 below
 
 ## Layout
 
-- Reading pages share `components/ReadingPage.tsx`: a 720px column with 24px gutters, masthead (logo + `about ~ blog ~ contents ~ changelog`, current page underlined in red), content with 24px gaps, and a footer with GitHub/LinkedIn/Strava icons and “back to top ↑”. Below 600px the masthead stacks.
+- Reading pages share `components/ReadingPage.tsx`: a 720px column with 24px gutters, masthead (logo + `about ~ blog ~ contents ~ changelog`, no underlines at rest; after the first ericzheng.nz, hovering a link grows a 2px red line out from its middle, just below the descenders, over 250ms, instantly with reduced motion), content with 24px gaps, and a footer with GitHub/LinkedIn/Strava icons and “back to top ↑”. Below 600px the masthead stacks.
 - About: 160px portrait (96px on mobile) beside the intro; then “fun fact:”, “about this site:” and “footnote:” sections with 24/32 headings and 22px gaps.
 - Blog: compact list — italic date right-aligned in a 132px column, 20px Eiko title, italic one-line summary, 28px between posts. Dates stack above titles on mobile.
 - Leetcode and Changelog: ruled list with a 132px date column and 24px titles.

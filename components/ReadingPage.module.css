@@ -53,12 +53,29 @@
   line-height: 24px;
 }
 .nav a {
+  position: relative;
   color: var(--ink);
   text-decoration: none;
 }
-.nav a:hover,
-.nav a[aria-current="page"] {
-  text-decoration: underline 1.5px var(--accent);
+/* After the first ericzheng.nz, no underline at rest. On hover a red
+   line grows out from the middle, just below the descenders. */
+.nav a::after {
+  content: "";
+  position: absolute;
+  top: calc(50% + 12px);
+  left: 0;
+  width: 100%;
+  border-top: 2px solid var(--accent);
+  transform: scaleX(0);
+  transition: transform 250ms ease-out;
+}
+.nav a:hover::after {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav a::after {
+    transition: none;
+  }
 }
 .nav span {
   color: var(--muted);
