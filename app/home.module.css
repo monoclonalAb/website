@@ -114,7 +114,7 @@
 
 /*
  * The opening, after the first ericzheng.nz (Paper: "Home intro"). The cover
- * is the plain alphabet in ink; a dark curtain falls through it, top down.
+ * is the plain alphabet in grey; a dark curtain falls through it, top down.
  * After a beat, the curtain's left half lifts, bottom up, to show the name.
  * Each moving edge is a 2px red line.
  */
@@ -145,7 +145,7 @@
 }
 
 .cover .row * {
-  color: var(--ink);
+  color: #666;
 }
 
 .cover::before {
@@ -169,6 +169,34 @@
   background: linear-gradient(to top, var(--accent) 2px, transparent 0);
   translate: 0 2px;
   animation: lift-edge 600ms cubic-bezier(0.22, 1, 0.36, 1) 900ms forwards;
+}
+
+/*
+ * Rows don't spread on hover or focus until the opening has finished. Then a
+ * resting pointer eases the row open (280ms) instead of snapping: with no
+ * closing keyframe, the hold ends on whatever hover asks for.
+ */
+@property --tracking {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+.row {
+  animation: hold-still 1780ms;
+}
+
+@keyframes hold-still {
+  0%,
+  84.27% {
+    --tracking: 0em;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* The release is the ease, so no transition runs on top of it. */
+  0%,
+  100% {
+    --duration: 0ms;
+  }
 }
 
 @keyframes fall {
@@ -224,6 +252,9 @@
   .cover,
   .curtain {
     display: none;
+  }
+  .row {
+    animation: none;
   }
 }
 
