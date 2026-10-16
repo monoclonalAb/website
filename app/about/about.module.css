@@ -32,13 +32,6 @@ main.about {
   font-size: 12px;
   line-height: 20px;
 }
-.portrait a {
-  color: inherit;
-  text-decoration: none;
-}
-.portrait a:hover {
-  text-decoration: underline;
-}
 .peers {
   grid-area: peers;
 }
@@ -47,24 +40,23 @@ main.about {
   display: grid;
   gap: 12px;
 }
-.notes {
+.note {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  padding-top: 2px;
+  margin-top: 8px;
+  padding-top: 32px;
+  border-top: 1px solid var(--rule);
 }
-.notes h2 {
+.note h2 {
   font-size: 24px;
   line-height: 32px;
 }
-.reasons {
-  display: grid;
-  gap: 22px;
-  padding-left: 30px;
-  list-style: decimal;
-}
-.reasons li::marker {
-  color: var(--muted);
+/* The yearbook quote. The rule is --link at 45%. */
+.quote {
+  border-left: 2px solid #7c414773;
+  padding-left: 20px;
+  font-style: italic;
 }
 .list {
   list-style: "·   ";
@@ -75,17 +67,13 @@ main.about {
 .list li::marker {
   color: var(--muted);
 }
-.list a {
-  color: inherit;
-  text-decoration: none;
-}
-.list a:hover {
-  text-decoration: underline;
-}
 
 @media (max-width: 599px) {
   main.about {
     padding-bottom: 40px;
+  }
+  .note {
+    padding-top: 28px;
   }
   .intro {
     grid-template-columns: minmax(0, 1fr) 96px;
