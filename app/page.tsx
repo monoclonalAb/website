@@ -13,16 +13,27 @@ const person = {
   name: "Eric Zheng",
   url: "https://ericzheng.nz",
   image: "https://ericzheng.nz/images/eric_photo_2.jpg",
-  jobTitle: "Undergraduate student",
-  affiliation: {
+  jobTitle: "Software Engineer",
+  worksFor: {
+    "@type": "Organization",
+    name: "Everyday AI",
+    url: "https://witheveryday.ai/",
+  },
+  alumniOf: {
     "@type": "CollegeOrUniversity",
     name: "University of Auckland",
+  },
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Auckland",
+    addressCountry: "NZ",
   },
   knowsAbout: ["Mathematics", "Computer Science"],
   sameAs: [
     "https://github.com/monoclonalAb",
     "https://www.linkedin.com/in/eric-zheng-nz/",
-    "https://www.kaggle.com/monoclonal",
+    "https://www.strava.com/athletes/130332761",
+    "https://www.instagram.com/erizheng/",
   ],
 };
 

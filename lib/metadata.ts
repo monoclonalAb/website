@@ -20,8 +20,8 @@ export const openGraph = {
 
 export const feeds = {
   "application/rss+xml": [
-    { url: "/writing.xml", title: "Eric Zheng — writing" },
-    { url: "/changelog.xml", title: "Eric Zheng — changelog" },
+    { url: "/writing.xml", title: "writing by eric zheng" },
+    { url: "/changelog.xml", title: "changelog by eric zheng" },
   ],
 };
 

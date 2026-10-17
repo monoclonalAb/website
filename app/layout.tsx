@@ -25,8 +25,7 @@ const firaCode = localFont({
 });
 
 const description =
-  "Personal site of Eric Zheng, an undergraduate studying Mathematics and " +
-  "Computer Science in Auckland, New Zealand.";
+  "personal site of eric zheng, based in auckland, new zealand";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ericzheng.nz"),

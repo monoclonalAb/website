@@ -7,7 +7,7 @@ import styles from "./blog.module.css";
 export const metadata = pageMetadata(
   "Blog",
   "/blog",
-  "A place for Eric Zheng's thoughts on interesting topics.",
+  "a place for eric zheng's thoughts on interesting topics",
 );
 
 export default async function BlogPage() {

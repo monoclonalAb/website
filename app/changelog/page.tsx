@@ -7,7 +7,7 @@ import styles from "./changelog.module.css";
 export const metadata = pageMetadata(
   "Changelog",
   "/changelog",
-  "Updates to Eric Zheng's personal website. Subscribe to the changelog with RSS.",
+  "updates to eric zheng's personal website, which you can subscribe to with rss",
 );
 
 function Summary({ summary, link }: ChangelogEntry) {

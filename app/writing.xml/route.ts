@@ -9,8 +9,8 @@ export async function GET() {
     ...(await getPosts("leetcode")),
   ].sort((a, b) => b.date.localeCompare(a.date));
   return rss({
-    title: "Eric Zheng — writing",
-    description: "Blog posts and Leetcode notes by Eric Zheng.",
+    title: "writing by eric zheng",
+    description: "writing by eric zheng",
     link: "/blog",
     self: "/writing.xml",
     items: posts.map((post) => ({ ...post, description: describe(post) })),

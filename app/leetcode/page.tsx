@@ -7,7 +7,7 @@ import { formatDate, getPosts } from "@/lib/posts";
 export const metadata = pageMetadata(
   "Leetcode",
   "/leetcode",
-  "Eric Zheng's solutions to the daily Leetcode question, grouped and posted as he works through them.",
+  "an archive of eric zheng's solutions to the daily leetcode question",
 );
 
 export default async function LeetcodePage() {

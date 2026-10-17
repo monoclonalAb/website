@@ -5,8 +5,8 @@ export const dynamic = "force-static";
 
 export function GET() {
   return rss({
-    title: "Eric Zheng — changelog",
-    description: "Updates to Eric Zheng's personal website.",
+    title: "changelog by eric zheng",
+    description: "updates to eric zheng's personal website",
     link: "/changelog",
     self: "/changelog.xml",
     items: changelog.map((entry) => ({

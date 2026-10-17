@@ -15,10 +15,7 @@ export default function ContentsPage() {
       <h1>
         contents<span>:</span>
       </h1>
-      <p>
-        ideally, i wanted the website to be an ever-expanding maze, so having a
-        contents page would be helpful to navigate the site
-      </p>
+      <p>my attempt at making my website somewhat navigable.</p>
 
       <section className={styles.group}>
         <h2 id="internal-links">
@@ -90,7 +87,7 @@ export default function ContentsPage() {
           <h2 id="external-links">
             external links<span>:</span>
           </h2>
-          <p>where else you can find me housed on the internet</p>
+          <p>where you can find me housed on the internet</p>
         </div>
 
         <section className={styles.group}>

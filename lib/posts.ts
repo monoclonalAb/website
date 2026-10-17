@@ -102,5 +102,4 @@ export const formatDate = (value: string) =>
   });
 
 export const describe = (post: PostSummary) =>
-  post.summary ??
-  `${post.title} — ${post.collection === "blog" ? "writing" : "Leetcode notes"} by Eric Zheng.`;
+  post.summary ?? `${post.title} — writing by eric zheng`;
