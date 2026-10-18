@@ -25,6 +25,7 @@ export function articleMetadata(post: Post): Metadata {
 export default function Article({ post }: { post: Post }) {
   const outline = post.headings.filter((heading) => heading.depth === 2);
   const { collection } = post;
+  const problem = post.collection === "leetcode" ? post : undefined;
   return (
     <ReadingPage current={collection}>
       <p className={styles.meta}>
@@ -34,11 +35,13 @@ export default function Article({ post }: { post: Post }) {
         <h1>{post.title}</h1>
         <p className={styles.meta}>
           <time dateTime={post.date}>{formatDate(post.date)}</time>
-          {post.difficulty && ` · ${post.difficulty}`}
+          {problem && ` · ${problem.difficulty}`}
         </p>
-        {post.problemUrl && (
+        {problem && (
           <p>
-            <a href={post.problemUrl}>LeetCode problem {post.problemId}</a>
+            <a href={problem.problemUrl}>
+              LeetCode problem {problem.problemId}
+            </a>
           </p>
         )}
       </header>

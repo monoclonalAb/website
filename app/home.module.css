@@ -1,3 +1,9 @@
+/* The dark half runs into the scrollbar gutter that globals.css reserves, so
+   it still reaches the window edge. Only Home has <main> directly in <body>. */
+body:has(> main) {
+  background-color: #30312e;
+}
+
 .hero {
   --letter-size: clamp(1.625rem, 8.205vw, 2rem);
   --letter-line: calc(var(--letter-size) * 1.1);

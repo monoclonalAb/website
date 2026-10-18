@@ -58,26 +58,19 @@ export default function ContentsPage() {
             <dt>
               <Link href="/changelog">changelog</Link>
             </dt>
-            <dd>
-              for long time fans (
-              <em>
-                like{" "}
-                <a
-                  href="https://koutaroyumiba.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  koutaro
-                </a>
-              </em>
-              ) who want to know what&apos;s changed
-            </dd>
+            <dd>what&apos;s changed</dd>
           </div>
           <div>
             <dt>
               <Link href="/leetcode">leetcode</Link>
             </dt>
             <dd>an archive of my daily questions</dd>
+          </div>
+          <div>
+            <dt>
+              <Link href="/friends">friends</Link>
+            </dt>
+            <dd>my friends&apos; corners of the internet</dd>
           </div>
         </dl>
       </section>
@@ -114,6 +107,14 @@ export default function ContentsPage() {
                 <a href="https://www.strava.com/athletes/130332761">strava</a>
               </dt>
               <dd>follow for only the best conversational runs</dd>
+            </div>
+            <div>
+              <dt>
+                <a href="https://open.spotify.com/user/2kxtbesq6jyddc615ge4lpuqq">
+                  spotify
+                </a>
+              </dt>
+              <dd>for all my half-marathon playlists</dd>
             </div>
             <div>
               <dt>

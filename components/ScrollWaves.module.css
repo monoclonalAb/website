@@ -59,6 +59,13 @@
   height: 100%;
 }
 
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  /* The still is stretched to the gutter; don't flash it before the canvas starts. */
+  .field:not([data-animate])::before {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .field[data-animate="true"]::before {
     display: none;

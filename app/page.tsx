@@ -12,7 +12,7 @@ const person = {
   "@type": "Person",
   name: "Eric Zheng",
   url: "https://ericzheng.nz",
-  image: "https://ericzheng.nz/images/eric_photo_2.jpg",
+  image: "https://ericzheng.nz/photos/parable-house.jpg",
   jobTitle: "Software Engineer",
   worksFor: {
     "@type": "Organization",
