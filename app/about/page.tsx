@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import ReadingPage from "@/components/ReadingPage";
 import { pageMetadata } from "@/lib/metadata";
-import photo from "@/public/images/eric_photo_2.jpg";
+import { getPhotos } from "@/lib/photos";
+import Photos from "./Photos";
 import styles from "./about.module.css";
 
 export const metadata = pageMetadata(
@@ -11,7 +11,8 @@ export const metadata = pageMetadata(
   "about eric zheng, a highly caffeinated working class citizen",
 );
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const photos = await getPhotos();
   return (
     <ReadingPage current="about" className={styles.about}>
       <div className={styles.intro}>
@@ -23,21 +24,7 @@ export default function AboutPage() {
           working class citizen, who is probably on a (conversational) long run
           or catching up on his latest book recommendation.
         </p>
-        <figure className={styles.portrait}>
-          <Image
-            src={photo}
-            alt="Eric at Parable House, August 2025"
-            sizes="(max-width: 599px) 96px, 160px"
-          />
-          <figcaption>
-            picture of me at
-            <br />
-            <a href="https://maps.app.goo.gl/HQVb5fpzGrYu7AyJ7">
-              Parable House
-            </a>
-            , August 2025
-          </figcaption>
-        </figure>
+        <Photos photos={photos} />
         <div className={styles.peers}>
           <p>like many of his peers, he:</p>
           <ul className={styles.list}>
@@ -95,9 +82,9 @@ export default function AboutPage() {
           by <a href="https://www.ericzheng.org/">eric zheng</a>&#32;(a
           different one). as a person that enjoys the art of story-telling,
           i&apos;ve definitely romanticised having some sort of public, personal
-          blog or substack and his website served as the perfect trigger to get
-          started. as a <em>second-generation</em> eric zheng with a website, i
-          hope this website serves as a good exemplar to spur on the{" "}
+          substack and his website served as the perfect trigger to get started.
+          as a <em>second-generation</em> eric zheng with a website, i hope this
+          website serves as a good exemplar to spur on the{" "}
           <em>third generation</em>&#32;of eric zheng&apos;s to get started on
           their own.
         </p>

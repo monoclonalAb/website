@@ -15,6 +15,7 @@ const redirects = [
     "/blog/sightseeing-the-sea-of-cpp-1",
   ],
   ["/leetcode/:date(\\d{4}-\\d{2}-\\d{2}).html", "/leetcode/:date"],
+  ["/images/eric_photo_2.jpg", "/photos/parable-house.jpg"],
 ];
 
 const nextConfig: NextConfig = {

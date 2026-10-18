@@ -5,9 +5,15 @@ import { getPosts } from "@/lib/posts";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = [...(await getPosts("blog")), ...(await getPosts("leetcode"))];
   return [
-    ...["", "/about", "/blog", "/contents", "/changelog", "/leetcode"].map(
-      (page) => ({ url: SITE_URL + page }),
-    ),
+    ...[
+      "",
+      "/about",
+      "/blog",
+      "/contents",
+      "/changelog",
+      "/leetcode",
+      "/friends",
+    ].map((page) => ({ url: SITE_URL + page })),
     ...posts.map((post) => ({
       url: SITE_URL + post.url,
       lastModified: post.date,

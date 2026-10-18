@@ -16,22 +16,6 @@ main.about {
 .biography {
   grid-area: biography;
 }
-.portrait {
-  grid-area: portrait;
-  margin-top: 7px;
-}
-.portrait img {
-  width: 100%;
-  aspect-ratio: 160 / 213;
-  object-fit: cover;
-}
-.portrait figcaption {
-  margin-top: 8px;
-  color: var(--muted);
-  font-family: var(--font-sans);
-  font-size: 12px;
-  line-height: 20px;
-}
 .peers {
   grid-area: peers;
 }
@@ -49,8 +33,8 @@ main.about {
   border-top: 1px solid var(--rule);
 }
 .note h2 {
-  font-size: 24px;
-  line-height: 32px;
+  font-size: 20px;
+  line-height: 26px;
 }
 /* The yearbook quote. The rule is --link at 45%. */
 .quote {
@@ -80,13 +64,6 @@ main.about {
     grid-template-areas: "heading heading" "biography portrait" "peers peers";
     column-gap: 28px;
     row-gap: 20px;
-  }
-  .portrait {
-    margin-top: 0;
-  }
-  .portrait figcaption {
-    font-size: 11px;
-    line-height: 18px;
   }
   .peers {
     margin-top: 16px;

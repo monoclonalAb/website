@@ -57,13 +57,19 @@ table {
   border-collapse: collapse;
 }
 
+/* Keep the gutter reserved so the centred column never shifts between a page
+   that scrolls and one that doesn't. */
+html {
+  scrollbar-gutter: stable;
+}
+
 /* Base */
 body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 18px;
-  line-height: 29px;
+  font-size: 16px;
+  line-height: 25px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -83,16 +89,16 @@ h6 {
   font-weight: 500;
 }
 h1 {
-  font-size: 42px;
-  line-height: 50px;
+  font-size: 36px;
+  line-height: 42px;
 }
 h2 {
-  font-size: 28px;
-  line-height: 36px;
+  font-size: 24px;
+  line-height: 30px;
 }
 h3 {
-  font-size: 24px;
-  line-height: 32px;
+  font-size: 20px;
+  line-height: 26px;
 }
 /* The red colon after each heading: <h1>blog<span>:</span></h1> */
 :is(h1, h2, h3) > span {
@@ -130,7 +136,7 @@ pre {
 
 @media (max-width: 599px) {
   h1 {
-    font-size: 36px;
-    line-height: 44px;
+    font-size: 30px;
+    line-height: 36px;
   }
 }

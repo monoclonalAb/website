@@ -1,6 +1,5 @@
 import ReadingPage from "@/components/ReadingPage";
-import entries from "@/components/entries.module.css";
-import { changelog, changelogId, type ChangelogEntry } from "@/lib/changelog";
+import { changelogId, getChangelog } from "@/lib/changelog";
 import { pageMetadata } from "@/lib/metadata";
 import styles from "./changelog.module.css";
 
@@ -10,19 +9,8 @@ export const metadata = pageMetadata(
   "updates to eric zheng's personal website, which you can subscribe to with rss",
 );
 
-function Summary({ summary, link }: ChangelogEntry) {
-  if (!link) return <p>{summary}</p>;
-  const [before, after] = summary.split(link.text);
-  return (
-    <p>
-      {before}
-      <a href={link.href}>{link.text}</a>
-      {after}
-    </p>
-  );
-}
-
-export default function ChangelogPage() {
+export default async function ChangelogPage() {
+  const changelog = await getChangelog();
   return (
     <ReadingPage current="changelog">
       <div className={styles.title}>
@@ -34,7 +22,7 @@ export default function ChangelogPage() {
         </p>
       </div>
       <p>the update log!!</p>
-      <ol className={entries.list}>
+      <ol className={styles.list}>
         {changelog.map((entry) => (
           <li key={entry.version} id={changelogId(entry)}>
             <time dateTime={entry.date}>
@@ -45,10 +33,7 @@ export default function ChangelogPage() {
                 timeZone: "UTC",
               })}
             </time>
-            <div>
-              <h2>{entry.version}</h2>
-              <Summary {...entry} />
-            </div>
+            <div dangerouslySetInnerHTML={{ __html: entry.html }} />
           </li>
         ))}
       </ol>

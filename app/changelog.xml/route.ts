@@ -1,9 +1,10 @@
-import { changelog, changelogId } from "@/lib/changelog";
+import { changelogId, getChangelog } from "@/lib/changelog";
 import { rss } from "@/lib/rss";
 
 export const dynamic = "force-static";
 
-export function GET() {
+export async function GET() {
+  const changelog = await getChangelog();
   return rss({
     title: "changelog by eric zheng",
     description: "updates to eric zheng's personal website",
@@ -13,7 +14,7 @@ export function GET() {
       title: entry.version,
       url: `/changelog#${changelogId(entry)}`,
       date: entry.date,
-      description: entry.summary,
+      description: entry.text,
     })),
   });
 }

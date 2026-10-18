@@ -19,10 +19,10 @@ Eric Zheng's personal site. It is small on purpose: keep changes small, and pref
 ## Rules
 
 - **Eric's words.** Copy comes from Eric or the Paper boards. Don't paraphrase it, and don't invent taglines, descriptions, summaries or biography.
-- **Server Components by default.** The only client component is `components/ScrollWaves.tsx`; add `"use client"` only when unavoidable, at the smallest boundary.
-- **Native browsing.** Plain links, native scrolling, history and zoom. No scroll libraries, smooth scrolling, pagers, scrollspy, drawers or decorative animation. Four exceptions: the home page's CSS-only opening curtain and row hover, the masthead links' CSS-only hover underline, and the edge waves, which change characters in place, only read scroll position and stop for reduced motion.
+- **Server Components by default.** The only client components are `components/ScrollWaves.tsx`, the page-number field `components/PageJump.tsx` and the photo sheet's fade-out `app/about/FadeOut.tsx`; add `"use client"` only when unavoidable, at the smallest boundary.
+- **Native browsing.** Plain links, native scrolling, history and zoom. No scroll libraries, smooth scrolling, pagers, scrollspy or drawers.
 - **Markdown is data.** No MDX, raw HTML or runtime authoring services.
-- **Accessible.** Semantic HTML, one `h1` per page, visible focus, keyboard access, readable without JavaScript.
+- **Accessible.** Semantic HTML, one `h1` per page, visible focus, keyboard access, readable without JavaScript, and motion that stops for reduced motion.
 - **No new dependencies** without a concrete need.
 - Commit only when asked. Never push or deploy.
 

@@ -1,7 +1,7 @@
 .meta {
   color: var(--muted);
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 14px;
+  line-height: 22px;
 }
 .header {
   display: grid;
@@ -61,8 +61,8 @@
   overflow-x: auto;
   padding: 20px;
   border: 1px solid var(--rule);
-  font-size: 14px;
-  line-height: 24px;
+  font-size: 13px;
+  line-height: 21px;
   tab-size: 4;
 }
 .prose :not(pre) > code {
@@ -104,7 +104,8 @@
 .prose :global(.footnotes) {
   border-top: 1px solid var(--rule);
   padding-top: 24px;
-  font-size: 16px;
+  font-size: 14px;
+  line-height: 22px;
 }
 @media (max-width: 599px) {
   .prose pre {
