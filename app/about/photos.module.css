@@ -237,10 +237,13 @@
 .radio:checked ~ .focus figure {
   pointer-events: auto;
 }
+/* Sized from the photo's shape rather than the file, so the frame (and the
+   caption on it) is in place before the photo arrives. */
 .focus img {
-  width: auto;
-  max-width: min(100vw - 128px, 640px);
-  max-height: min(100svh - 176px, 600px);
+  width: min(640px, 100vw - 128px, min(100svh - 176px, 600px) * var(--ratio));
+  max-width: none;
+  aspect-ratio: var(--ratio);
+  background: #e4e1d9;
   box-shadow:
     0 2px 4px rgb(22 23 27 / 10%),
     0 32px 64px -20px rgb(22 23 27 / 45%);
@@ -303,8 +306,7 @@
     padding: 72px 24px;
   }
   .focus img {
-    max-width: calc(100vw - 48px);
-    max-height: calc(100svh - 200px);
+    width: min(100vw - 48px, (100svh - 200px) * var(--ratio));
   }
   .focus figcaption {
     right: -8px;
