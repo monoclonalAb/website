@@ -90,7 +90,7 @@ export default function Photos({ photos }: { photos: Photo[] }) {
                 style={
                   {
                     "--i": i,
-                    "--ratio": `${photo.width} / ${photo.height}`,
+                    "--ratio": photo.width / photo.height,
                     "--size": lie.size,
                     "--x": lie.x,
                     "--y": lie.y,

@@ -32,7 +32,7 @@ haul @ [sydney fish market](https://www.google.com/maps/search/?api=1&query=Sydn
 
 ## IMG_1274.jpg | Friends around a small round table at an outdoor café
 
-drinks after work @ [jimmy's rooftop](https://www.google.com/maps/search/?api=1&query=Jimmy%27s%20Rooftop%20Sydney), 01/26
+tea tuesdays @ [jimmy's rooftop](https://www.google.com/maps/search/?api=1&query=Jimmy%27s%20Rooftop%20Sydney), 01/26
 
 ## IMG_1318.jpg | A crowded table of friends at an izakaya hung with paper lanterns
 
@@ -44,7 +44,7 @@ bowo's safe space @ [homm](https://www.google.com/maps/search/?api=1&query=HOMM%
 
 ## IMG_1361.jpg | Friends around a table of pizzas and drinks on an outdoor terrace, seen from above
 
-@ [pizza bros](https://www.google.com/maps/search/?api=1&query=Pizza%20Bros%20Sydney), 01/26
+[pizza bros](https://www.google.com/maps/search/?api=1&query=Pizza%20Bros%20Sydney), 01/26
 
 ## IMG_1521.jpg | Eric taking a selfie with a group of friends on a city street at night
 
