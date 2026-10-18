@@ -1,3 +1,7 @@
+## 2.0.0 | 2026-10-19
+
+reformatted entire website and added [/friends](/friends) page
+
 ## 1.2.1 | 2025-07-06
 
 added a table of contents to every article, reformatting all blog and leetcode posts
