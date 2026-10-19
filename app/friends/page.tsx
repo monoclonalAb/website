@@ -60,7 +60,9 @@ export default function FriendsPage() {
         {friends.map(({ name, href, note }) => (
           <div key={href}>
             <dt>
-              <a href={href}>{name}</a>
+              <a href={href} target="_blank">
+                {name}
+              </a>
             </dt>
             <dd>{note}</dd>
           </div>

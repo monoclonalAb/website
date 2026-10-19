@@ -65,7 +65,7 @@ export default function ReadingPage({
       <footer className={styles.footer}>
         <div className={styles.profiles}>
           {profiles.map(({ label, href, viewBox, path }) => (
-            <a key={label} href={href} aria-label={label}>
+            <a key={label} href={href} aria-label={label} target="_blank">
               <svg
                 width="20"
                 height="20"

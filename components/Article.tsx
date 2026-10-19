@@ -39,7 +39,7 @@ export default function Article({ post }: { post: Post }) {
         </p>
         {problem && (
           <p>
-            <a href={problem.problemUrl}>
+            <a href={problem.problemUrl} target="_blank">
               LeetCode problem {problem.problemId}
             </a>
           </p>

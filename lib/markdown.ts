@@ -21,7 +21,8 @@ const text = (node: ElementContent): string =>
 
 /**
  * Markdown is data, not code: raw HTML is rejected, and relative image paths
- * are served from `assetBase` (see app/writing-assets).
+ * are served from `assetBase` (see app/writing-assets). Links to other sites
+ * open in a new tab.
  */
 export async function renderMarkdown(markdown: string, assetBase: string) {
   const headings: Heading[] = [];
@@ -60,6 +61,11 @@ export async function renderMarkdown(markdown: string, assetBase: string) {
         }
         if (node.tagName === "pre") code.push(node);
         if (node.tagName === "img") node.properties.loading = "lazy";
+        if (
+          node.tagName === "a" &&
+          /^https?:/.test(String(node.properties.href))
+        )
+          node.properties.target = "_blank";
         if (node.tagName === "table" && parent) {
           const wrapper: Element = {
             type: "element",
