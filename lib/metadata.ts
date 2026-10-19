@@ -13,7 +13,7 @@ export const openGraph = {
       url: "/opengraph-image.jpg",
       width: 1200,
       height: 630,
-      alt: "Eric Zheng, photographed through a doorway at Parable House",
+      alt: "The home page: the split alphabet, with ERIC and ZHENG in red and about, blog, contents and changelog in white on the dark half",
     },
   ],
 } satisfies Metadata["openGraph"];
