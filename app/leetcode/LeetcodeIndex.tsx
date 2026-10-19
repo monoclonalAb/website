@@ -22,7 +22,7 @@ export default async function LeetcodeIndex({ page }: { page: number }) {
       </p>
       <ul className={styles.list}>
         {result.posts.map((post) => (
-          <li key={post.slug}>
+          <li key={post.slug} data-difficulty={post.difficulty}>
             <time dateTime={post.date}>{formatDate(post.date)}</time>
             <div>
               <h2>
