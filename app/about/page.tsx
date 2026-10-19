@@ -34,7 +34,9 @@ export default async function AboutPage() {
             <li>dreams about becoming a fabled &apos;10x developer&apos;</li>
             <li>
               worries about getting replaced by the next{" "}
-              <a href="https://en.wikipedia.org/wiki/Devin_AI">devin</a>
+              <a href="https://en.wikipedia.org/wiki/Devin_AI" target="_blank">
+                devin
+              </a>
             </li>
             <li>is desperately trying to reducing his screen time</li>
           </ul>
@@ -51,7 +53,10 @@ export default async function AboutPage() {
           <li>maximises development card production in Catan</li>
           <li>
             (un)professionally uses light-mode (
-            <a href="https://catppuccin.com/">catppuccin latte</a>)
+            <a href="https://catppuccin.com/" target="_blank">
+              catppuccin latte
+            </a>
+            )
           </li>
           <li>
             hopes to maintain a semi-active semi-academic{" "}
@@ -79,22 +84,27 @@ export default async function AboutPage() {
         </h2>
         <p>
           to be completely transparent, the website itself was heavily inspired
-          by <a href="https://www.ericzheng.org/">eric zheng</a>&#32;(a
-          different one). as a person that enjoys the art of story-telling,
-          i&apos;ve definitely romanticised having some sort of public, personal
-          substack and his website served as the perfect trigger to get started.
-          as a <em>second-generation</em> eric zheng with a website, i hope this
-          website serves as a good exemplar to spur on the{" "}
-          <em>third generation</em>&#32;of eric zheng&apos;s to get started on
-          their own.
+          by{" "}
+          <a href="https://www.ericzheng.org/" target="_blank">
+            eric zheng
+          </a>
+          &#32;(a different one). as a person that enjoys the art of
+          story-telling, i&apos;ve definitely romanticised having some sort of
+          public, personal substack and his website served as the perfect
+          trigger to get started. as a <em>second-generation</em> eric zheng
+          with a website, i hope this website serves as a good exemplar to spur
+          on the <em>third generation</em>&#32;of eric zheng&apos;s to get
+          started on their own.
         </p>
 
         <p>
           on that note, i do have to give a special shout-out to{" "}
-          <a href="https://koutaroyumiba.com/">koutaro yumiba</a>, whose
-          persistence in reminding me to update my website is matched only by
-          his commitment to not posting on the{" "}
-          <a href="https://www.instagram.com/ericzhengfanpage/">
+          <a href="https://koutaroyumiba.com/" target="_blank">
+            koutaro yumiba
+          </a>
+          , whose persistence in reminding me to update my website is matched
+          only by his commitment to not posting on the{" "}
+          <a href="https://www.instagram.com/ericzhengfanpage/" target="_blank">
             eric zheng fan page
           </a>
           . i&apos;ve had a revamped website in the works for a good year or so,

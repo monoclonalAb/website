@@ -90,13 +90,18 @@ export default function ContentsPage() {
           <dl className={styles.directory}>
             <div>
               <dt>
-                <a href="https://github.com/monoclonalAb">github</a>
+                <a href="https://github.com/monoclonalAb" target="_blank">
+                  github
+                </a>
               </dt>
               <dd>code</dd>
             </div>
             <div>
               <dt>
-                <a href="https://www.linkedin.com/in/eric-zheng-nz/">
+                <a
+                  href="https://www.linkedin.com/in/eric-zheng-nz/"
+                  target="_blank"
+                >
                   linkedin
                 </a>
               </dt>
@@ -104,13 +109,21 @@ export default function ContentsPage() {
             </div>
             <div>
               <dt>
-                <a href="https://www.strava.com/athletes/130332761">strava</a>
+                <a
+                  href="https://www.strava.com/athletes/130332761"
+                  target="_blank"
+                >
+                  strava
+                </a>
               </dt>
               <dd>follow for only the best conversational runs</dd>
             </div>
             <div>
               <dt>
-                <a href="https://open.spotify.com/user/2kxtbesq6jyddc615ge4lpuqq">
+                <a
+                  href="https://open.spotify.com/user/2kxtbesq6jyddc615ge4lpuqq"
+                  target="_blank"
+                >
                   spotify
                 </a>
               </dt>
@@ -118,7 +131,9 @@ export default function ContentsPage() {
             </div>
             <div>
               <dt>
-                <a href="https://www.instagram.com/erizheng/">instagram</a>
+                <a href="https://www.instagram.com/erizheng/" target="_blank">
+                  instagram
+                </a>
               </dt>
               <dd>obligatory instagram mention</dd>
             </div>
