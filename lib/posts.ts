@@ -114,8 +114,11 @@ export const getPosts = cache(
   },
 );
 
+/** Every index with pages: the post sections and the changelog. */
+export type Paginated = Collection | "changelog";
+
 /** Page 1 of an index is the collection root; later pages sit under /page/N. */
-export const pageHref = (collection: Collection, page: number) =>
+export const pageHref = (collection: Paginated, page: number) =>
   page === 1 ? `/${collection}` : `/${collection}/page/${page}`;
 
 /**
@@ -123,7 +126,7 @@ export const pageHref = (collection: Collection, page: number) =>
  * app/<collection>/page/route.ts. Anything below 2 or not a number opens page
  * 1; a page past the end 404s like any unknown URL, so no content is read here.
  */
-export function jumpHref(collection: Collection, request: Request) {
+export function jumpHref(collection: Paginated, request: Request) {
   const query = new URL(request.url).searchParams.get("page") ?? "";
   const page = Number.parseInt(query, 10);
   return pageHref(collection, page > 1 ? page : 1);

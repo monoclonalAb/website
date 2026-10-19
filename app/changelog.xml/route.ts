@@ -1,4 +1,4 @@
-import { changelogId, getChangelog } from "@/lib/changelog";
+import { getChangelog } from "@/lib/changelog";
 import { rss } from "@/lib/rss";
 
 export const dynamic = "force-static";
@@ -12,7 +12,10 @@ export async function GET() {
     self: "/changelog.xml",
     items: changelog.map((entry) => ({
       title: entry.version,
-      url: `/changelog#${changelogId(entry)}`,
+      url: entry.url,
+      // Where every entry used to be: newer entries push it to later pages,
+      // and a new guid would show it again as unread.
+      guid: `/changelog#${entry.id}`,
       date: entry.date,
       description: entry.text,
     })),

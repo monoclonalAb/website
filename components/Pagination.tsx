@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { pageHref, type Collection } from "@/lib/posts";
+import { pageHref, type Paginated } from "@/lib/posts";
 import PageJump from "./PageJump";
 import styles from "./Pagination.module.css";
 
@@ -13,7 +13,7 @@ export default function Pagination({
   page,
   totalPages,
 }: {
-  collection: Collection;
+  collection: Paginated;
   page: number;
   totalPages: number;
 }) {
