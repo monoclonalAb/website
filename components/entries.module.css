@@ -38,11 +38,39 @@
   line-height: 24px;
 }
 
+/* Leetcode: a 2px rule in the difficulty's colour down each entry's title and
+   difficulty. It takes 12px of the 24px gap, so titles line up with Blog's. */
+.list > [data-difficulty="Easy"] {
+  --difficulty: #1cb8b8;
+}
+.list > [data-difficulty="Medium"] {
+  --difficulty: #ffb800;
+}
+.list > [data-difficulty="Hard"] {
+  --difficulty: var(--accent);
+}
+.list > [data-difficulty] {
+  column-gap: 12px;
+}
+.list > [data-difficulty] > div {
+  border-left: 2px solid var(--difficulty);
+  padding-left: 10px;
+}
+
 @media (max-width: 599px) {
   .list > li {
     grid-template-columns: minmax(0, 1fr);
   }
   .list time {
     text-align: left;
+  }
+  /* The date stacks above the title, so the rule runs down the whole entry. */
+  .list > [data-difficulty] {
+    border-left: 2px solid var(--difficulty);
+    padding-left: 12px;
+  }
+  .list > [data-difficulty] > div {
+    border-left: 0;
+    padding-left: 0;
   }
 }
