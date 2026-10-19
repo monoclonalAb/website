@@ -1,6 +1,13 @@
 import { SITE_URL } from "./metadata";
 
-type Item = { title: string; url: string; date: string; description: string };
+type Item = {
+  title: string;
+  url: string;
+  /** What feed readers know the item by, if not its url, which can change. */
+  guid?: string;
+  date: string;
+  description: string;
+};
 
 const escape = (value: string) =>
   value.replace(
@@ -30,7 +37,7 @@ export function rss({ title, description, link, self, items }: Feed) {
       (item) => `    <item>
       <title>${escape(item.title)}</title>
       <link>${escape(SITE_URL + item.url)}</link>
-      <guid isPermaLink="true">${escape(SITE_URL + item.url)}</guid>
+      <guid isPermaLink="${!item.guid}">${escape(SITE_URL + (item.guid ?? item.url))}</guid>
       <pubDate>${new Date(item.date).toUTCString()}</pubDate>
       <description>${escape(item.description)}</description>
     </item>`,

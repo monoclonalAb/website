@@ -19,7 +19,7 @@ Eric Zheng's personal site. It is small on purpose: keep changes small, and pref
 ## Rules
 
 - **Eric's words.** Copy comes from Eric or the Paper boards. Don't paraphrase it, and don't invent taglines, descriptions, summaries or biography.
-- **Server Components by default.** The only client components are `components/ScrollWaves.tsx`, the page-number field `components/PageJump.tsx` and the photo sheet's fade-out `app/about/FadeOut.tsx`; add `"use client"` only when unavoidable, at the smallest boundary.
+- **Server Components by default.** The only client components are `components/ScrollWaves.tsx`, the page-number field `components/PageJump.tsx`, the photo sheet's fade-out `app/about/FadeOut.tsx` and `app/changelog/MovedEntry.tsx`, which sends an old link to a changelog entry on to the page it has moved to; add `"use client"` only when unavoidable, at the smallest boundary.
 - **Native browsing.** Plain links, native scrolling, history and zoom. No scroll libraries, smooth scrolling, pagers, scrollspy or drawers.
 - **Markdown is data.** No MDX, raw HTML or runtime authoring services.
 - **Accessible.** Semantic HTML, one `h1` per page, visible focus, keyboard access, readable without JavaScript, and motion that stops for reduced motion.
