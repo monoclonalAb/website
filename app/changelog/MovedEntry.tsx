@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 /**
  * Newer entries push older ones on to later pages, so a saved link like
- * /changelog#changelog-1-0-0 can open a page that no longer has that entry.
+ * /changelog#changelog-2025-01-09 can open a page that no longer has that entry.
  * The browser never sends the #… part to the server, so only the page can
  * follow it: this sends the link on to the page the entry is on now.
  * Without JavaScript the link stays on this page.

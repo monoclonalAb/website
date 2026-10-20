@@ -5,14 +5,12 @@ import { renderMarkdown } from "./markdown";
 import { pageHref } from "./posts";
 
 const file = path.join(process.cwd(), "content", "changelog.md");
-const heading = /^(\d+\.\d+\.\d+) *\| *(\d{4}-\d{2}-\d{2})$/;
+const heading = /^\d{4}-\d{2}-\d{2}$/;
 /** Entries per page of /changelog. */
 const pageSize = 8;
 
 export type ChangelogEntry = {
-  /** The feed title; not shown. */
-  version: string;
-  /** The permanent anchor, changelog-<version>. */
+  /** The permanent anchor, changelog-<date>. */
   id: string;
   /** The anchor on the page the entry is on now; newer entries push it on. */
   url: string;
@@ -23,35 +21,32 @@ export type ChangelogEntry = {
 };
 
 /**
- * content/changelog.md, newest first: each entry is a `## 1.0.0 | 2025-01-09`
- * heading over a little Markdown. Shared by /changelog and /changelog.xml.
+ * content/changelog.md, newest first: each entry is a `## 2025-01-09` heading
+ * over a little Markdown, one a day. Shared by /changelog and /changelog.xml.
  */
 export const getChangelog = cache(async () => {
   const [preamble, ...blocks] = (await readFile(file, "utf8")).split(/^## /m);
-  if (preamble.trim())
-    fail('start with an entry, like "## 1.0.0 | 2025-01-09"');
+  if (preamble.trim()) fail('start with an entry, like "## 2025-01-09"');
 
   const entries: ChangelogEntry[] = [];
   for (const block of blocks) {
     const [title, ...lines] = block.split("\n");
-    const match = heading.exec(title.trim());
-    if (!match)
-      fail(`"## ${title.trim()}" should look like "## 1.0.0 | 2025-01-09"`);
-    const [, version, date] = match;
+    const date = title.trim();
+    if (!heading.test(date))
+      fail(`"## ${date}" should look like "## 2025-01-09"`);
     const body = lines.join("\n").trim();
     const previous = entries.at(-1);
-    if (!body) fail(`${version} has no text`);
-    if (entries.some((entry) => entry.version === version))
-      fail(`${version} appears twice`);
+    if (!body) fail(`${date} has no text`);
+    if (previous?.date === date)
+      fail(`${date} appears twice; join its entries into one`);
     if (previous && date > previous.date)
-      fail(`${version} is newer than ${previous.version}; put it above`);
+      fail(`${date} is newer than ${previous.date}; put it above`);
     const { html } = await renderMarkdown(body, "/writing-assets").catch(
-      (error) => fail(`${version}: ${error.message}`),
+      (error) => fail(`${date}: ${error.message}`),
     );
-    const id = `changelog-${version.replaceAll(".", "-")}`;
+    const id = `changelog-${date}`;
     const page = Math.floor(entries.length / pageSize) + 1;
     entries.push({
-      version,
       id,
       url: `${pageHref("changelog", page)}#${id}`,
       date,
