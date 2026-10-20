@@ -28,7 +28,7 @@ export default async function ChangelogIndex({ page }: { page: number }) {
       <p>the update log!!</p>
       <ol className={styles.list}>
         {result.entries.map((entry) => (
-          <li key={entry.version} id={entry.id}>
+          <li key={entry.id} id={entry.id}>
             <time dateTime={entry.date}>
               {new Date(entry.date).toLocaleDateString("en-NZ", {
                 day: "2-digit",

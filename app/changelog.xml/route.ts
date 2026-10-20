@@ -11,7 +11,7 @@ export async function GET() {
     link: "/changelog",
     self: "/changelog.xml",
     items: changelog.map((entry) => ({
-      title: entry.version,
+      title: entry.date,
       url: entry.url,
       // Where every entry used to be: newer entries push it to later pages,
       // and a new guid would show it again as unread.
