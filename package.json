@@ -8,10 +8,11 @@
     "start": "next start",
     "daily": "node scripts/daily.mjs",
     "photos": "node scripts/photos.mjs",
+    "docs:check": "node scripts/check-docs.mjs",
     "format": "prettier --write .",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "validate": "prettier --check . && pnpm lint && pnpm typecheck && pnpm build"
+    "validate": "prettier --check . && pnpm lint && pnpm docs:check && pnpm typecheck && pnpm build"
   },
   "dependencies": {
     "katex": "^0.16.47",

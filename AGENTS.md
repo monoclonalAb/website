@@ -8,7 +8,19 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Agent guide
 
-Eric Zheng's personal site. It is small on purpose: keep changes small, and prefer deleting code to adding it. The [README](README.md) has the file map, commands and the Markdown format.
+Eric Zheng's personal site. It is small on purpose: keep changes small, and prefer deleting code to adding it.
+
+This file is a map. The repository is the record: anything not written down in it is invisible to the next agent. Read only what your task needs.
+
+## Map
+
+- [ARCHITECTURE.md](ARCHITECTURE.md): how a page gets built, where the code for each page lives, and the invariants.
+- [docs/design.md](docs/design.md): the design system, and where each design lives in Paper.
+- [docs/writing.md](docs/writing.md): how posts, Leetcode entries, changelog entries, photos and friends are published.
+- [docs/plans.md](docs/plans.md): when to write an execution plan, and its format. Plans live in `docs/exec-plans/`.
+- [docs/exec-plans/tech-debt-tracker.md](docs/exec-plans/tech-debt-tracker.md): known problems nobody is fixing yet.
+- `node_modules/next/dist/docs/`: the guide to this version of Next.js.
+- `.agents/skills/doc-gardening/`: finds docs that no longer match the code, and fixes them.
 
 ## Before you start
 
@@ -28,4 +40,6 @@ Eric Zheng's personal site. It is small on purpose: keep changes small, and pref
 
 ## Done means
 
-`pnpm validate` passes. For visual changes, also look at the affected pages at 1440px and 390px wide and compare them with Paper.
+`pnpm validate` passes; it includes `pnpm docs:check`, which checks the docs against the code. For visual changes, also look at the affected pages at 1440px and 390px wide and compare them with Paper.
+
+If your change makes a doc wrong, fix the doc in the same change. When Eric corrects something an agent did, write the rule where the next agent will look, and if a script could check it, add the check to `scripts/check-docs.mjs`.
