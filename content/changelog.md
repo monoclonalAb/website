@@ -1,3 +1,7 @@
+## 2026-10-23
+
+added a [/books](/books) page, made index pages fit as many entries as your screen can hold, and rebuilt the site in plain html, css and js with a bash script instead of Next.js
+
 ## 2026-10-19
 
 reformatted entire website and added [/friends](/friends) page
