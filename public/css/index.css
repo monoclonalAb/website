@@ -120,6 +120,13 @@
   }
 }
 
+/* While js/page-fit.js fits a list to the screen, the list and its
+   pagination row stay invisible, so the page never shows the build's few
+   entries first, then jumps. Without JavaScript, nothing is hidden. */
+.fitting main > :is(.entries, .changelog, .books, .pagination) {
+  visibility: hidden;
+}
+
 /* The row after an index's last entry: previous, a page-number box, next. */
 .pagination {
   display: flex;

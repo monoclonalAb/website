@@ -8,7 +8,7 @@ Eric Zheng's personal site: a split-alphabet home page plus About, Blog, Content
 2. `make` runs `build.sh`. It checks every file in `content/`, turns the Markdown into HTML with pandoc, and wraps it and the copy in `pages/` in the shared head, masthead and footer. Each page goes in its own folder in `out/` (`out/blog/page/2/index.html`), beside the feed, the sitemap and a copy of `public/`.
 3. A file that breaks a rule stops the build and names the file: a misspelt frontmatter key, raw HTML, a photo that still has camera data, or a book without a cover.
 4. Vercel runs the same build (`vercel.json`), with pandoc from `scripts/install-pandoc.sh`, and serves `out/`. `vercel.json` also redirects the old static site's links, and the page-number field's `?page=N` when JavaScript is off.
-5. In the browser, four small scripts in `public/js/` add the edge waves, the page-number field's in-place jump, the fade-out of the photo sheet and of a picked book, and the forwarding of old changelog links. Every page reads fine without them.
+5. In the browser, four small scripts in `public/js/` add the edge waves, index pages that hold as many entries as fit on the screen (which also opens an old changelog link on the right page), the page-number field's in-place jump, and the fade-out of the photo sheet and of a picked book. Every page reads fine without them.
 
 ## Code map
 

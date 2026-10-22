@@ -84,6 +84,10 @@ sub {
 table {
   border-collapse: collapse;
 }
+/* Hidden stays hidden, even on an element whose class sets display. */
+[hidden] {
+  display: none !important;
+}
 
 /* Keep the gutter reserved so the centred column never shifts between a page
    that scrolls and one that doesn't. */

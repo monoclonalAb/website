@@ -18,8 +18,10 @@ export LC_ALL=C # awk and sort work on bytes, the same on every machine
 cd "$(dirname "$0")"
 
 SITE_URL=https://ericzheng.nz
-PAGE_SIZE=8        # posts or changelog entries on each index page
-BOOKS_PAGE_SIZE=10 # books on each page of /books
+# The fewest entries on an index page. With JavaScript, public/js/page-fit.js
+# shows as many more as fit on the screen.
+PAGE_SIZE=5        # posts or changelog entries
+BOOKS_PAGE_SIZE=10 # books on /books
 SEP=$'\037' # separates the fields of a post's line in posts.tsv
 out=out
 work=$(mktemp -d)
@@ -65,6 +67,13 @@ page_path() { if (($2 == 1)); then printf '/%s' "$1"; else printf '/%s/page/%s' 
 # How many index pages N entries need, $2 (or PAGE_SIZE) to a page: at least
 # one, even when there are none.
 page_count() { local size=${2:-$PAGE_SIZE} n; n=$((($1 + size - 1) / size)); printf '%s' "$((n > 0 ? n : 1))"; }
+# A whole list's entries from stdin, each starting on a line that begins $3,
+# with all but page $1's ($2 a page) hidden, for public/js/page-fit.js.
+hide_others() {
+  awk -v first=$((($1 - 1) * $2 + 1)) -v last=$(($1 * $2)) -v start="$3" '
+    index($0, start) == 1 { n++; if (n < first || n > last) sub(/>$/, " hidden>") }
+    { print }'
+}
 
 # Prints a file with the line "<!-- name -->" replaced by the file $3.
 fill() {
@@ -199,7 +208,15 @@ page_start() {
   css=""
   for name in site $4; do css+="<link rel=\"stylesheet\" href=\"/css/$name.css\">"$'\n'; done
   js=""
-  for name in waves $5; do js+="<script src=\"/js/$name.js\" defer></script>"$'\n'; done
+  for name in waves $5; do
+    # page-fit.js isn't deferred: it has to run before the page is drawn, or
+    # a tall screen shows the page's few entries first, then jumps.
+    if [[ $name == page-fit ]]; then
+      js+="<script src=\"/js/$name.js\"></script>"$'\n'
+    else
+      js+="<script src=\"/js/$name.js\" defer></script>"$'\n'
+    fi
+  done
   cat <<EOF
 <!doctype html>
 <html lang="en-NZ">
@@ -444,9 +461,10 @@ articles() {
 
 # The row after an index's last entry: previous, the page number, next. The
 # page number is a field you can type a page into (public/js/page-jump.js).
-# Prints nothing when everything fits on one page.
+# Prints nothing when everything fits on one page. public/js/page-fit.js
+# rewrites the row when it fits more entries to the screen, in the same markup.
 pagination() {
-  local collection=$1 page=$2 pages=$3 previous next
+  local collection=$1 page=$2 pages=$3 size=${4:-$PAGE_SIZE} previous next
   ((pages > 1)) || return 0
   if ((page > 1)); then
     previous="<a href=\"$(page_path "$collection" $((page - 1)))\" rel=\"prev\"><span aria-hidden=\"true\">←&nbsp;</span>previous</a>"
@@ -462,7 +480,7 @@ pagination() {
   # field can't select its own text, so a filled-in 8 would become 812 when
   # you type 12.
   cat <<EOF
-<nav class="pagination" aria-label="Pagination">
+<nav class="pagination" aria-label="Pagination" data-page-size="$size">
   <span class="end">$previous</span>
   <form class="jump" action="/$collection/page">
     <label><span class="sr-only">Page $page of $pages</span><input type="number" name="page" min="1" max="$pages" required placeholder="$page" autocomplete="off" enterkeyhint="go" style="--digits: ${#pages}"></label><span aria-hidden="true">/ $pages</span>
@@ -473,14 +491,16 @@ EOF
 }
 
 # An index page: its copy from pages/<collection>.html, with the list (and
-# pagination) at <!-- list -->. The rest of the arguments add scripts.
+# pagination) at <!-- list -->. The rest of the arguments add scripts. The
+# list is the whole collection, with every entry not on this page hidden, so
+# public/js/page-fit.js can show as many as fit on the screen.
 index_page() {
   local collection=$1 page=$2 pages=$3 list=$4 js=${5:-}
   local source=pages/$collection.html path title dir
   path=$(page_path "$collection" "$page")
   title=$(field "$source" title)
   ((page > 1)) && title="$title, page $page"
-  ((pages > 1)) && js="$js page-jump"
+  ((pages > 1)) && js="$js page-fit page-jump"
   dir=$out${path}
   mkdir -p "$dir"
   {
@@ -491,7 +511,7 @@ index_page() {
   } >"$dir/index.html"
 }
 
-# /blog and /leetcode, 8 posts a page.
+# /blog and /leetcode, PAGE_SIZE posts a page.
 post_indexes() {
   local collection count pages page item
   for collection in blog leetcode; do
@@ -506,13 +526,14 @@ post_indexes() {
           return (substr(d, 9, 2) + 0) " " months[substr(d, 6, 2) + 0] " " substr(d, 1, 4)
         }
         BEGIN { print "<ul class=\"entries\">" }
-        $1 == c { n++ }
-        $1 == c && n >= first && n <= last {
+        $1 == c {
+          n++
+          hidden = (n < first || n > last) ? " hidden" : ""
           if ($8 != "") {
-            print "  <li data-difficulty=\"" $8 "\">"
+            print "  <li data-difficulty=\"" $8 "\"" hidden ">"
             title = $6 ". " esc($4); summary = $8
           } else {
-            print "  <li>"
+            print "  <li" hidden ">"
             title = esc($4); summary = esc($5)
           }
           print "    <time datetime=\"" $3 "\">" long_date($3) "</time>"
@@ -566,35 +587,29 @@ read_changelog() {
     n { print > (dir "/entry." n) }'
 }
 
-# /changelog, 8 entries a page, and /changelog.xml.
+# /changelog, PAGE_SIZE entries a page, and /changelog.xml.
 changelog() {
-  local count pages page list n date text entries=""
+  local count pages page list n date text
   count=$(wc -l <"$work/changelog.tsv")
   pages=$(page_count "$count")
-  # Where each entry is now, for public/js/moved-entry.js.
+  # Every entry, once; each page hides the ones that aren't on it.
   n=0
   while IFS=$SEP read -r date text; do
     n=$((n + 1))
-    entries+="${entries:+,}\"changelog-$date\":\"$(page_path changelog $(((n - 1) / PAGE_SIZE + 1)))#changelog-$date\""
-  done <"$work/changelog.tsv"
+    echo "  <li id=\"changelog-$date\">"
+    echo "    <time datetime=\"$date\">$(short_date "$date")</time>"
+    echo "    <div>"
+    cat "$work/entry.$n"
+    echo "    </div>"
+    echo "  </li>"
+  done <"$work/changelog.tsv" >"$work/changelog.entries"
   for ((page = 1; page <= pages; page++)); do
     list="$work/list.changelog.$page"
     {
       echo '<ol class="changelog">'
-      n=0
-      while IFS=$SEP read -r date text; do
-        n=$((n + 1))
-        ((n > (page - 1) * PAGE_SIZE && n <= page * PAGE_SIZE)) || continue
-        echo "  <li id=\"changelog-$date\">"
-        echo "    <time datetime=\"$date\">$(short_date "$date")</time>"
-        echo "    <div>"
-        cat "$work/entry.$n"
-        echo "    </div>"
-        echo "  </li>"
-      done <"$work/changelog.tsv"
+      hide_others "$page" "$PAGE_SIZE" '  <li id="changelog-' <"$work/changelog.entries"
       echo '</ol>'
       pagination changelog "$page" "$pages"
-      echo "<script type=\"application/json\" id=\"changelog-entries\">{$entries}</script>"
     } >"$list"
     index_page changelog "$page" "$pages" "$list"
   done
@@ -733,29 +748,28 @@ EOF
 EOF
 }
 
-# /books, 10 books a page: the list, the pagination row, and each book's dialog.
+# /books, BOOKS_PAGE_SIZE books a page: the list, the pagination row, and each
+# book's dialog. Every page has every book, with the lines not on it hidden.
 books() {
   local count pages page list n slug date title author width height small
   count=$(wc -l <"$work/books.tsv")
   pages=$(page_count "$count" "$BOOKS_PAGE_SIZE")
+  : >"$work/books.lines"
+  : >"$work/books.dialogs"
+  n=0
+  while IFS=$SEP read -r slug date title author width height small; do
+    n=$((n + 1))
+    book_line "$n" "$slug" "$date" "$title" "$author" "$width" "$height" "$small" >>"$work/books.lines"
+    book_dialog "$n" "$slug" "$date" "$title" "$author" "$width" "$height" >>"$work/books.dialogs"
+  done <"$work/books.tsv"
   for ((page = 1; page <= pages; page++)); do
     list="$work/list.books.$page"
     {
       echo '<ol class="books">'
-      n=0
-      while IFS=$SEP read -r slug date title author width height small; do
-        n=$((n + 1))
-        ((n > (page - 1) * BOOKS_PAGE_SIZE && n <= page * BOOKS_PAGE_SIZE)) || continue
-        book_line "$n" "$slug" "$date" "$title" "$author" "$width" "$height" "$small"
-      done <"$work/books.tsv"
+      hide_others "$page" "$BOOKS_PAGE_SIZE" '  <li>' <"$work/books.lines"
       echo '</ol>'
-      pagination books "$page" "$pages"
-      n=0
-      while IFS=$SEP read -r slug date title author width height small; do
-        n=$((n + 1))
-        ((n > (page - 1) * BOOKS_PAGE_SIZE && n <= page * BOOKS_PAGE_SIZE)) || continue
-        book_dialog "$n" "$slug" "$date" "$title" "$author" "$width" "$height"
-      done <"$work/books.tsv"
+      pagination books "$page" "$pages" "$BOOKS_PAGE_SIZE"
+      cat "$work/books.dialogs"
     } >"$list"
     index_page books "$page" "$pages" "$list"
   done
