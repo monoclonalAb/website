@@ -208,7 +208,15 @@ page_start() {
   css=""
   for name in site $4; do css+="<link rel=\"stylesheet\" href=\"/css/$name.css\">"$'\n'; done
   js=""
-  for name in waves $5; do js+="<script src=\"/js/$name.js\" defer></script>"$'\n'; done
+  for name in waves $5; do
+    # The page isn't drawn until page-fit.js has run, or a tall screen would
+    # show the page's few entries first, then jump to as many as fit.
+    if [[ $name == page-fit ]]; then
+      js+="<script src=\"/js/$name.js\" defer blocking=\"render\"></script>"$'\n'
+    else
+      js+="<script src=\"/js/$name.js\" defer></script>"$'\n'
+    fi
+  done
   cat <<EOF
 <!doctype html>
 <html lang="en-NZ">
