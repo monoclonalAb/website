@@ -1,0 +1,158 @@
+<!--
+layout: home
+css: home
+-->
+<main class="hero">
+  <!-- "Eric Zheng" is a shared name; sameAs ties this site to Eric's own profiles. -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Eric Zheng",
+      "url": "https://ericzheng.nz",
+      "image": "https://ericzheng.nz/photos/parable-house.jpg",
+      "jobTitle": "Software Engineer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Everyday AI",
+        "url": "https://witheveryday.ai/"
+      },
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "University of Auckland"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Auckland",
+        "addressCountry": "NZ"
+      },
+      "knowsAbout": ["Mathematics", "Computer Science"],
+      "sameAs": [
+        "https://github.com/monoclonalAb",
+        "https://www.linkedin.com/in/eric-zheng-nz/",
+        "https://www.strava.com/athletes/130332761",
+        "https://www.instagram.com/erizheng/"
+      ]
+    }
+  </script>
+  <div class="waves" data-side="right" data-opening aria-hidden="true"><canvas></canvas></div>
+  <div class="waves" data-side="left" data-opening aria-hidden="true"><canvas></canvas></div>
+  <h1 class="sr-only">Eric Zheng</h1>
+  <!--
+    The split alphabet. Upper-case letters sit right of centre on the light
+    half, lower-case letters left of centre on the dark half. On hover or
+    focus, a linked row spreads its letters while the link stays centred.
+    Keep each row's .lower on one line: a space between its pieces would show.
+  -->
+  <nav class="alphabet" aria-label="Introduction">
+    <div class="row" style="--half-gaps: -0.5; --prefix-letters: 0">
+      <div class="upper" aria-hidden="true"><span class="upper-text">ABCDEF</span></div>
+      <div class="lower"><span aria-hidden="true"></span></div>
+    </div>
+    <div class="row" style="--half-gaps: -0.5; --prefix-letters: 0">
+      <div class="upper" aria-hidden="true"><span class="upper-text">GHIJKL</span></div>
+      <div class="lower"><span aria-hidden="true"></span></div>
+    </div>
+    <div class="row" style="--half-gaps: 3; --prefix-letters: 0">
+      <div class="upper" aria-hidden="true"><span class="upper-text">M<span class="accent">ERIC</span>N</span></div>
+      <div class="lower"><span aria-hidden="true">abcdefg</span></div>
+    </div>
+    <div class="row" style="--half-gaps: 2; --prefix-letters: 1">
+      <div class="upper" aria-hidden="true"><span class="upper-text">O<span class="accent">ZHENG</span></span></div>
+      <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">h</span><span class="light-prefix"><span class="prefix-text">h</span></span><span class="dark-prefix"><span class="prefix-text">h</span></span></span><a class="link" href="/about"><span class="measure" aria-hidden="true">about</span><span class="word">about</span></a><span class="suffix" aria-hidden="true">ij</span></div>
+    </div>
+    <div class="row" style="--half-gaps: 1.5; --prefix-letters: 3">
+      <div class="upper" aria-hidden="true"><span class="upper-text">PQRSTU</span></div>
+      <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">klm</span><span class="light-prefix"><span class="prefix-text">klm</span></span><span class="dark-prefix"><span class="prefix-text">klm</span></span></span><a class="link" href="/blog"><span class="measure" aria-hidden="true">blog</span><span class="word">blog</span></a><span class="suffix" aria-hidden="true">n</span></div>
+    </div>
+    <div class="row" style="--half-gaps: 3.5; --prefix-letters: 1">
+      <div class="upper" aria-hidden="true"><span class="upper-text">VWXYZ</span></div>
+      <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">o</span><span class="light-prefix"><span class="prefix-text">o</span></span><span class="dark-prefix"><span class="prefix-text">o</span></span></span><a class="link" href="/contents"><span class="measure" aria-hidden="true">contents</span><span class="word">contents</span></a><span class="suffix" aria-hidden="true"></span></div>
+    </div>
+    <div class="row" style="--half-gaps: 4; --prefix-letters: 1">
+      <div class="upper" aria-hidden="true"><span class="upper-text"></span></div>
+      <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">p</span><span class="light-prefix"><span class="prefix-text">p</span></span><span class="dark-prefix"><span class="prefix-text">p</span></span></span><a class="link" href="/changelog"><span class="measure" aria-hidden="true">changelog</span><span class="word">changelog</span></a><span class="suffix" aria-hidden="true"></span></div>
+    </div>
+    <div class="row" style="--half-gaps: 4.5; --prefix-letters: 0">
+      <div class="upper" aria-hidden="true"><span class="upper-text"></span></div>
+      <div class="lower"><span aria-hidden="true">qrstuvwxyz</span></div>
+    </div>
+  </nav>
+  <!--
+    The opening, after the first ericzheng.nz: two painted copies of the
+    alphabet, with spans in place of links, are clipped away over the real one,
+    which works throughout. Change a row above, change it in both copies too.
+  -->
+  <div class="curtain" aria-hidden="true">
+    <div class="alphabet">
+      <div class="row" style="--half-gaps: -0.5; --prefix-letters: 0">
+        <div class="upper" aria-hidden="true"><span class="upper-text">ABCDEF</span></div>
+        <div class="lower"><span aria-hidden="true"></span></div>
+      </div>
+      <div class="row" style="--half-gaps: -0.5; --prefix-letters: 0">
+        <div class="upper" aria-hidden="true"><span class="upper-text">GHIJKL</span></div>
+        <div class="lower"><span aria-hidden="true"></span></div>
+      </div>
+      <div class="row" style="--half-gaps: 3; --prefix-letters: 0">
+        <div class="upper" aria-hidden="true"><span class="upper-text">M<span class="accent">ERIC</span>N</span></div>
+        <div class="lower"><span aria-hidden="true">abcdefg</span></div>
+      </div>
+      <div class="row" style="--half-gaps: 2; --prefix-letters: 1">
+        <div class="upper" aria-hidden="true"><span class="upper-text">O<span class="accent">ZHENG</span></span></div>
+        <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">h</span><span class="light-prefix"><span class="prefix-text">h</span></span><span class="dark-prefix"><span class="prefix-text">h</span></span></span><span class="link"><span class="measure" aria-hidden="true">about</span><span class="word">about</span></span><span class="suffix" aria-hidden="true">ij</span></div>
+      </div>
+      <div class="row" style="--half-gaps: 1.5; --prefix-letters: 3">
+        <div class="upper" aria-hidden="true"><span class="upper-text">PQRSTU</span></div>
+        <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">klm</span><span class="light-prefix"><span class="prefix-text">klm</span></span><span class="dark-prefix"><span class="prefix-text">klm</span></span></span><span class="link"><span class="measure" aria-hidden="true">blog</span><span class="word">blog</span></span><span class="suffix" aria-hidden="true">n</span></div>
+      </div>
+      <div class="row" style="--half-gaps: 3.5; --prefix-letters: 1">
+        <div class="upper" aria-hidden="true"><span class="upper-text">VWXYZ</span></div>
+        <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">o</span><span class="light-prefix"><span class="prefix-text">o</span></span><span class="dark-prefix"><span class="prefix-text">o</span></span></span><span class="link"><span class="measure" aria-hidden="true">contents</span><span class="word">contents</span></span><span class="suffix" aria-hidden="true"></span></div>
+      </div>
+      <div class="row" style="--half-gaps: 4; --prefix-letters: 1">
+        <div class="upper" aria-hidden="true"><span class="upper-text"></span></div>
+        <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">p</span><span class="light-prefix"><span class="prefix-text">p</span></span><span class="dark-prefix"><span class="prefix-text">p</span></span></span><span class="link"><span class="measure" aria-hidden="true">changelog</span><span class="word">changelog</span></span><span class="suffix" aria-hidden="true"></span></div>
+      </div>
+      <div class="row" style="--half-gaps: 4.5; --prefix-letters: 0">
+        <div class="upper" aria-hidden="true"><span class="upper-text"></span></div>
+        <div class="lower"><span aria-hidden="true">qrstuvwxyz</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="cover" aria-hidden="true">
+    <div class="alphabet">
+      <div class="row" style="--half-gaps: -0.5; --prefix-letters: 0">
+        <div class="upper" aria-hidden="true"><span class="upper-text">ABCDEF</span></div>
+        <div class="lower"><span aria-hidden="true"></span></div>
+      </div>
+      <div class="row" style="--half-gaps: -0.5; --prefix-letters: 0">
+        <div class="upper" aria-hidden="true"><span class="upper-text">GHIJKL</span></div>
+        <div class="lower"><span aria-hidden="true"></span></div>
+      </div>
+      <div class="row" style="--half-gaps: 3; --prefix-letters: 0">
+        <div class="upper" aria-hidden="true"><span class="upper-text">M<span class="accent">ERIC</span>N</span></div>
+        <div class="lower"><span aria-hidden="true">abcdefg</span></div>
+      </div>
+      <div class="row" style="--half-gaps: 2; --prefix-letters: 1">
+        <div class="upper" aria-hidden="true"><span class="upper-text">O<span class="accent">ZHENG</span></span></div>
+        <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">h</span><span class="light-prefix"><span class="prefix-text">h</span></span><span class="dark-prefix"><span class="prefix-text">h</span></span></span><span class="link"><span class="measure" aria-hidden="true">about</span><span class="word">about</span></span><span class="suffix" aria-hidden="true">ij</span></div>
+      </div>
+      <div class="row" style="--half-gaps: 1.5; --prefix-letters: 3">
+        <div class="upper" aria-hidden="true"><span class="upper-text">PQRSTU</span></div>
+        <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">klm</span><span class="light-prefix"><span class="prefix-text">klm</span></span><span class="dark-prefix"><span class="prefix-text">klm</span></span></span><span class="link"><span class="measure" aria-hidden="true">blog</span><span class="word">blog</span></span><span class="suffix" aria-hidden="true">n</span></div>
+      </div>
+      <div class="row" style="--half-gaps: 3.5; --prefix-letters: 1">
+        <div class="upper" aria-hidden="true"><span class="upper-text">VWXYZ</span></div>
+        <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">o</span><span class="light-prefix"><span class="prefix-text">o</span></span><span class="dark-prefix"><span class="prefix-text">o</span></span></span><span class="link"><span class="measure" aria-hidden="true">contents</span><span class="word">contents</span></span><span class="suffix" aria-hidden="true"></span></div>
+      </div>
+      <div class="row" style="--half-gaps: 4; --prefix-letters: 1">
+        <div class="upper" aria-hidden="true"><span class="upper-text"></span></div>
+        <div class="lower"><span class="prefix" aria-hidden="true"><span class="measure">p</span><span class="light-prefix"><span class="prefix-text">p</span></span><span class="dark-prefix"><span class="prefix-text">p</span></span></span><span class="link"><span class="measure" aria-hidden="true">changelog</span><span class="word">changelog</span></span><span class="suffix" aria-hidden="true"></span></div>
+      </div>
+      <div class="row" style="--half-gaps: 4.5; --prefix-letters: 0">
+        <div class="upper" aria-hidden="true"><span class="upper-text"></span></div>
+        <div class="lower"><span aria-hidden="true">qrstuvwxyz</span></div>
+      </div>
+    </div>
+  </div>
+</main>

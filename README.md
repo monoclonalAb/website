@@ -3,7 +3,7 @@
 my personal website.
 
 ```bash
-pnpm install
-pnpm dev        # http://localhost:3000
-pnpm validate   # prettier, eslint, the docs check, typecheck and a build (what CI runs)
+brew install pandoc shellcheck
+make serve      # http://localhost:4000
+make check      # shellcheck, the docs check and a build (what CI runs)
 ```

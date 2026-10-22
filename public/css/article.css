@@ -1,0 +1,149 @@
+/* A blog post or Leetcode entry: the header, "On this page" and the prose. */
+.meta {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 22px;
+}
+.article-header {
+  display: grid;
+  gap: 16px;
+}
+.article-header h1 {
+  overflow-wrap: anywhere;
+}
+.outline {
+  border-block: 1px solid var(--rule);
+  padding-block: 16px;
+}
+.outline summary {
+  cursor: pointer;
+}
+.outline ul {
+  padding: 12px 0 0 24px;
+  list-style: disc;
+}
+.prose {
+  min-width: 0;
+}
+.prose > * + * {
+  margin-top: 24px;
+}
+.prose :is(h2, h3, h4, h5, h6) {
+  margin-top: 40px;
+  margin-bottom: 16px;
+}
+.prose :is(h2, h3, h4, h5, h6):first-child {
+  margin-top: 0;
+}
+.prose :is(ul, ol) {
+  padding-left: 28px;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose li + li {
+  margin-top: 8px;
+}
+.prose li > p + p {
+  margin-top: 12px;
+}
+.prose blockquote {
+  border-left: 2px solid var(--accent);
+  padding-left: 20px;
+}
+.prose blockquote > * + * {
+  margin-top: 12px;
+}
+.prose pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 20px;
+  border: 1px solid var(--rule);
+  background: #fff;
+  color: #24292e;
+  font-size: 13px;
+  line-height: 21px;
+  tab-size: 4;
+}
+.prose :not(pre) > code {
+  font-size: 0.85em;
+  background: #e7e4dc;
+  padding: 2px 4px;
+  overflow-wrap: anywhere;
+}
+.prose pre code {
+  white-space: pre;
+}
+/* Maths is MathML, which the browser draws; this is KaTeX's old size. */
+.prose math {
+  font-size: 1.21em;
+}
+.prose .table-scroll,
+.prose math[display="block"] {
+  max-width: 100%;
+  overflow-x: auto;
+  padding-block: 8px;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.prose :is(th, td) {
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  text-align: left;
+}
+.prose th {
+  font-weight: bold;
+}
+.prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+.prose .footnotes {
+  border-top: 1px solid var(--rule);
+  padding-top: 24px;
+  font-size: 14px;
+  line-height: 22px;
+}
+/* pandoc puts a rule of its own at the top of the footnotes. */
+.prose .footnotes > hr {
+  display: none;
+}
+@media (max-width: 599px) {
+  .prose pre {
+    padding: 12px;
+  }
+}
+
+/* Code colours, after Shiki's github-light theme. pandoc's highlighter marks
+   each word with a two-letter class: kw for keyword, st for string, and so on. */
+.sourceCode :is(.kw, .cf, .dt, .pp, .im) {
+  color: #d73a49;
+}
+.sourceCode :is(.fu, .ex, .at) {
+  color: #6f42c1;
+}
+.sourceCode :is(.dv, .bn, .fl, .cn, .bu) {
+  color: #005cc5;
+}
+.sourceCode :is(.st, .ch, .vs, .ss, .sc) {
+  color: #032f62;
+}
+.sourceCode :is(.co, .do, .an, .cv, .in) {
+  color: #6a737d;
+}
+.sourceCode :is(.al, .er) {
+  color: #b31d28;
+}
+.sourceCode .wa {
+  color: #e36209;
+}

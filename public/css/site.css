@@ -1,0 +1,444 @@
+/* Every page: fonts, design tokens, the reset, the reading layout (masthead,
+   column and footer) and the edge waves. */
+
+@font-face {
+  font-family: "Helvetica";
+  src: url("/fonts/helvetica/Helvetica.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Helvetica";
+  src: url("/fonts/helvetica/Helvetica-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Eiko";
+  src: url("/fonts/eiko/PPEiko-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Fira Code";
+  src: url("/fonts/fira-code/FiraCode-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --paper: #f0eee8;
+  --ink: #16171b;
+  --muted: #666;
+  --rule: #c8c5bc;
+  --accent: #d91620;
+  --link: #7c4147;
+  --font-body: Georgia, "Times New Roman", serif;
+  --font-display: "PP Eiko", Georgia, serif;
+  --font-sans: "Helvetica", Arial, sans-serif;
+  --font-code: "Fira Code", ui-monospace, monospace;
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
+}
+
+/* Reset */
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid;
+}
+ol,
+ul {
+  list-style: none;
+}
+img,
+svg {
+  display: block;
+  vertical-align: middle;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+b,
+strong {
+  font-weight: bolder;
+}
+sub,
+sup {
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+table {
+  border-collapse: collapse;
+}
+
+/* Keep the gutter reserved so the centred column never shifts between a page
+   that scrolls and one that doesn't. */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Base */
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 25px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #ffd987;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: inherit;
+  font-weight: 500;
+}
+h1 {
+  font-size: 36px;
+  line-height: 42px;
+}
+h2 {
+  font-size: 24px;
+  line-height: 30px;
+}
+h3 {
+  font-size: 20px;
+  line-height: 26px;
+}
+/* The red colon after each heading: <h1>blog<span>:</span></h1> */
+:is(h1, h2, h3) > span {
+  color: var(--accent);
+}
+
+a {
+  color: var(--link);
+  text-decoration: underline 1px;
+  text-underline-offset: 2px;
+}
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+code,
+pre {
+  font-family: var(--font-code);
+  font-size: 1em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 599px) {
+  h1 {
+    font-size: 30px;
+    line-height: 36px;
+  }
+}
+
+/* The reading layout: every page except Home. */
+.page {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, calc(100% - 48px));
+  min-height: 100svh;
+  margin-inline: auto;
+  padding-block: 64px 40px;
+}
+
+.skip {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
+  padding: 8px 16px;
+  background: var(--paper);
+  clip-path: inset(50%);
+}
+.skip:focus {
+  clip-path: none;
+}
+
+/* Masthead */
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.logo {
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 34px;
+  text-decoration: none;
+}
+.logo span {
+  color: var(--accent);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+}
+.nav a {
+  position: relative;
+  color: var(--ink);
+  text-decoration: none;
+}
+/* After the first ericzheng.nz, no underline at rest. On hover a red
+   line grows out from the middle, just below the descenders. */
+.nav a::after {
+  content: "";
+  position: absolute;
+  top: calc(50% + 11px);
+  left: 0;
+  width: 100%;
+  border-top: 1.5px solid var(--accent);
+  transform: scaleX(0);
+  transition: transform 250ms ease-out;
+}
+.nav a:hover::after {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav a::after {
+    transition: none;
+  }
+}
+.nav span {
+  color: var(--muted);
+}
+
+/* Content */
+.main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 24px;
+  padding-block: 64px;
+}
+.main :is(p, li, dd, a) {
+  overflow-wrap: anywhere;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 36px;
+}
+
+.profiles {
+  display: flex;
+  gap: 16px;
+}
+.profiles a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+/* Larger touch targets without moving the 20px icons. */
+.profiles a::before {
+  content: "";
+  position: absolute;
+  inset: -4px -6px;
+}
+
+@media (max-width: 599px) {
+  .page {
+    padding-block: 16px 32px;
+  }
+  .masthead {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+  .nav {
+    justify-content: space-between;
+    width: 100%;
+    gap: 4px;
+  }
+  .nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .main {
+    padding-top: 40px;
+  }
+}
+
+@media (max-width: 359px) {
+  .nav {
+    gap: 2px;
+    font-size: 14px;
+  }
+}
+
+/* The edge waves (js/waves.js): a column of ASCII characters in each side
+   gutter. Without JavaScript, or with reduced motion, a still image shows. */
+.waves {
+  --wave-unread: var(--rule);
+  --wave-read: var(--ink);
+  --wave-progress: 0%;
+  --wave-expansive: 0;
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 0;
+  /* Compact gutters stay 24px; the wider desktop treatment is below. */
+  width: clamp(14px, calc((100vw - 720px) / 2 - 140px), 220px);
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-sans);
+}
+
+.waves[data-opening] {
+  --wave-unread: color-mix(in srgb, var(--rule) 38%, transparent);
+  --wave-read: var(--paper);
+}
+
+.waves[data-side="left"] {
+  inset: 0 auto 0 0;
+  color: #c8c5bc;
+  --wave-unread: currentColor;
+  --wave-read: currentColor;
+}
+
+/* Static fallbacks for no JS, reduced motion or no canvas. */
+.waves::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--wave-unread);
+  mask: url("/waves/desktop.png") right top / 100% 100% no-repeat;
+}
+
+.waves[data-side="left"]::before {
+  mask-image: url("/waves/left-desktop.png");
+}
+
+/* A page that already fits is fully read, including the reduced-motion fallback. */
+.waves[data-scrollable="false"]::before {
+  background: var(--wave-read);
+}
+
+.waves[data-tracking="true"]::before {
+  background: linear-gradient(
+    to bottom,
+    var(--wave-read) max(0%, calc(var(--wave-progress) - 3%)),
+    var(--accent) max(0%, calc(var(--wave-progress) - 3%)),
+    var(--accent) min(100%, calc(var(--wave-progress) + 3%)),
+    var(--wave-unread) min(100%, calc(var(--wave-progress) + 3%))
+  );
+}
+
+.waves canvas {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  /* The still is stretched to the gutter; don't flash it before the canvas starts. */
+  .waves:not([data-animate])::before {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .waves[data-animate="true"]::before {
+    display: none;
+  }
+  .waves[data-animate="true"] canvas {
+    display: block;
+  }
+}
+
+@media (max-width: 599px) {
+  .waves[data-opening] {
+    /* The unexpanded changelog row spans just under 5.625em. */
+    max-width: max(0px, calc(50vw - 5.625 * var(--letter-size)));
+  }
+}
+
+@media (max-width: 1071px) {
+  .waves::before {
+    mask-image: url("/waves/mobile.png");
+  }
+  .waves[data-side="left"]::before {
+    mask-image: url("/waves/left-mobile.png");
+  }
+}
+
+@media (min-width: 1200px) {
+  .waves {
+    --wave-expansive: 1;
+    width: min(360px, calc((100vw - 720px) / 2 - 64px));
+  }
+  .waves[data-opening] {
+    /* At most 204px, and always clear of the fully expanded changelog row. */
+    max-width: min(
+      204px,
+      calc(50vw - 6.25 * clamp(2rem, 5.556vw, 5rem) - 16px)
+    );
+  }
+}
+
+@media print, (forced-colors: active) {
+  .waves {
+    display: none;
+  }
+}
