@@ -2,9 +2,11 @@
 # Builds the site into out/, one folder per page (out/blog/page/2/index.html),
 # plus the changelog feed, the sitemap and the images from content/.
 #
-#   content/  Markdown: blog posts, Leetcode entries, the changelog, the photos
+#   content/  Markdown: blog posts, Leetcode entries, the changelog, the photos,
+#             the books
 #   pages/    each page's copy, in HTML
-#   public/   copied into out/ as it is: CSS, JavaScript, fonts, photos, icons
+#   public/   copied into out/ as it is: CSS, JavaScript, fonts, photos, book
+#             covers, icons
 #
 # Every file is checked as it's read. One that breaks a rule stops the build
 # and says which file and why. Needs bash (3.2 is enough), pandoc 3 and the
@@ -16,7 +18,8 @@ export LC_ALL=C # awk and sort work on bytes, the same on every machine
 cd "$(dirname "$0")"
 
 SITE_URL=https://ericzheng.nz
-PAGE_SIZE=8 # posts or changelog entries on each index page
+PAGE_SIZE=8        # posts or changelog entries on each index page
+BOOKS_PAGE_SIZE=10 # books on each page of /books
 SEP=$'\037' # separates the fields of a post's line in posts.tsv
 out=out
 work=$(mktemp -d)
@@ -59,8 +62,9 @@ rfc822() {
 
 # Index page N's path: /blog for page 1, /blog/page/N after that.
 page_path() { if (($2 == 1)); then printf '/%s' "$1"; else printf '/%s/page/%s' "$1" "$2"; fi; }
-# How many index pages N entries need: at least one, even when there are none.
-page_count() { local n=$((($1 + PAGE_SIZE - 1) / PAGE_SIZE)); printf '%s' "$((n > 0 ? n : 1))"; }
+# How many index pages N entries need, $2 (or PAGE_SIZE) to a page: at least
+# one, even when there are none.
+page_count() { local size=${2:-$PAGE_SIZE} n; n=$((($1 + size - 1) / size)); printf '%s' "$((n > 0 ? n : 1))"; }
 
 # Prints a file with the line "<!-- name -->" replaced by the file $3.
 fill() {
@@ -628,11 +632,140 @@ EOF
   } >"$out/changelog.xml"
 }
 
+# --- Books -------------------------------------------------------------------
+
+# content/books.md, newest first: each finished book is a
+# "## Title | Author | 2026-10-17" heading over Eric's review, in Markdown,
+# which may be empty. Its cover is public/books/<slug>.jpg, the slug being the
+# title in lower case without apostrophes and with a hyphen for each run of
+# other characters (Ender’s Game is enders-game.jpg), and its 240px wide copy
+# is in public/books/240/; make covers makes both. Writes books.tsv (slug,
+# date, title, author, and the sizes of the cover and its copy) and one HTML
+# file per review.
+read_books() {
+  local list=content/books.md title author date slug size small file i n=0 slugs=" " ids=" " reviews
+  awk -v sep="$SEP" '
+    function fail(message) { print "content/books.md: " message > "/dev/stderr"; failed = 1; exit 1 }
+    /^## / {
+      line = substr($0, 4); sub(/[ \t\r]+$/, "", line)
+      if (line !~ /^[^|]+\|[^|]+\| *[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/)
+        fail("\"## " line "\" should look like \"## Title | Author | 2026-10-17\"")
+      split(line, part, "|")
+      for (i = 1; i <= 3; i++) gsub(/^[ \t]+|[ \t]+$/, "", part[i])
+      if (date != "" && part[3] > date) fail(part[1] " is newer than " title "; put it above")
+      title = part[1]; date = part[3]
+      print part[1] sep part[2] sep part[3]; next
+    }
+    date == "" && !/^[ \t\r]*$/ { fail("start with a book, like \"## Title | Author | 2026-10-17\"") }
+    END { if (failed) exit 1 }' "$list" >"$work/books.list"
+  : >"$work/books.tsv"
+  while IFS=$SEP read -r title author date; do
+    n=$((n + 1))
+    slug=$(printf '%s' "$title" | tr '[:upper:]' '[:lower:]' | sed "s/’//g; s/'//g; s/[^a-z0-9][^a-z0-9]*/-/g; s/^-//; s/-\$//")
+    [[ -n $slug ]] || fail "$list: $title needs a letter or digit in its title"
+    file=public/books/$slug.jpg
+    [[ -f $file ]] || fail "$list: save $title's cover as $file, then run make covers"
+    [[ -f public/books/240/$slug.jpg ]] || fail "$list: $title's cover has no 240px copy; run make covers"
+    size=$(jpeg_size "$file" "$list" "run make covers")
+    small=$(jpeg_size "public/books/240/$slug.jpg" "$list" "run make covers")
+    [[ $ids != *" $slug-$date "* ]] || fail "$list: $title appears twice on $date"
+    ids+="$slug-$date " slugs+="$slug "
+    printf '%s\n' "$slug$SEP$date$SEP$title$SEP$author$SEP${size% *}$SEP${size#* }$SEP${small#* }" >>"$work/books.tsv"
+  done <"$work/books.list"
+  for file in public/books/*.* public/books/240/*.*; do
+    i=${file##*/}
+    [[ $slugs == *" ${i%.jpg} "* && $i == *.jpg ]] || fail "$list: no book uses $file; delete it, or run make covers if it's a new cover"
+  done
+  # Reviews: one pandoc pass, each review what follows its <h2>.
+  reviews=$(markdown /writing-assets /dev/null <"$list" | awk -v dir="$work" '/^<h2[ >]/ { n++; next } n { print > (dir "/review." n) } END { print n + 0 }')
+  ((reviews == n)) || fail "$list: a review has a heading in it (a line of --- or === under text makes one); only books get headings"
+}
+
+# One book's line in the list: the day it was finished, the title (a button
+# that opens the book), the author and "¶" if there's a review, and the cover
+# that slips in beside the title when you point at it.
+book_line() { # n slug date title author width height small_height
+  local id=book-$2-$3 mark=""
+  [[ -s $work/review.$1 ]] && mark=$'\n      <span class="mark"><span aria-hidden="true">¶</span><span class="sr-only">has a review</span></span>'
+  cat <<EOF
+  <li>
+    <time datetime="$3">$(long_date "$3")</time>
+    <div class="line">
+      <h2><button type="button" commandfor="$id" command="show-modal" aria-haspopup="dialog">$(esc "$4")</button></h2>
+      <span class="author">$(esc "$5")</span>$mark
+    </div>
+    <img class="peek" src="/books/240/$2.jpg" width="240" height="$8" alt="" loading="lazy" decoding="async">
+  </li>
+EOF
+}
+
+# A picked book: a dialog with the cover, straight and large, and a slip of
+# paper beside it holding the title, author, date and review. HTML command
+# buttons open and close it without JavaScript.
+book_dialog() { # n slug date title author width height
+  local id=book-$2-$3 ratio
+  ratio=$(awk -v w="$6" -v h="$7" 'BEGIN { printf "%.4f", w / h }')
+  cat <<EOF
+<dialog id="$id" class="book" aria-labelledby="$id-title">
+  <button type="button" class="close" commandfor="$id" command="close">close <span aria-hidden="true">×</span></button>
+  <div class="stage">
+    <!-- Bare paper puts the book back. -->
+    <button type="button" class="paper" commandfor="$id" command="close" tabindex="-1" aria-hidden="true"></button>
+    <div class="picked" style="--ratio: $ratio">
+      <img class="cover" src="/books/$2.jpg" width="$6" height="$7" alt="" loading="lazy" decoding="async">
+      <div class="slip">
+        <div>
+          <h2 id="$id-title">$(esc "$4")</h2>
+          <p class="by">$(esc "$5")</p>
+        </div>
+        <time datetime="$3">$(long_date "$3")</time>
+EOF
+  if [[ -s $work/review.$1 ]]; then
+    echo '        <div class="review">'
+    cat "$work/review.$1"
+    echo '        </div>'
+  fi
+  cat <<'EOF'
+      </div>
+    </div>
+  </div>
+</dialog>
+EOF
+}
+
+# /books, 10 books a page: the list, the pagination row, and each book's dialog.
+books() {
+  local count pages page list n slug date title author width height small
+  count=$(wc -l <"$work/books.tsv")
+  pages=$(page_count "$count" "$BOOKS_PAGE_SIZE")
+  for ((page = 1; page <= pages; page++)); do
+    list="$work/list.books.$page"
+    {
+      echo '<ol class="books">'
+      n=0
+      while IFS=$SEP read -r slug date title author width height small; do
+        n=$((n + 1))
+        ((n > (page - 1) * BOOKS_PAGE_SIZE && n <= page * BOOKS_PAGE_SIZE)) || continue
+        book_line "$n" "$slug" "$date" "$title" "$author" "$width" "$height" "$small"
+      done <"$work/books.tsv"
+      echo '</ol>'
+      pagination books "$page" "$pages"
+      n=0
+      while IFS=$SEP read -r slug date title author width height small; do
+        n=$((n + 1))
+        ((n > (page - 1) * BOOKS_PAGE_SIZE && n <= page * BOOKS_PAGE_SIZE)) || continue
+        book_dialog "$n" "$slug" "$date" "$title" "$author" "$width" "$height"
+      done <"$work/books.tsv"
+    } >"$list"
+    index_page books "$page" "$pages" "$list"
+  done
+}
+
 # --- Photos ------------------------------------------------------------------
 
 # A JPEG's "width height", from its frame header. Fails on anything that isn't
 # a JPEG, or that still has camera data (EXIF or XMP, which can say where the
-# photo was taken).
+# photo was taken), naming the list it's in ($2) and how to fix it ($3).
 jpeg_size() {
   local size
   size=$(od -An -tu1 -v -N 65536 "$1" | awk '
@@ -650,9 +783,9 @@ jpeg_size() {
       print "unknown"
     }')
   case $size in
-  not-jpeg) fail "content/photos.md: ${1##*/} isn't a JPEG; add it with make photos" ;;
-  camera-data) fail "content/photos.md: ${1##*/} still has camera data; add it with make photos" ;;
-  unknown) fail "content/photos.md: couldn't read the size of ${1##*/}" ;;
+  not-jpeg) fail "$2: $1 isn't a JPEG; $3" ;;
+  camera-data) fail "$2: $1 still has camera data; $3" ;;
+  unknown) fail "$2: couldn't read the size of $1" ;;
   esac
   printf '%s' "$size"
 }
@@ -699,7 +832,7 @@ photos() {
     [[ -f public/photos/$file ]] || fail "$list: public/photos/$file is missing"
     [[ -f public/photos/320/$file && -f public/photos/640/$file ]] ||
       fail "$list: $file has no smaller copies; run make photos"
-    size=$(jpeg_size "public/photos/$file")
+    size=$(jpeg_size "public/photos/$file" "$list" "add it with make photos")
     files+=("$file") alts+=("$(esc "$alt")") widths+=("${size% *}") heights+=("${size#* }")
   done <"$work/photos.list"
   ((${#files[@]})) || fail "$list: list at least one photo"
@@ -771,7 +904,7 @@ static_pages() {
     name=${source#pages/}
     name=${name%.html}
     case $name in
-    blog | leetcode | changelog) continue ;; # the indexes, built with their lists
+    blog | leetcode | changelog | books) continue ;; # the indexes, built with their lists
     esac
     layout=$(field "$source" layout)
     title=$(field "$source" title)
@@ -809,7 +942,7 @@ sitemap() {
   {
     echo '<?xml version="1.0" encoding="UTF-8"?>'
     echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-    for path in "" /about /blog /contents /changelog /leetcode /friends; do
+    for path in "" /about /blog /contents /changelog /leetcode /friends /books; do
       printf '<url>\n<loc>%s</loc>\n</url>\n' "$SITE_URL$path"
     done
     for collection in blog leetcode; do
@@ -839,14 +972,16 @@ writing_assets() {
 
 rm -rf "$out"
 mkdir -p "$out"
-check_markdown content/blog/*/index.md content/leetcode/*.md content/changelog.md content/photos.md
+check_markdown content/blog/*/index.md content/leetcode/*.md content/changelog.md content/photos.md content/books.md
 read_posts
 read_changelog
+read_books
 cp -R public/. "$out/"
 writing_assets
 articles
 post_indexes
 changelog
+books
 static_pages
 sitemap
-echo "Built $(wc -l <"$work/posts.tsv" | tr -d ' ') posts and $(wc -l <"$work/changelog.tsv" | tr -d ' ') changelog entries into $out/."
+echo "Built $(wc -l <"$work/posts.tsv" | tr -d ' ') posts, $(wc -l <"$work/changelog.tsv" | tr -d ' ') changelog entries and $(wc -l <"$work/books.tsv" | tr -d ' ') books into $out/."
