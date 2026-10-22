@@ -40,4 +40,4 @@
 
 ## Outcome
 
-`/books` and `/books/page/2` build from `content/books.md` with the same list, hover cover, picked dialog and pagination as the Next.js version and the Paper boards, on the `books` branch for a pull request into main. The intro under "books:" still reads "documenting all my recent reads is a", unfinished, and needs Eric's words.
+`/books` and `/books/page/2` build from `content/books.md` with the same list, hover cover, picked dialog and pagination as the Next.js version and the Paper boards, on the `books` branch for a pull request into main. Eric then wrote the intro under "books:", which had been left unfinished.
