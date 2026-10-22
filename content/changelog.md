@@ -1,6 +1,6 @@
 ## 2026-10-23
 
-added a [/books](/books) page, made index pages fit as many entries as your screen can hold, and rebuilt the site in plain html, css and js with a bash script instead of Next.js
+added [/books](/books) page and rebuilt the site without Next.js
 
 ## 2026-10-19
 
