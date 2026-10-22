@@ -1,6 +1,6 @@
 ## 2026-10-23
 
-added [/books](/books) page and rebuilt the site with pure HTML, CSS, JS and bash only
+added [/books](/books) page and rebuilt the site with pure HTML, CSS, JS and Bash
 
 ## 2026-10-19
 
