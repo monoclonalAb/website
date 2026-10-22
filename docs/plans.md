@@ -49,4 +49,4 @@ Write for a reader who has only the repository and the plan. Name files by their
 
 Keep Progress true at every stopping point; split a half-done step into what's done and what's left. Record each decision, and why, as you make it. Write the Outcome when the work ends, then move the plan.
 
-`pnpm docs:check` makes sure each plan has a Progress and a Decision log, that a plan whose steps are all ticked has left `active/`, and that a completed plan has an Outcome.
+`make docs` makes sure each plan has a Progress and a Decision log, that a plan whose steps are all ticked has left `docs/exec-plans/active/`, and that a completed plan has an Outcome.

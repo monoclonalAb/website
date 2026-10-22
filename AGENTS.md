@@ -1,11 +1,3 @@
-<!-- BEGIN:nextjs-agent-rules -->
-
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-
-<!-- END:nextjs-agent-rules -->
-
 # Agent guide
 
 Eric Zheng's personal site. It is small on purpose: keep changes small, and prefer deleting code to adding it.
@@ -19,19 +11,20 @@ This file is a map. The repository is the record: anything not written down in i
 - [docs/writing.md](docs/writing.md): how posts, Leetcode entries, changelog entries, photos and friends are published.
 - [docs/plans.md](docs/plans.md): when to write an execution plan, and its format. Plans live in `docs/exec-plans/`.
 - [docs/exec-plans/tech-debt-tracker.md](docs/exec-plans/tech-debt-tracker.md): known problems nobody is fixing yet.
-- `node_modules/next/dist/docs/`: the guide to this version of Next.js.
 - `.agents/skills/doc-gardening/`: finds docs that no longer match the code, and fixes them.
 
 ## Before you start
 
 - Check `git status` and preserve work you didn't make.
 - UI work: read [docs/design.md](docs/design.md). Designs live in Paper; use Paper for design work, never Penpot.
-- Use pnpm only.
+- You need pandoc and shellcheck (`brew install pandoc shellcheck`); photos also need ImageMagick.
 
 ## Rules
 
 - **Eric's words.** Copy comes from Eric or the Paper boards. Don't paraphrase it, and don't invent taglines, descriptions, summaries or biography.
-- **Server Components by default.** The only client components are `components/ScrollWaves.tsx`, the page-number field `components/PageJump.tsx`, the photo sheet's fade-out `app/about/FadeOut.tsx` and `app/changelog/MovedEntry.tsx`, which sends an old link to a changelog entry on to the page it has moved to; add `"use client"` only when unavoidable, at the smallest boundary.
+- **Bash, HTML, CSS and JavaScript.** `build.sh` and pandoc build the site; there is no framework, Node or package.json. Eric moved the site off Next.js on purpose: don't bring back a framework, bundler or package manager.
+- **HTML and CSS first.** JavaScript runs only from `public/js/waves.js` (the edge waves), `public/js/page-jump.js` (the page-number field), `public/js/fade-out.js` (the photo sheet's fade-out) and `public/js/moved-entry.js`, which sends an old link to a changelog entry on to the page it has moved to. Add a script only when unavoidable.
+- **Portable scripts.** `build.sh` and `scripts/` run on macOS (bash 3.2, BSD awk and sed) and on Linux (bash 5, GNU awk) for Vercel and CI, and must build the same site on both. No associative arrays, `mapfile`, `find`, `xargs` or GNU-only flags.
 - **Native browsing.** Plain links, native scrolling, history and zoom. No scroll libraries, smooth scrolling, pagers, scrollspy or drawers.
 - **Markdown is data.** No MDX, raw HTML or runtime authoring services.
 - **Accessible.** Semantic HTML, one `h1` per page, visible focus, keyboard access, readable without JavaScript, and motion that stops for reduced motion.
@@ -40,6 +33,6 @@ This file is a map. The repository is the record: anything not written down in i
 
 ## Done means
 
-`pnpm validate` passes; it includes `pnpm docs:check`, which checks the docs against the code. For visual changes, also look at the affected pages at 1440px and 390px wide and compare them with Paper.
+`make check` passes: shellcheck, `make docs` (which checks the docs against the code) and a build. For visual changes, also look at the affected pages at 1440px and 390px wide (`make serve`) and compare them with Paper.
 
-If your change makes a doc wrong, fix the doc in the same change. When Eric corrects something an agent did, write the rule where the next agent will look, and if a script could check it, add the check to `scripts/check-docs.mjs`.
+If your change makes a doc wrong, fix the doc in the same change. When Eric corrects something an agent did, write the rule where the next agent will look, and if a script could check it, add the check to `scripts/check-docs.sh`.
