@@ -1,0 +1,281 @@
+/* /books: one line per book, like the Blog list, and the book each title
+   opens. The pagination row is in index.css.
+   Paper: "Planning · Books · reading log". */
+
+/* The finished date in a grey column, then the title, the author and ¶ for
+   a review. */
+.books {
+  display: grid;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.books > li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 2px 24px;
+}
+
+.books time {
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 22px;
+  text-align: right;
+}
+
+.books .line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+  line-height: 26px;
+}
+
+.books h2 {
+  font-size: 18px;
+  line-height: 26px;
+}
+
+/* The title is a button that looks like a link, with a 44px tap target that
+   keeps the rhythm. */
+.books h2 button {
+  display: block;
+  margin-block: -9px;
+  padding-block: 9px;
+  background: none;
+  color: var(--link);
+  font: inherit;
+  text-align: left;
+  text-decoration: underline 1px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.books h2 button:hover {
+  text-decoration-thickness: 2px;
+}
+
+.books .author {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.books .mark {
+  color: var(--link);
+}
+
+/* Pointing at a title, or tabbing to it, slips its cover in at the right
+   edge of the column, standing on that line so it never covers the page
+   numbers below. */
+.books .peek {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 120px;
+  box-shadow:
+    0 1px 2px rgb(22 23 27 / 10%),
+    0 8px 20px -8px rgb(22 23 27 / 30%);
+  opacity: 0;
+  translate: 0 6px;
+  rotate: 3deg;
+  pointer-events: none;
+}
+.books li:has(button:focus-visible) .peek {
+  opacity: 1;
+  translate: 0;
+}
+@media (hover: hover) {
+  .books li:has(button:hover) .peek {
+    opacity: 1;
+    translate: 0;
+  }
+}
+
+/* A picked book: paper fades the page, and the cover comes forward, straight
+   and large, with a slip holding the title, author, date and Eric's review.
+   Bare paper, Escape or close puts it back. */
+.book {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgb(240 238 232 / 72%);
+  color: var(--ink);
+}
+.book::backdrop {
+  background: none;
+}
+:root:has(.book[open]) {
+  overflow: hidden;
+}
+
+.book .close {
+  position: fixed;
+  top: 24px;
+  right: 32px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding-inline: 8px;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  cursor: pointer;
+}
+.book .close span {
+  font-size: 20px;
+}
+
+.book .paper {
+  position: fixed;
+  inset: 0;
+  background: none;
+}
+
+.book .stage {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  padding: 88px 64px;
+}
+
+/* The slip overlaps the cover's right edge and stands near its foot; a long
+   review grows it upwards, and the dialog scrolls if it outgrows the screen. */
+.book .picked {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Sized from the cover's shape rather than the file, so the slip is in place
+   before the cover arrives. */
+.book .cover {
+  flex-shrink: 0;
+  width: auto;
+  max-width: none;
+  height: min(492px, 100svh - 176px);
+  aspect-ratio: var(--ratio);
+  background: #e4e1d9;
+  box-shadow:
+    0 2px 4px rgb(22 23 27 / 10%),
+    0 32px 64px -20px rgb(22 23 27 / 45%);
+}
+
+.book .slip {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 14px;
+  width: 328px;
+  margin: 0 0 20px -40px;
+  padding: 20px 24px 22px;
+  background: #f7f6f2;
+  box-shadow:
+    0 1px 2px rgb(22 23 27 / 10%),
+    0 16px 32px -12px rgb(22 23 27 / 35%);
+  rotate: -2deg;
+}
+.book .slip h2 {
+  font-size: 20px;
+  line-height: 26px;
+}
+.book .by {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 22px;
+}
+.book time {
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 20px;
+}
+.book .review {
+  display: grid;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+  font-style: italic;
+}
+
+/* Too narrow for the slip beside the cover: it goes underneath. */
+@media (max-width: 779px) {
+  .book .close {
+    top: 12px;
+    right: 16px;
+  }
+  .book .stage {
+    padding: 72px 24px 40px;
+  }
+  .book .picked {
+    flex-direction: column;
+    align-items: center;
+  }
+  .book .cover {
+    width: min(240px, 100%);
+    height: auto;
+  }
+  .book .slip {
+    width: min(334px, 100%);
+    margin: -38px 0 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .books {
+    gap: 20px;
+  }
+  .books > li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .books time {
+    text-align: left;
+  }
+  .books .peek {
+    display: none;
+  }
+}
+
+/* Motion: the cover slips in, and a picked book fades in and out. */
+@media (prefers-reduced-motion: no-preference) {
+  .books .peek {
+    transition:
+      opacity 200ms ease-out,
+      translate 200ms ease-out;
+  }
+  .book {
+    transition:
+      opacity 200ms ease-out,
+      display 200ms allow-discrete,
+      overlay 200ms allow-discrete;
+  }
+  /* data-closing: js/fade-out.js holds the close while this plays. */
+  .book:not([open]),
+  .book[data-closing] {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .book .picked {
+    transition: scale 220ms ease-out;
+  }
+  @starting-style {
+    .book[open] {
+      opacity: 0;
+    }
+    .book[open] .picked {
+      scale: 0.94;
+    }
+  }
+}

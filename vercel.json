@@ -7,7 +7,7 @@
   "trailingSlash": false,
   "redirects": [
     {
-      "source": "/:collection(blog|leetcode|changelog)/page",
+      "source": "/:collection(blog|leetcode|changelog|books)/page",
       "has": [
         { "type": "query", "key": "page", "value": "0*(?<n>[2-9]|[1-9]\\d+)" }
       ],
@@ -15,7 +15,7 @@
       "permanent": false
     },
     {
-      "source": "/:collection(blog|leetcode|changelog)/page",
+      "source": "/:collection(blog|leetcode|changelog|books)/page",
       "destination": "/:collection",
       "permanent": false
     },

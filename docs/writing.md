@@ -39,3 +39,13 @@ September 2026
 The line below the heading is the caption, in Markdown, shown when the photo is picked. Missing alt text, a missing or unlisted file, a repeated entry or a photo that still has camera data fails the build.
 
 **Friends:** add a name, link and note to the list in `pages/friends.html`, copying one of its `<div>`s.
+
+**Books:** add each book you finish to the top of `content/books.md`. The heading is the title, author and the day you finished it; the text below it is your review, in Markdown, shown on a slip beside the cover when someone clicks the title (a ¶ after the author marks the books that have one). It can be left empty:
+
+```md
+## The Bullet That Missed | Richard Osman | 2026-09-29
+
+this series is so funny its never misses
+```
+
+Save the book's cover in `public/books/`, named after the title in lower case with a hyphen for each run of spaces and punctuation and no apostrophes (`enders-game.jpg` for Ender’s Game; a PNG or WebP is fine), then run `make covers` (it needs ImageMagick). It turns the cover into a JPEG at most 1000px tall without camera data, with the 240px wide copy the list shows when you point at a title. Run it again after replacing a cover. A malformed heading, a book newer than the one above it, a missing cover or copy, or a cover no book uses fails the build, and the error names the file. The page shows 10 books at a time; older ones move on to `/books/page/2` and later pages.
