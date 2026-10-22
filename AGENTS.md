@@ -23,7 +23,7 @@ This file is a map. The repository is the record: anything not written down in i
 
 - **Eric's words.** Copy comes from Eric or the Paper boards. Don't paraphrase it, and don't invent taglines, descriptions, summaries or biography.
 - **Bash, HTML, CSS and JavaScript.** `build.sh` and pandoc build the site; there is no framework, Node or package.json. Eric moved the site off Next.js on purpose: don't bring back a framework, bundler or package manager.
-- **HTML and CSS first.** JavaScript runs only from `public/js/waves.js` (the edge waves), `public/js/page-jump.js` (the page-number field), `public/js/fade-out.js` (the fade-out of About's photo sheet and a book picked on /books) and `public/js/moved-entry.js`, which sends an old link to a changelog entry on to the page it has moved to. Add a script only when unavoidable.
+- **HTML and CSS first.** JavaScript runs only from `public/js/waves.js` (the edge waves), `public/js/page-fit.js` (fits as many index entries as the screen holds on each page, and opens an old link to a changelog entry on the page it has moved to), `public/js/page-jump.js` (the page-number field) and `public/js/fade-out.js` (the fade-out of About's photo sheet and a book picked on /books). Add a script only when unavoidable.
 - **Portable scripts.** `build.sh` and `scripts/` run on macOS (bash 3.2, BSD awk and sed) and on Linux (bash 5, GNU awk) for Vercel and CI, and must build the same site on both. No associative arrays, `mapfile`, `find`, `xargs` or GNU-only flags.
 - **Native browsing.** Plain links, native scrolling, history and zoom. No scroll libraries, smooth scrolling, pagers, scrollspy or drawers.
 - **Markdown is data.** No MDX, raw HTML or runtime authoring services.

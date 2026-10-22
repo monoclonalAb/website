@@ -9,8 +9,9 @@
 
 document.querySelectorAll("form.jump").forEach((form) => {
   const input = form.elements.namedItem("page");
-  const page = Number(input.placeholder);
-  const totalPages = Number(input.max);
+  // Read when needed: js/page-fit.js can change both after this runs.
+  const page = () => Number(input.placeholder);
+  const totalPages = () => Number(input.max);
   // /blog/page → /blog for page 1, /blog/page/N for the rest.
   const base = form.getAttribute("action").replace(/\/page$/, "");
   const href = (n) => (n === 1 ? base : `${base}/page/${n}`);
@@ -22,8 +23,8 @@ document.querySelectorAll("form.jump").forEach((form) => {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const asked = Number.parseInt(input.value, 10);
-    const target = Math.min(Math.max(asked, 1), totalPages);
-    if (Number.isNaN(asked) || target === page) {
+    const target = Math.min(Math.max(asked, 1), totalPages());
+    if (Number.isNaN(asked) || target === page()) {
       input.blur();
       return;
     }
@@ -42,7 +43,7 @@ document.querySelectorAll("form.jump").forEach((form) => {
   // it is a page that exists; otherwise put back what was there before.
   input.addEventListener("input", () => {
     const value = input.validity.badInput ? "x" : input.value;
-    const isPage = /^[1-9]\d*$/.test(value) && Number(value) <= totalPages;
+    const isPage = /^[1-9]\d*$/.test(value) && Number(value) <= totalPages();
     if (value === "" || isPage) lastGood = value;
     else input.value = lastGood;
   });
