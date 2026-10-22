@@ -3,8 +3,9 @@
 # make check      what CI runs: shellcheck, the docs check and a build
 # make daily      start today's Leetcode entry; DATE=2026-09-14 for another day
 # make photos     add photos to About: ADD="~/Pictures/IMG_1234.heic"
+# make covers     ready the book covers saved in public/books/
 
-.PHONY: site serve check docs daily photos clean
+.PHONY: site serve check docs daily photos covers clean
 
 site:
 	./build.sh
@@ -25,6 +26,9 @@ daily:
 
 photos:
 	scripts/photos.sh $(ADD)
+
+covers:
+	scripts/covers.sh
 
 clean:
 	rm -rf out
