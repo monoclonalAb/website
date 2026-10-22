@@ -1,0 +1,57 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "scripts/install-pandoc.sh",
+  "buildCommand": "PATH=\"$PWD/.pandoc/bin:$PATH\" ./build.sh",
+  "outputDirectory": "out",
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:collection(blog|leetcode|changelog)/page",
+      "has": [
+        { "type": "query", "key": "page", "value": "0*(?<n>[2-9]|[1-9]\\d+)" }
+      ],
+      "destination": "/:collection/page/:n",
+      "permanent": false
+    },
+    {
+      "source": "/:collection(blog|leetcode|changelog)/page",
+      "destination": "/:collection",
+      "permanent": false
+    },
+    { "source": "/blog.html", "destination": "/blog" },
+    { "source": "/leetcode.html", "destination": "/leetcode" },
+    { "source": "/changelog.html", "destination": "/changelog" },
+    {
+      "source": "/blog/group_theory.html",
+      "destination": "/blog/group-theory"
+    },
+    {
+      "source": "/blog/uncompetitively_competing_in_competitive_programming.html",
+      "destination": "/blog/uncompetitively-competing-in-competitive-programming"
+    },
+    {
+      "source": "/blog/sightseeing_the_sea_of_c\\+\\+_1.html",
+      "destination": "/blog/sightseeing-the-sea-of-cpp-1"
+    },
+    {
+      "source": "/leetcode/:date(\\d{4}-\\d{2}-\\d{2}).html",
+      "destination": "/leetcode/:date"
+    },
+    {
+      "source": "/images/eric_photo_2.jpg",
+      "destination": "/photos/parable-house.jpg"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/changelog.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/rss+xml; charset=utf-8"
+        }
+      ]
+    }
+  ]
+}
