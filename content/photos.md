@@ -106,3 +106,7 @@ we finally got [manawa seafood boil](https://www.google.com/maps/search/?api=1&q
 ## IMG_4893.jpg | Eric taking a selfie with a big group of friends outside a shop with a lit open sign at night
 
 william's birthday, 10/26
+
+## IMG_4961.jpg | Eric taking a selfie with seven friends on wooden benches in a bar with plywood walls and a large wall fan
+
+last day of semester @ [the beer spot](https://www.google.com/maps/search/?api=1&query=The%20Beer%20Spot%20Morningside%20Auckland), 10/26
