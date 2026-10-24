@@ -1,5 +1,6 @@
-# the built site (make)
+# the built site (make), and what a build keeps beside it
 /out/
+/out.*
 
 # pandoc, downloaded by scripts/install-pandoc.sh on Vercel and in CI
 /.pandoc/

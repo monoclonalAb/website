@@ -10,7 +10,9 @@
 #
 # Every file is checked as it's read. One that breaks a rule stops the build
 # and says which file and why. Needs bash (3.2 is enough), pandoc 3 and the
-# usual Unix tools. `make` runs it.
+# usual Unix tools. `make` runs it. `make serve` runs build.sh --update, which
+# redoes only the pages that show the files changed since the last build (see
+# the end).
 set -euo pipefail
 shopt -u patsub_replacement 2>/dev/null || true # bash 5.2: & in ${x//a/b} stays &
 shopt -s nullglob
@@ -23,10 +25,27 @@ SITE_URL=https://ericzheng.nz
 PAGE_SIZE=5        # posts or changelog entries
 BOOKS_PAGE_SIZE=10 # books on /books
 SEP=$'\037' # separates the fields of a post's line in posts.tsv
-out=out
+# Where pages are written. A whole build writes a new site here and swaps it in
+# for out/ at the end, so out/ never holds half a site; an update (at the end)
+# writes into out/.
+new=out.new.$$
+out=$new
 work=$(mktemp -d)
 checking='' # the Markdown check, while it runs
-trap 'rm -rf "$work"; [[ -z $checking ]] || kill "$checking" 2>/dev/null || true' EXIT
+locked=''   # set while this build holds out.lock
+writing=''  # set once an update has begun to change out/
+finish() {
+  local status=$?
+  rm -rf "$work" "$new"
+  if [[ -n $checking ]]; then kill "$checking" 2>/dev/null || true; fi
+  # Stopped between the two renames at the end: put the last site back.
+  if [[ ! -d out && -d out.old.$$ ]]; then mv "out.old.$$" out || true; fi
+  # An update that failed partway may have left out/ half done. Forgetting
+  # what out/ was built from makes the next build a whole one.
+  if ((status != 0)) && [[ -n $writing ]]; then rm -f out.sources; fi
+  if [[ -n $locked ]]; then rm -f out.lock; fi
+}
+trap finish EXIT
 
 fail() {
   printf '%s\n' "$*" >&2
@@ -480,14 +499,14 @@ EOF
   } >"$out/$collection/$slug/index.html"
 }
 
-# Renders every post's page, a few at a time.
+# Renders the page of every post in $1 (lines of posts.tsv), a few at a time.
 articles() {
   local jobs chunk pid pids=() dirs=() collection slug rest
-  while IFS=$SEP read -r collection slug rest; do dirs+=("$out/$collection/$slug"); done <"$work/posts.tsv"
+  while IFS=$SEP read -r collection slug rest; do dirs+=("$out/$collection/$slug"); done <"$1"
   ((${#dirs[@]})) || return 0
   mkdir -p "${dirs[@]}"
   jobs=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
-  awk -v jobs="$jobs" -v dir="$work" '{ print > (dir "/chunk." (NR % jobs)) }' "$work/posts.tsv"
+  awk -v jobs="$jobs" -v dir="$work" '{ print > (dir "/chunk." (NR % jobs)) }' "$1"
   for chunk in "$work"/chunk.*; do
     (
       while IFS=$SEP read -r collection slug date title summary problem_id problem_url difficulty; do
@@ -543,7 +562,7 @@ index_page() {
   ((page > 1)) && title="$title, page $page"
   ((pages > 1)) && js="$js page-fit page-jump"
   dir=$out${path}
-  mkdir -p "$dir"
+  [[ -d $dir ]] || mkdir -p "$dir"
   {
     page_start "$title | Eric Zheng" "$path" "$page_description" "$page_css" "$page_js$js"
     reading_start "$page_nav" "$page_main"
@@ -552,10 +571,21 @@ index_page() {
   } >"$dir/index.html"
 }
 
-# /blog and /leetcode, PAGE_SIZE posts a page.
+# Deletes a collection's index pages after page $2, which an update leaves
+# behind when its list gets shorter.
+drop_pages_after() {
+  local dir
+  for dir in "$out/$1/page"/*; do
+    if ((${dir##*/} > $2)); then rm -rf "$dir"; fi
+  done
+  rmdir "$out/$1/page" 2>/dev/null || true # if no pages are left in it
+}
+
+# The indexes of the collections named, /blog and /leetcode, PAGE_SIZE posts a
+# page.
 post_indexes() {
   local collection count pages page list
-  for collection in blog leetcode; do
+  for collection in "$@"; do
     # Every page's list in one go: the whole collection, with the entries not
     # on that page hidden. Prints how many entries there are.
     count=$(awk -F "$SEP" -v c="$collection" -v size="$PAGE_SIZE" -v dir="$work" '
@@ -594,6 +624,7 @@ post_indexes() {
       pagination "$collection" "$page" "$pages" >>"$list"
       index_page "$collection" "$page" "$pages" "$list"
     done
+    drop_pages_after "$collection" "$pages"
   done
 }
 
@@ -660,6 +691,7 @@ changelog() {
     } >"$list"
     index_page changelog "$page" "$pages" "$list"
   done
+  drop_pages_after changelog "$pages"
 
   # The feed links to wherever each entry is now. Its guid is where the entry
   # was first, so newer entries pushing it on don't show it again as unread.
@@ -820,6 +852,7 @@ books() {
     } >"$list"
     index_page books "$page" "$pages" "$list"
   done
+  drop_pages_after books "$pages"
 }
 
 # --- Photos ------------------------------------------------------------------
@@ -962,10 +995,12 @@ photos() {
 
 # --- Pages ---------------------------------------------------------------------
 
-# Every page in pages/ but the indexes: Home, About, Contents, Friends, 404.
+# The pages in pages/ named (pages/about.html), or all of them, but the
+# indexes: Home, About, Contents, Friends, 404.
 static_pages() {
   local source name path target
-  for source in pages/*.html; do
+  (($#)) || set -- pages/*.html
+  for source in "$@"; do
     name=${source#pages/}
     name=${name%.html}
     case $name in
@@ -990,7 +1025,7 @@ static_pages() {
         page_start "$page_title | Eric Zheng" "$path" "$page_description" "$page_css" "$page_js"
         reading_start "$page_nav" "$page_main"
         if [[ $name == about ]]; then
-          photos >"$work/photos.html"
+          [[ -f $work/photos.html ]] || photos >"$work/photos.html" # an update makes it first
           page_body "$source" photos "$work/photos.html"
         else
           page_body "$source"
@@ -1028,11 +1063,12 @@ is_image() {
   return $yes
 }
 
-# Images beside the Markdown in content/, served from /writing-assets/.
+# Images beside the Markdown in content/ (any of sources), served from
+# /writing-assets/.
 writing_assets() {
   local file target
-  for file in content/*.* content/leetcode/*.* content/blog/*/*.*; do
-    if is_image "$file"; then
+  for file in "${sources[@]}"; do
+    if [[ $file == content/* ]] && is_image "$file"; then
       target=$out/writing-assets/${file#content/}
       mkdir -p "${target%/*}"
       cp "$file" "$target"
@@ -1041,6 +1077,127 @@ writing_assets() {
 }
 
 # --- Build -------------------------------------------------------------------
+
+# Every file the site is built from, with its checksum, a line each. A build
+# that works keeps the list in out.sources, and the posts it read in
+# out.posts.tsv, so an update can tell what has changed since.
+add_sources() {
+  local file
+  for file in "$1"/*; do
+    if [[ -d $file ]]; then add_sources "$file"; else sources+=("$file"); fi
+  done
+}
+# One build at a time: an update from make serve and a make in another
+# terminal would otherwise both change out/. The lock is a link naming the
+# build that holds it, made in one step; one left by a build that died is
+# taken over.
+until ln -s "build-$$" out.lock 2>/dev/null; do
+  holder=$(readlink out.lock 2>/dev/null || true)
+  if [[ -n $holder ]] && ! kill -0 "${holder#build-}" 2>/dev/null; then rm -f out.lock; else sleep 0.1; fi
+done
+locked=1
+
+sources=(build.sh)
+add_sources content
+add_sources pages
+shopt -s dotglob # public/ is copied whole, hidden files (like .well-known/) too
+add_sources public
+shopt -u dotglob
+cksum "${sources[@]}" >"$work/sources"
+keep_sources() {
+  cp "$work/sources" out.sources
+  if [[ -f $work/posts.tsv ]]; then cp "$work/posts.tsv" out.posts.tsv; fi
+}
+
+# make serve runs build.sh --update, which redoes in out/ only the pages that
+# show the files changed since the last build, in a fraction of a second:
+#   a post            its page, and if its title, date or summary changed, or
+#                     it's new or gone, its collection's indexes and the sitemap
+#   the changelog, books.md, photos.md, a page in pages/    those pages
+#   a file in public/, an image in content/    copied (and a cover or photo
+#                     redoes Books or About)
+# A change to build.sh builds the whole site. So does --update without out/.
+whole=1
+if [[ ${1:-} == --update && -d out && -f out.sources && -f out.posts.tsv ]]; then
+  whole='' changed=() posts=() checks=() copies=() pages=() read_them='' redo_changelog='' redo_books='' redo_about='' want=''
+  # The files whose line is new, different or gone.
+  while IFS= read -r file; do
+    changed+=("$file")
+    case $file in
+    build.sh) whole=1 ;;
+    content/blog/*/index.md | content/leetcode/*.md) posts+=("$file") read_them=1 ;;
+    content/changelog.md) redo_changelog=1 ;;
+    content/books.md) redo_books=1 ;;
+    content/photos.md) redo_about=1 ;;
+    content/*.md) ;;
+    content/*) if is_image "$file"; then copies+=("$file") read_them=1; fi ;;
+    pages/blog.html | pages/leetcode.html) read_them=1 ;;
+    pages/changelog.html) redo_changelog=1 ;;
+    pages/books.html) redo_books=1 ;;
+    pages/about.html) redo_about=1 ;;
+    pages/*.html) if [[ -f $file ]]; then pages+=("$file"); else whole=1; fi ;;
+    public/books/*) copies+=("$file") redo_books=1 ;;
+    public/photos/*) copies+=("$file") redo_about=1 ;;
+    public/*) copies+=("$file") ;;
+    esac # anything else, like an editor's backup file, the site doesn't use
+    case $file in
+    content/blog/*/index.md | content/leetcode/*.md | content/changelog.md | content/books.md | content/photos.md)
+      if [[ -f $file ]]; then checks+=("$file"); fi
+      ;;
+    esac
+  done < <(awk '
+    function path(line) { sub(/^[^ ]+ [^ ]+ /, "", line); return line }
+    NR == FNR { old[path($0)] = $0; next }
+    { file = path($0); if (old[file] != $0) print file; delete old[file] }
+    END { for (file in old) print file }' out.sources "$work/sources" | sort)
+  ((${#changed[@]})) || exit 0
+fi
+
+if [[ -z $whole ]]; then
+  out=out
+  # Read and check everything first, so a mistake changes nothing.
+  ((${#checks[@]} == 0)) || check_markdown "${checks[@]}"
+  if [[ -n $read_them ]]; then read_posts; fi
+  if [[ -n $redo_changelog ]]; then read_changelog; fi
+  if [[ -n $redo_books ]]; then read_books; fi
+  if [[ -n $redo_about ]]; then photos >"$work/photos.html"; fi
+
+  writing=1
+  for file in ${copies[@]+"${copies[@]}"}; do
+    case $file in public/*) target=out/${file#public/} ;; *) target=out/writing-assets/${file#content/} ;; esac
+    if [[ -f $file ]]; then
+      mkdir -p "${target%/*}" && cp "$file" "$target"
+    else
+      rm -f "$target"
+      # Its folder too, if now empty and a whole build wouldn't make it.
+      if [[ $file == content/* || ! -d ${file%/*} ]]; then rmdir "${target%/*}" 2>/dev/null || true; fi
+    fi
+  done
+  if [[ -n $read_them ]]; then
+    for file in ${posts[@]+"${posts[@]}"}; do
+      post=${file#content/} post=${post%/index.md} post=${post%.md} # blog/<slug>
+      if [[ -f $file ]]; then want+=" $post"; else rm -rf "out/$post"; fi
+    done
+    awk -F "$SEP" -v want="$want " 'index(want, " " $1 "/" $2 " ")' "$work/posts.tsv" >"$work/posts.changed"
+    articles "$work/posts.changed"
+    # The collections whose list is different: a title, date or summary, or a
+    # post that's new or gone. Changed copy above a list redoes it too.
+    for collection in blog leetcode; do
+      if [[ " ${changed[*]} " == *" pages/$collection.html "* ]] ||
+        ! cmp -s <(awk -F "$SEP" -v c="$collection" '$1 == c' out.posts.tsv) <(awk -F "$SEP" -v c="$collection" '$1 == c' "$work/posts.tsv"); then
+        post_indexes "$collection"
+      fi
+    done
+    cmp -s out.posts.tsv "$work/posts.tsv" || sitemap
+  fi
+  if [[ -n $redo_changelog ]]; then changelog; fi
+  if [[ -n $redo_books ]]; then books; fi
+  if [[ -n $redo_about ]]; then pages+=(pages/about.html); fi
+  ((${#pages[@]} == 0)) || static_pages "${pages[@]}"
+  keep_sources
+  echo "Updated out/ for ${changed[*]}."
+  exit 0
+fi
 
 rm -rf "$out"
 mkdir -p "$out"
@@ -1052,12 +1209,19 @@ read_changelog
 read_books
 cp -R public/. "$out/"
 writing_assets
-articles
-post_indexes
+articles "$work/posts.tsv"
+post_indexes blog leetcode
 changelog
 books
 static_pages
 sitemap
 wait "$checking" || exit 1
 checking=''
-echo "Built $(wc -l <"$work/posts.tsv" | tr -d ' ') posts, $(wc -l <"$work/changelog.tsv" | tr -d ' ') changelog entries and $(wc -l <"$work/books.tsv" | tr -d ' ') books into $out/."
+# Two renames, so make serve never shows half a site (finish puts the last one
+# back if this is stopped between them). A build that fails stops before
+# this and leaves the last site that built.
+if [[ -d out ]]; then mv out "out.old.$$"; fi
+mv "$out" out
+rm -rf "out.old.$$"
+keep_sources
+echo "Built $(wc -l <"$work/posts.tsv" | tr -d ' ') posts, $(wc -l <"$work/changelog.tsv" | tr -d ' ') changelog entries and $(wc -l <"$work/books.tsv" | tr -d ' ') books into out/."
