@@ -1,7 +1,7 @@
 ---
 title: What is your Goal in Life?
 date: 2026-10-24
-summary: maybe life is just an impossible optimisation question
+summary: maybe life is just an impossible optimisation problem
 ---
 
 recently, too many people have been asking me *"what is your goal in life?"* and, 
