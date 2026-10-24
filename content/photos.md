@@ -114,3 +114,7 @@ william's birthday, 10/26
 ## IMG_4961.jpg | Eric taking a selfie with seven friends on wooden benches in a bar with plywood walls and a large wall fan
 
 last day of semester @ [the beer spot](https://www.google.com/maps/search/?api=1&query=The%20Beer%20Spot%20Morningside%20Auckland), 10/26
+
+## rainbows-end.jpg | Eric taking a selfie at the foot of a purple drop tower ride, two friends in costumes walking behind him
+
+not height legal for fearfall @ [rainbow's end](https://www.google.com/maps/search/?api=1&query=Rainbow%27s%20End%20Auckland), 10/26
