@@ -1,3 +1,7 @@
+## 2026-10-24
+
+wrote up a [short blog post](/blog/what-is-your-goal-in-life) on life goals
+
 ## 2026-10-23
 
 added [/books](/books) page and rebuilt the site with pure HTML, CSS, JS and Bash
