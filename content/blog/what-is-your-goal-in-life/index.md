@@ -25,9 +25,9 @@ it's eventually counter-productive, often not reflecting what you really care ab
 following that train of thought, it makes sense that at each point in life you have a varied set of priorities but a finite amount of resources to allocate to each priority.
 how much each priority adds to your life depends on how much you put into it, what you’re giving up, and how it affects everything else.
 
-therefore, assuming that you have a perfect model on your current state of life, with weights that accurately depict relationships between priorities,
+therefore, assuming that you have a perfect model of your current state of life, one that accurately depicts the relationships between priorities,
 perhaps you could identify the Pareto frontier of possible resource allocations: the allocations where improving one priority would mean sacrificing another. 
-each allocation would bring a different combination of benefits to your life, and you could use those weights to decide which combination you preferred.
+each allocation would bring a different combination of benefits to your life, and by weighting each priority by how much it matters to you, you could decide which combination you'd prefer.
 
 perhaps the *best life* would reveal itself somewhere in that process.
 
