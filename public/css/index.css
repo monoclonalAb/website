@@ -1,0 +1,223 @@
+/* The indexes: the Blog and Leetcode lists, the Changelog, and the
+   pagination row under each. */
+
+/* Compact date/title list shared by /blog and /leetcode. */
+.entries {
+  display: grid;
+  gap: 28px;
+  margin-top: 12px;
+}
+
+.entries > li {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 6px 24px;
+}
+
+.entries time {
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 22px;
+  text-align: right;
+}
+
+.entries h2 {
+  font-size: 18px;
+  line-height: 26px;
+}
+
+/* 44px tap target without changing the row rhythm. */
+.entries h2 a {
+  display: block;
+  margin-block: -9px;
+  padding-block: 9px;
+}
+
+.summary {
+  margin-top: 4px;
+  font-style: italic;
+  line-height: 24px;
+}
+
+/* Leetcode: a 2px rule in the difficulty's colour down each entry's title and
+   difficulty. It takes 12px of the 24px gap, so titles line up with Blog's. */
+.entries > [data-difficulty="Easy"] {
+  --difficulty: #1cb8b8;
+}
+.entries > [data-difficulty="Medium"] {
+  --difficulty: #ffb800;
+}
+.entries > [data-difficulty="Hard"] {
+  --difficulty: var(--accent);
+}
+.entries > [data-difficulty] {
+  column-gap: 12px;
+}
+.entries > [data-difficulty] > div {
+  border-left: 2px solid var(--difficulty);
+  padding-left: 10px;
+}
+
+@media (max-width: 599px) {
+  .entries > li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .entries time {
+    text-align: left;
+  }
+  /* The date stacks above the title, so the rule runs down the whole entry. */
+  .entries > [data-difficulty] {
+    border-left: 2px solid var(--difficulty);
+    padding-left: 12px;
+  }
+  .entries > [data-difficulty] > div {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+
+/* The changelog: dated entries, no titles, no rules. */
+.changelog-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+
+.rss {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+.changelog {
+  display: grid;
+  gap: 32px;
+}
+
+.changelog > li {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 4px 24px;
+}
+
+.changelog time {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 599px) {
+  .changelog > li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* While js/page-fit.js fits a list to the screen, the list and its
+   pagination row stay invisible, so the page never shows the build's few
+   entries first, then jumps. Without JavaScript, nothing is hidden. */
+.fitting main > :is(.entries, .changelog, .books, .pagination) {
+  visibility: hidden;
+}
+
+/* The row after an index's last entry: previous, a page-number box, next. */
+.pagination {
+  display: flex;
+  flex-wrap: wrap; /* Larger text wraps onto a second line instead of spilling. */
+  align-items: baseline; /* Eiko labels and the Georgia count share one line. */
+  justify-content: space-between;
+  column-gap: 16px;
+  min-height: 44px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+/* Equal ends keep the box centred, whatever the label widths. */
+.pagination .end {
+  display: flex;
+  flex: 1 0 0;
+  white-space: nowrap;
+}
+.pagination .last {
+  justify-content: flex-end;
+}
+.pagination .end > * {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* An inactive end is text, not a link: muted and not focusable. */
+.pagination .inactive {
+  color: var(--muted);
+}
+
+.jump {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 24px;
+}
+
+/* The label is the 44px tap target around the 25px field. */
+.jump label {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: text;
+}
+
+/* An underlined number, the line sized for the last page's digits and set
+   below the old-style figures' tails. Grey is 4.95:1; the paper rule is too
+   faint to show it's a field. */
+.jump input {
+  width: calc(var(--digits) * 1ch + 4px);
+  height: 25px;
+  padding: 0 2px;
+  border: 0;
+  border-bottom: 1px solid var(--muted);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 16px / 24px var(--font-body); /* At 16px, iPhone doesn't zoom in on focus. */
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  appearance: textfield;
+}
+.jump input::-webkit-inner-spin-button,
+.jump input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+.jump input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+.jump input:hover {
+  border-bottom-color: var(--ink);
+}
+/* Focus is the line turning 2px red, like the masthead's hover line,
+   instead of the usual ring. */
+.jump input:focus-visible {
+  border-bottom-color: var(--accent);
+  outline: none;
+  box-shadow: 0 1px 0 var(--accent);
+}
+/* Without JavaScript only (js/page-jump.js sets novalidate once it runs): an
+   out-of-range number, which the browser then explains. */
+.jump:not([novalidate]) input:user-invalid {
+  border-bottom-color: var(--accent);
+}

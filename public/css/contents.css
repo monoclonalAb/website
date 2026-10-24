@@ -1,0 +1,52 @@
+/* Contents and Friends: two-column directories of links. */
+.group {
+  display: grid;
+  gap: 16px;
+}
+
+.external {
+  display: grid;
+  gap: 28px;
+  margin-top: 8px;
+  padding-top: 32px;
+  border-top: 1px solid var(--rule);
+}
+
+.directory {
+  display: grid;
+  gap: 8px;
+}
+.directory > div {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 24px;
+}
+.directory dt > * {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+}
+.directory dd {
+  color: var(--muted);
+}
+
+.emails {
+  gap: 4px;
+}
+.emails > div {
+  grid-template-columns: 252px minmax(0, 1fr);
+}
+
+@media (max-width: 599px) {
+  .directory {
+    gap: 16px;
+  }
+  .directory > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .external {
+    padding-top: 28px;
+  }
+}
