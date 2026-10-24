@@ -25,7 +25,8 @@ BOOKS_PAGE_SIZE=10 # books on /books
 SEP=$'\037' # separates the fields of a post's line in posts.tsv
 out=out
 work=$(mktemp -d)
-trap 'rm -rf "$work"' EXIT
+checking='' # the Markdown check, while it runs
+trap 'rm -rf "$work"; [[ -z $checking ]] || kill "$checking" 2>/dev/null || true' EXIT
 
 fail() {
   printf '%s\n' "$*" >&2
@@ -43,6 +44,22 @@ esc() {
   s=${s//>/&gt;}
   s=${s//\"/&quot;}
   printf '%s' "$s"
+}
+
+# Prints a here-document, like cat but without starting a process; the site
+# has hundreds of pages, each printed from several. (For files, cat is faster.)
+put() {
+  local text
+  IFS= read -r -d '' text || true
+  printf '%s' "$text"
+}
+
+# Sets the variable named $1 to $2 without the spaces around it.
+trim() {
+  local s=$2
+  s=${s#"${s%%[![:space:]]*}"}
+  s=${s%"${s##*[![:space:]]}"}
+  printf -v "$1" '%s' "$s"
 }
 
 months=(January February March April May June July August September October November December)
@@ -73,14 +90,6 @@ hide_others() {
   awk -v first=$((($1 - 1) * $2 + 1)) -v last=$(($1 * $2)) -v start="$3" '
     index($0, start) == 1 { n++; if (n < first || n > last) sub(/>$/, " hidden>") }
     { print }'
-}
-
-# Prints a file with the line "<!-- name -->" replaced by the file $3.
-fill() {
-  awk -v marker="<!-- $2 -->" -v insert="$3" '
-    { line = $0; gsub(/^[ \t]+|[ \t]+$/, "", line) }
-    line == marker { while ((getline row < insert) > 0) print row; next }
-    { print }' "$1"
 }
 
 # --- Markdown --------------------------------------------------------------
@@ -217,7 +226,7 @@ page_start() {
       js+="<script src=\"/js/$name.js\" defer></script>"$'\n'
     fi
   done
-  cat <<EOF
+  put <<EOF
 <!doctype html>
 <html lang="en-NZ">
 <head>
@@ -239,7 +248,7 @@ page_start() {
 <meta property="og:image:alt" content="$og_image_alt">
 EOF
   if [[ -n ${7:-} ]]; then
-    cat <<EOF
+    put <<EOF
 <meta property="og:type" content="article">
 <meta property="article:published_time" content="$7">
 <meta property="article:author" content="Eric Zheng">
@@ -247,7 +256,7 @@ EOF
   else
     echo '<meta property="og:type" content="website">'
   fi
-  cat <<EOF
+  put <<EOF
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="$title">
 <meta name="twitter:description" content="$description">
@@ -277,7 +286,7 @@ reading_start() {
       nav+="      <a href=\"/$name\">$name</a>"
     fi
   done
-  cat <<EOF
+  put <<EOF
 <body>
 <div id="top" class="page">
   <a class="skip" href="#main">Skip to content</a>
@@ -293,7 +302,7 @@ EOF
 
 # The end of <main>, the footer and the edge waves.
 reading_end() {
-  cat <<'EOF'
+  put <<'EOF'
   </main>
   <footer class="footer">
     <div class="profiles">
@@ -311,15 +320,44 @@ reading_end() {
 EOF
 }
 
-# A page's field from the comment at the top of its file in pages/:
+# Sets page_title, page_description, page_css, page_js, page_nav, page_main
+# and page_layout from the comment at the top of a file in pages/:
 #   <!--
 #   title: About
 #   -->
-field() {
-  awk -v key="$2: " 'NR == 1 && !/^<!--/ { exit } /^-->/ { exit } index($0, key) == 1 { print substr($0, length(key) + 1); exit }' "$1"
+page_fields() {
+  local line key
+  [[ $1 != "${page_fields_of:-}" ]] || return 0 # already read
+  page_fields_of=$1
+  page_title='' page_description='' page_css='' page_js='' page_nav='' page_main='' page_layout=''
+  {
+    IFS= read -r line
+    [[ $line == '<!--'* ]] || return 0
+    while IFS= read -r line && [[ $line != '-->'* ]]; do
+      key=${line%%: *}
+      case $key in
+      title | description | css | js | nav | main | layout) printf -v "page_$key" '%s' "${line#"$key": }" ;;
+      esac
+    done
+  } <"$1"
 }
-# A page's HTML, without that comment.
-page_body() { awk 'NR == 1 && /^<!--/ { skip = 1; next } skip { if (/^-->/) skip = 0; next } { print }' "$1"; }
+# A page's HTML, without that comment, and with the line "<!-- $2 -->" (if
+# $2 is given) replaced by the file $3.
+page_body() {
+  local line n=0 skip=''
+  while IFS= read -r line || [[ -n $line ]]; do
+    n=$((n + 1))
+    if ((n == 1)) && [[ $line == '<!--'* ]]; then
+      skip=1
+    elif [[ -n $skip ]]; then
+      if [[ $line == '-->'* ]]; then skip=''; fi
+    elif [[ -n ${2:-} && $line =~ ^[[:blank:]]*"<!-- $2 -->"[[:blank:]]*$ ]]; then
+      cat "$3"
+    else
+      printf '%s\n' "$line"
+    fi
+  done <"$1"
+}
 
 # --- Posts -------------------------------------------------------------------
 
@@ -403,7 +441,7 @@ read_posts() {
 # A post's page: /blog/<slug> or /leetcode/<slug>.
 article() {
   local collection=$1 slug=$2 date=$3 title=$4 summary=$5 problem_id=$6 problem_url=$7 difficulty=$8
-  local file base outline body description meta="" link="" toc=""
+  local file base outline body description meta="" link="" toc="" entry entries=() tab=$'\t'
   if [[ $collection == blog ]]; then
     file=content/blog/$slug/index.md base=/writing-assets/blog/$slug
   else
@@ -412,22 +450,21 @@ article() {
   outline=$work/outline.$collection.$slug body=$work/body.$collection.$slug
   : >"$outline"
   body_of "$file" | markdown "$base" "$outline" >"$body"
-  if (($(wc -l <"$outline") > 1)); then
-    toc=$(awk -F '\t' '
-      BEGIN { print "<details class=\"outline\">\n  <summary>On this page</summary>\n  <ul>" }
-      { print "    <li><a href=\"#" $1 "\">" $2 "</a></li>" }
-      END { print "  </ul>\n</details>" }' "$outline")
+  while IFS= read -r entry; do entries+=("$entry"); done <"$outline"
+  if ((${#entries[@]} > 1)); then
+    toc=$'<details class="outline">\n  <summary>On this page</summary>\n  <ul>'
+    for entry in "${entries[@]}"; do toc+=$'\n'"    <li><a href=\"#${entry%%"$tab"*}\">${entry#*"$tab"}</a></li>"; done
+    toc+=$'\n  </ul>\n</details>'
   fi
   if [[ -n $difficulty ]]; then
     meta=" · $difficulty"
     link="  <p><a href=\"$(esc "$problem_url")\" target=\"_blank\">LeetCode problem $problem_id</a></p>"
   fi
   description=${summary:-"$title — writing by eric zheng"}
-  mkdir -p "$out/$collection/$slug"
   {
     page_start "$title | Eric Zheng" "/$collection/$slug" "$description" article "" "$title" "$date"
     reading_start "$collection"
-    cat <<EOF
+    put <<EOF
 <p class="meta"><a href="/$collection">← $collection</a></p>
 <header class="article-header">
   <h1>$(esc "$title")</h1>
@@ -445,7 +482,10 @@ EOF
 
 # Renders every post's page, a few at a time.
 articles() {
-  local jobs chunk pid pids=()
+  local jobs chunk pid pids=() dirs=() collection slug rest
+  while IFS=$SEP read -r collection slug rest; do dirs+=("$out/$collection/$slug"); done <"$work/posts.tsv"
+  ((${#dirs[@]})) || return 0
+  mkdir -p "${dirs[@]}"
   jobs=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
   awk -v jobs="$jobs" -v dir="$work" '{ print > (dir "/chunk." (NR % jobs)) }' "$work/posts.tsv"
   for chunk in "$work"/chunk.*; do
@@ -479,7 +519,7 @@ pagination() {
   # The current page is grey hint text, not the value: without JavaScript the
   # field can't select its own text, so a filled-in 8 would become 812 when
   # you type 12.
-  cat <<EOF
+  put <<EOF
 <nav class="pagination" aria-label="Pagination" data-page-size="$size">
   <span class="end">$previous</span>
   <form class="jump" action="/$collection/page">
@@ -498,54 +538,61 @@ index_page() {
   local collection=$1 page=$2 pages=$3 list=$4 js=${5:-}
   local source=pages/$collection.html path title dir
   path=$(page_path "$collection" "$page")
-  title=$(field "$source" title)
+  page_fields "$source"
+  title=$page_title
   ((page > 1)) && title="$title, page $page"
   ((pages > 1)) && js="$js page-fit page-jump"
   dir=$out${path}
   mkdir -p "$dir"
   {
-    page_start "$title | Eric Zheng" "$path" "$(field "$source" description)" "$(field "$source" css)" "$(field "$source" js)$js"
-    reading_start "$(field "$source" nav)" "$(field "$source" main)"
-    page_body "$source" | fill - list "$list"
+    page_start "$title | Eric Zheng" "$path" "$page_description" "$page_css" "$page_js$js"
+    reading_start "$page_nav" "$page_main"
+    page_body "$source" list "$list"
     reading_end
   } >"$dir/index.html"
 }
 
 # /blog and /leetcode, PAGE_SIZE posts a page.
 post_indexes() {
-  local collection count pages page item
+  local collection count pages page list
   for collection in blog leetcode; do
-    count=$(awk -F "$SEP" -v c="$collection" '$1 == c' "$work/posts.tsv" | wc -l)
+    # Every page's list in one go: the whole collection, with the entries not
+    # on that page hidden. Prints how many entries there are.
+    count=$(awk -F "$SEP" -v c="$collection" -v size="$PAGE_SIZE" -v dir="$work" '
+      function esc(s) { gsub(/&/, "\\&amp;", s); gsub(/</, "\\&lt;", s); gsub(/>/, "\\&gt;", s); gsub(/"/, "\\&quot;", s); return s }
+      function long_date(d,   months) {
+        split("January February March April May June July August September October November December", months, " ")
+        return (substr(d, 9, 2) + 0) " " months[substr(d, 6, 2) + 0] " " substr(d, 1, 4)
+      }
+      $1 == c {
+        n++
+        if ($8 != "") {
+          start[n] = "  <li data-difficulty=\"" $8 "\""
+          title = $6 ". " esc($4); summary = $8
+        } else {
+          start[n] = "  <li"
+          title = esc($4); summary = esc($5)
+        }
+        rest[n] = "    <time datetime=\"" $3 "\">" long_date($3) "</time>\n    <div>\n      <h2><a href=\"/" c "/" $2 "\">" title "</a></h2>\n"
+        if (summary != "") rest[n] = rest[n] "      <p class=\"summary\">" summary "</p>\n"
+        rest[n] = rest[n] "    </div>\n  </li>"
+      }
+      END {
+        pages = n ? int((n + size - 1) / size) : 1
+        for (page = 1; page <= pages; page++) {
+          file = dir "/list." c "." page
+          print "<ul class=\"entries\">" > file
+          for (i = 1; i <= n; i++) print start[i] (i > (page - 1) * size && i <= page * size ? "" : " hidden") ">\n" rest[i] > file
+          print "</ul>" > file
+          close(file)
+        }
+        print n + 0
+      }' "$work/posts.tsv")
     pages=$(page_count "$count")
     for ((page = 1; page <= pages; page++)); do
-      item="$work/list.$collection.$page"
-      awk -F "$SEP" -v c="$collection" -v first=$(((page - 1) * PAGE_SIZE + 1)) -v last=$((page * PAGE_SIZE)) '
-        function esc(s) { gsub(/&/, "\\&amp;", s); gsub(/</, "\\&lt;", s); gsub(/>/, "\\&gt;", s); gsub(/"/, "\\&quot;", s); return s }
-        function long_date(d,   months) {
-          split("January February March April May June July August September October November December", months, " ")
-          return (substr(d, 9, 2) + 0) " " months[substr(d, 6, 2) + 0] " " substr(d, 1, 4)
-        }
-        BEGIN { print "<ul class=\"entries\">" }
-        $1 == c {
-          n++
-          hidden = (n < first || n > last) ? " hidden" : ""
-          if ($8 != "") {
-            print "  <li data-difficulty=\"" $8 "\"" hidden ">"
-            title = $6 ". " esc($4); summary = $8
-          } else {
-            print "  <li" hidden ">"
-            title = esc($4); summary = esc($5)
-          }
-          print "    <time datetime=\"" $3 "\">" long_date($3) "</time>"
-          print "    <div>"
-          print "      <h2><a href=\"/" c "/" $2 "\">" title "</a></h2>"
-          if (summary != "") print "      <p class=\"summary\">" summary "</p>"
-          print "    </div>"
-          print "  </li>"
-        }
-        END { print "</ul>" }' "$work/posts.tsv" >"$item"
-      pagination "$collection" "$page" "$pages" >>"$item"
-      index_page "$collection" "$page" "$pages" "$item"
+      list="$work/list.$collection.$page"
+      pagination "$collection" "$page" "$pages" >>"$list"
+      index_page "$collection" "$page" "$pages" "$list"
     done
   done
 }
@@ -617,7 +664,7 @@ changelog() {
   # The feed links to wherever each entry is now. Its guid is where the entry
   # was first, so newer entries pushing it on don't show it again as unread.
   {
-    cat <<EOF
+    put <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
@@ -632,7 +679,7 @@ EOF
       n=$((n + 1))
       text=$(esc "$text")
       text=${text//\'/&apos;}
-      cat <<EOF
+      put <<EOF
     <item>
       <title>$date</title>
       <link>$SITE_URL$(page_path changelog $(((n - 1) / PAGE_SIZE + 1)))#changelog-$date</link>
@@ -702,7 +749,7 @@ read_books() {
 book_line() { # n slug date title author width height small_height
   local id=book-$2-$3 mark=""
   [[ -s $work/review.$1 ]] && mark=$'\n      <span class="mark"><span aria-hidden="true">¶</span><span class="sr-only">has a review</span></span>'
-  cat <<EOF
+  put <<EOF
   <li>
     <time datetime="$3">$(long_date "$3")</time>
     <div class="line">
@@ -720,7 +767,7 @@ EOF
 book_dialog() { # n slug date title author width height
   local id=book-$2-$3 ratio
   ratio=$(awk -v w="$6" -v h="$7" 'BEGIN { printf "%.4f", w / h }')
-  cat <<EOF
+  put <<EOF
 <dialog id="$id" class="book" aria-labelledby="$id-title">
   <button type="button" class="close" commandfor="$id" command="close">close <span aria-hidden="true">×</span></button>
   <div class="stage">
@@ -740,7 +787,7 @@ EOF
     cat "$work/review.$1"
     echo '        </div>'
   fi
-  cat <<'EOF'
+  put <<'EOF'
       </div>
     </div>
   </div>
@@ -781,25 +828,29 @@ books() {
 # a JPEG, or that still has camera data (EXIF or XMP, which can say where the
 # photo was taken), naming the list it's in ($2) and how to fix it ($3).
 jpeg_size() {
-  local size
-  size=$(od -An -tu1 -v -N 65536 "$1" | awk '
-    { for (i = 1; i <= NF; i++) b[n++] = $i }
-    END {
-      if (b[0] != 255 || b[1] != 216) { print "not-jpeg"; exit }
-      for (at = 2; at + 9 < n; at += 2 + b[at + 2] * 256 + b[at + 3]) {
-        if (b[at] != 255) break
-        marker = b[at + 1]
-        if (marker == 225) { print "camera-data"; exit }  # APP1
-        if (marker >= 192 && marker <= 207 && marker != 196 && marker != 200 && marker != 204) {
-          print b[at + 7] * 256 + b[at + 8], b[at + 5] * 256 + b[at + 6]; exit
+  local size bytes
+  # The frame header is usually in the first 4KB; read up to 64KB if not.
+  for bytes in 4096 65536; do
+    size=$(od -An -tu1 -v -N "$bytes" "$1" | awk -v limit="$bytes" '
+      { for (i = 1; i <= NF; i++) b[n++] = $i }
+      END {
+        if (b[0] != 255 || b[1] != 216) { print "not-jpeg"; exit }
+        for (at = 2; at + 9 < n; at += 2 + b[at + 2] * 256 + b[at + 3]) {
+          if (b[at] != 255) { print "unknown"; exit }
+          marker = b[at + 1]
+          if (marker == 225) { print "camera-data"; exit }  # APP1
+          if (marker >= 192 && marker <= 207 && marker != 196 && marker != 200 && marker != 204) {
+            print b[at + 7] * 256 + b[at + 8], b[at + 5] * 256 + b[at + 6]; exit
+          }
         }
-      }
-      print "unknown"
-    }')
+        print (n == limit ? "more" : "unknown")
+      }')
+    [[ $size == more ]] || break
+  done
   case $size in
   not-jpeg) fail "$2: $1 isn't a JPEG; $3" ;;
   camera-data) fail "$2: $1 still has camera data; $3" ;;
-  unknown) fail "$2: couldn't read the size of $1" ;;
+  unknown | more) fail "$2: couldn't read the size of $1" ;;
   esac
   printf '%s' "$size"
 }
@@ -837,8 +888,8 @@ photos() {
     fail "$list: start with an entry, like \"## photo.jpg | alt\""
   awk '/^## / { print substr($0, 4) }' "$list" >"$work/photos.list"
   while IFS='|' read -r file alt; do
-    file=$(printf '%s' "$file" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
-    alt=$(printf '%s' "$alt" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+    trim file "$file"
+    trim alt "$alt"
     [[ -n $alt ]] || fail "$list: $file needs alt text: describe the photo after a |"
     for ((i = 0; i < ${#files[@]}; i++)); do
       [[ ${files[i]} != "$file" ]] || fail "$list: $file appears twice"
@@ -913,35 +964,34 @@ photos() {
 
 # Every page in pages/ but the indexes: Home, About, Contents, Friends, 404.
 static_pages() {
-  local source name path target title layout
+  local source name path target
   for source in pages/*.html; do
     name=${source#pages/}
     name=${name%.html}
     case $name in
     blog | leetcode | changelog | books) continue ;; # the indexes, built with their lists
     esac
-    layout=$(field "$source" layout)
-    title=$(field "$source" title)
+    page_fields "$source"
     case $name in
     index) path=/ target=$out/index.html ;;
     404) path=/404 target=$out/404.html ;; # Vercel shows it for unknown paths
     *) path=/$name target=$out/$name/index.html ;;
     esac
-    mkdir -p "$(dirname "$target")"
+    mkdir -p "${target%/*}"
     {
-      if [[ $layout == home ]]; then
-        page_start "Eric Zheng" / "personal site of eric zheng, based in auckland, new zealand" "$(field "$source" css)" "$(field "$source" js)"
+      if [[ $page_layout == home ]]; then
+        page_start "Eric Zheng" / "personal site of eric zheng, based in auckland, new zealand" "$page_css" "$page_js"
         echo '<body>'
         page_body "$source"
         printf '</body>\n</html>\n'
-      elif [[ $layout == bare ]]; then
+      elif [[ $page_layout == bare ]]; then
         page_body "$source"
       else
-        page_start "$title | Eric Zheng" "$path" "$(field "$source" description)" "$(field "$source" css)" "$(field "$source" js)"
-        reading_start "$(field "$source" nav)" "$(field "$source" main)"
+        page_start "$page_title | Eric Zheng" "$path" "$page_description" "$page_css" "$page_js"
+        reading_start "$page_nav" "$page_main"
         if [[ $name == about ]]; then
           photos >"$work/photos.html"
-          page_body "$source" | fill - photos "$work/photos.html"
+          page_body "$source" photos "$work/photos.html"
         else
           page_body "$source"
         fi
@@ -969,16 +1019,24 @@ sitemap() {
   } >"$out/sitemap.xml"
 }
 
+# Whether a file's name is an image's.
+is_image() {
+  local yes=1
+  shopt -s nocasematch
+  case $1 in *.png | *.jpg | *.jpeg | *.gif | *.webp | *.avif) yes=0 ;; esac
+  shopt -u nocasematch
+  return $yes
+}
+
 # Images beside the Markdown in content/, served from /writing-assets/.
 writing_assets() {
-  local file
+  local file target
   for file in content/*.* content/leetcode/*.* content/blog/*/*.*; do
-    case $(printf '%s' "${file##*.}" | tr '[:upper:]' '[:lower:]') in
-    png | jpg | jpeg | gif | webp | avif)
-      mkdir -p "$out/writing-assets/$(dirname "${file#content/}")"
-      cp "$file" "$out/writing-assets/${file#content/}"
-      ;;
-    esac
+    if is_image "$file"; then
+      target=$out/writing-assets/${file#content/}
+      mkdir -p "${target%/*}"
+      cp "$file" "$target"
+    fi
   done
 }
 
@@ -986,7 +1044,9 @@ writing_assets() {
 
 rm -rf "$out"
 mkdir -p "$out"
-check_markdown content/blog/*/index.md content/leetcode/*.md content/changelog.md content/photos.md content/books.md
+# The check takes a while, so the rest of the build goes on beside it.
+check_markdown content/blog/*/index.md content/leetcode/*.md content/changelog.md content/photos.md content/books.md &
+checking=$!
 read_posts
 read_changelog
 read_books
@@ -998,4 +1058,6 @@ changelog
 books
 static_pages
 sitemap
+wait "$checking" || exit 1
+checking=''
 echo "Built $(wc -l <"$work/posts.tsv" | tr -d ' ') posts, $(wc -l <"$work/changelog.tsv" | tr -d ' ') changelog entries and $(wc -l <"$work/books.tsv" | tr -d ' ') books into $out/."
