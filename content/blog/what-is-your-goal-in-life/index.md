@@ -31,8 +31,8 @@ each allocation would bring a different combination of benefits to your life, an
 
 perhaps the *best life* would reveal itself somewhere in that process.
 
-however, this assumes i can meaningfully anticipate what i will value, how my choices will affect it, and that i am able to weigh my present priorities against my future ones. 
+however, this assumes you can meaningfully anticipate what you will value, how your choices will affect it, and that you are able to weigh your present priorities against your future ones. 
 
-how can i build that model when part of living itself is discovering what i want?
+how can you build that model when part of living itself is discovering what you want?
 
 maybe, it's okay to leave this question unanswered.
