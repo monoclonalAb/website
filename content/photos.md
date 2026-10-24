@@ -91,6 +91,10 @@ bag duty @ [auckland art gallery](https://www.google.com/maps/search/?api=1&quer
 
 really happy to be @ [rotorua](https://www.google.com/maps/search/?api=1&query=Rotorua%20New%20Zealand), 07/26
 
+## sesa-wdcc-hackathon.jpg | A selfie of Eric and two friends on a footpath at night, one hugging a body pillow printed with a photo of a man
+
+family photo @ sesa x wdcc hackathon, 08/26
+
 ## IMG_0057.jpg | Eric taking a selfie with a group of friends in a lobby with curved wooden walls
 
 secret tour of basement @ [auckland museum](https://www.google.com/maps/search/?api=1&query=Auckland%20War%20Memorial%20Museum), 09/26
