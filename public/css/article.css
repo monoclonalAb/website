@@ -141,7 +141,7 @@
   gap: 4px 20px;
 }
 .comments-count,
-.comment-list time,
+.comment-meta > :not(.comment-name),
 .comment-label span {
   color: var(--muted);
   font-size: 14px;
@@ -180,29 +180,32 @@
   line-height: 26px;
 }
 /* Eric's replies sit on the rule the yearbook quote on About uses. */
-.comment.eric,
-.comment-sent {
+.comment.eric {
   margin-left: 24px;
   padding-left: 20px;
   border-left: 2px solid #7c414773;
 }
-/* After a send, api/comments.py comes back to #comment-sent. */
+/* The reader's own comment after a send, until Eric has read it. */
+.comment.waiting :is(.comment-name, p) {
+  color: var(--muted);
+}
+/* After a send, api/comments.py comes back to #comment-sent, which takes the
+   form's place; "leave another" goes to #comment-form, which brings it back.
+   Paper page "Audit · Comments · after sending", A and C. */
 .comment-sent {
   display: none;
+  flex-direction: column;
   gap: 4px;
-  padding: 16px 20px 18px;
-  border-left-color: var(--link);
-  background: #f7f6f2;
+  padding-top: 20px;
 }
 .comment-sent:target {
   display: flex;
-  flex-direction: column;
 }
-.comment-sent-title {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 26px;
+.comment-sent:target ~ .comment-form {
+  display: none;
+}
+.comment-sent p + p {
+  margin-top: 8px;
 }
 
 .comment-form {
@@ -293,13 +296,9 @@
   text-underline-offset: 5px;
 }
 @media (max-width: 599px) {
-  .comment.eric,
-  .comment-sent {
+  .comment.eric {
     margin-left: 14px;
     padding-left: 16px;
-  }
-  .comment-sent {
-    padding: 14px 16px 16px;
   }
   .comment-fields {
     flex-direction: column;

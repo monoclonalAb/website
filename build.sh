@@ -448,11 +448,13 @@ EOF
 # new one there, and public/js/comments.js fetches the approved ones, fills
 # the list and shows the line for its state (data-state). Without JavaScript
 # the <noscript> line shows instead, and the form still sends. After a send,
-# api/comments.py comes back to #comment-sent, which CSS shows by :target.
+# api/comments.py comes back to #comment-sent, which CSS shows by :target in
+# the form's place; with JavaScript, the reader's own comment also shows at
+# the end of the list, greyed, with data-waiting where the date goes.
 comments_section() {
   local slug=$1
   cat <<EOF
-<section class="comments" id="comments" data-post="$slug" aria-labelledby="comments-heading">
+<section class="comments" id="comments" data-post="$slug" data-waiting="waiting for me to read it" aria-labelledby="comments-heading">
   <div class="comments-head">
     <h2 id="comments-heading">comments<span>:</span></h2>
     <p class="comments-count" hidden><span></span> so far</p>
@@ -463,10 +465,11 @@ comments_section() {
   <noscript><p class="comments-status">comments need JavaScript to show. you can still leave one below.</p></noscript>
   <ol class="comment-list" hidden></ol>
   <div class="comment-sent" id="comment-sent">
-    <p class="comment-sent-title">thanks!</p>
-    <p>your comment is with me now. it’ll show up here once I’ve read it.</p>
+    <h3>sent<span>:</span></h3>
+    <p>thanks! your comment is with me now. it’ll show up here once I’ve read it.</p>
+    <p><a href="#comment-form">leave another</a></p>
   </div>
-  <form class="comment-form" method="post" action="/api/comments">
+  <form class="comment-form" id="comment-form" method="post" action="/api/comments">
     <div class="comment-form-head">
       <h3>leave one<span>:</span></h3>
       <p>it shows up here once I’ve read it.</p>
