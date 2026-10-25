@@ -45,7 +45,7 @@ Eric decided these on 2026-10-25 (see the Decision log):
 Steps:
 
 1. **Prove a Python function runs in this project.** Add a hello-world api/comments.py. Eric pushes a branch, and its preview deployment answers at /api/comments. This comes first because Vercel's docs describe Python functions in api/ as supported "for existing projects" (see Surprises). If it doesn't run, stop and ask Eric. The options are a JavaScript function on Vercel's Node runtime with no dependencies and no package.json, or Vercel Services.
-2. **Eric sets up the database.** He adds Upstash for Redis to the Vercel project (Storage tab, free plan). He sets `COMMENTS_PREFIX` to `preview:` for Preview and Development. He copies `KV_REST_API_URL` and `KV_REST_API_TOKEN` into a `.env.local` at the top of the repository, which `.gitignore` already keeps out of git (`.env*`).
+2. **Eric sets up the database.** He adds Upstash for Redis to the Vercel project (Storage tab, free plan). He sets `COMMENTS_PREFIX` to `preview:` for Preview and Development. In the project's Environment Variables, `KV_REST_API_URL`, `KV_REST_API_TOKEN` and `KV_REST_API_READ_ONLY_TOKEN` must each be ticked for Production, Preview and Development. He copies the same three into a `.env.local` at the top of the repository, which `.gitignore` already keeps out of git (`.env*`).
 3. **Design and words.** The design is draft C on the Paper page **Planning · Comments**:
    - C1 and C2 show the list and the form on a post (desktop and mobile).
    - C3 and C6 show the page after a send, with a "thanks!" note.
@@ -101,7 +101,8 @@ Steps:
   - The read-only token can't write.
   - With the database down, a GET answers 502 and a POST goes to the not-sent page.
 - [x] (2026-10-25 18:00) 4b. On the preview of d7386f3, Eric got `{"error": "couldn't load the comments"}` from `/api/comments?post=group-theory`. So outside production the 502 now also says why, as the error's repr: a missing variable's name or an HTTP status, never a token.
-- [ ] 4c. Find the cause from that "why", fix it, and see `[]` on a preview. Sending a comment on a preview waits for the form (step 5), because previews need a Vercel login that curl doesn't have.
+- [x] (2026-10-25 18:10) 4c. The preview's "why" was `KeyError('KV_REST_API_READ_ONLY_TOKEN')`: the read-only token isn't set for Preview (see Surprises).
+- [ ] 4d. Eric adds the missing variables in Vercel. Redeploy, and see `[]` on a preview. Sending a comment on a preview waits for the form (step 5), because previews need a Vercel login that curl doesn't have.
 - [ ] 5. The comments section in `build.sh` and `public/css/article.css`.
 - [ ] 6. public/js/comments.js.
 - [ ] 7. Local testing through `make serve`.
@@ -134,6 +135,7 @@ Steps:
 
 ## Surprises
 
+- On Vercel, the preview had no `KV_REST_API_READ_ONLY_TOKEN`, though Eric's `.env.local` has it. The function looks up the token before the URL, so `KV_REST_API_URL` may be missing too. All three variables need ticking for every environment.
 - The preview deployment of 6adbe80 (step 1) failed. GitHub shows only Vercel's "Deployment has failed" and the deployment id, dpl_4JD1or8View8GpTP58Chj2XWJ55m. The build log needs a Vercel login, which agents here don't have, so Eric pasted it. The site built, and then the Python step stopped: `Error: [RUNTIME_DEPENDENCY_INSTALLATION_FAILED] Total bundle size (490.36 MB) exceeds the maximum function size`. A Python function's bundle includes every file in the project. That took in pandoc, which `scripts/install-pandoc.sh` downloads into `.pandoc/`, plus `out/` and `public/`. The error's advice about the lock file and pre-built wheels doesn't apply, because there are no dependencies.
 
 - Vercel's Python docs (updated 2026-08-12) say Python functions in api/ are supported for "existing projects", and point new Python apps at framework presets or Services: https://vercel.com/docs/functions/runtimes/python/api-directory. It isn't clear whether a project that has never had one can add one now. That's why step 1 comes first.
