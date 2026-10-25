@@ -108,7 +108,7 @@ code_map=$(awk '/^## Code map$/ { on = 1; next } /^## / { on = 0 } on' ARCHITECT
 [[ -n $code_map ]] || fail ARCHITECTURE.md 'put the code map under "## Code map".'
 # shellcheck disable=SC2016 # the backticks are Markdown's, not the shell's
 mapped=$(grep -oE '`[^`]+`' <<<"$code_map" | tr -d '`' | paths_in | while IFS= read -r mention; do pattern "$mention"; done)
-grep -E '^(build\.sh|Makefile|vercel\.json|scripts/.+|pages/.+|public/(css|js)/.+)$' <<<"$files" | while IFS= read -r file; do
+grep -E '^(build\.sh|Makefile|vercel\.json|api/.+|scripts/.+|pages/.+|public/(css|js)/.+)$' <<<"$files" | while IFS= read -r file; do
   while IFS= read -r regex; do
     [[ -n $regex ]] && grep -qE -- "$regex" <<<"$file" && continue 2
   done <<<"$mapped"

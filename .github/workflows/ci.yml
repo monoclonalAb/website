@@ -14,6 +14,6 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      # ubuntu-latest comes with make and shellcheck.
+      # ubuntu-latest comes with make, shellcheck and python3.
       - run: scripts/install-pandoc.sh
       - run: PATH="$PWD/.pandoc/bin:$PATH" make check

@@ -1,4 +1,5 @@
 User-Agent: *
 Allow: /
+Disallow: /comment-not-sent
 
 Sitemap: https://ericzheng.nz/sitemap.xml

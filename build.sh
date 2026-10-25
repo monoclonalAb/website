@@ -501,9 +501,9 @@ read_posts() {
 # A post's page: /blog/<slug> or /leetcode/<slug>.
 article() {
   local collection=$1 slug=$2 date=$3 title=$4 summary=$5 problem_id=$6 problem_url=$7 difficulty=$8
-  local file base outline body description meta="" link="" toc="" entry entries=() tab=$'\t'
+  local file base outline body description meta="" link="" toc="" js="" entry entries=() tab=$'\t'
   if [[ $collection == blog ]]; then
-    file=content/blog/$slug/index.md base=/writing-assets/blog/$slug
+    file=content/blog/$slug/index.md base=/writing-assets/blog/$slug js=comments
   else
     file=content/$collection/$slug.md base=/writing-assets/$collection
   fi
@@ -522,7 +522,7 @@ article() {
   fi
   description=${summary:-"$title — writing by eric zheng"}
   {
-    page_start "$title | Eric Zheng" "/$collection/$slug" "$description" article "" "$title" "$date"
+    page_start "$title | Eric Zheng" "/$collection/$slug" "$description" article "$js" "$title" "$date"
     reading_start "$collection"
     put <<EOF
 <p class="meta"><a href="/$collection">← $collection</a></p>
@@ -536,8 +536,61 @@ $toc
 EOF
     cat "$body"
     echo "</article>"
+    [[ $collection == blog ]] && comments_section "$slug"
     reading_end
   } >"$out/$collection/$slug/index.html"
+}
+
+# The comments under a blog post. api/comments.py keeps them: the form sends a
+# new one there, and public/js/comments.js fetches the approved ones, fills
+# the list and shows the line for its state (data-state). Without JavaScript
+# the <noscript> line shows instead, and the form still sends. After a send,
+# api/comments.py comes back to #comment-sent, which CSS shows by :target in
+# the form's place; with JavaScript, the reader's own comment also shows at
+# the end of the list, greyed, with data-waiting where the date goes.
+comments_section() {
+  local slug=$1
+  put <<EOF
+<section class="comments" id="comments" data-post="$slug" data-waiting="waiting for me to read it" aria-labelledby="comments-heading">
+  <div class="comments-head">
+    <h2 id="comments-heading">comments<span>:</span></h2>
+    <p class="comments-count" hidden><span></span> so far</p>
+  </div>
+  <p class="comments-status" data-state="loading" hidden>loading comments…</p>
+  <p class="comments-status" data-state="none" hidden>no comments yet. be the first to leave one.</p>
+  <p class="comments-status" data-state="failed" hidden>comments couldn’t load right now. <a href="/blog/$slug">try again</a></p>
+  <noscript><p class="comments-status">comments need JavaScript to show. you can still leave one below.</p></noscript>
+  <ol class="comment-list" hidden></ol>
+  <div class="comment-sent" id="comment-sent">
+    <h3>sent<span>:</span></h3>
+    <p>thanks! your comment is with me now. it’ll show up here once I’ve read it.</p>
+    <p><a href="#comment-form">leave another</a></p>
+  </div>
+  <form class="comment-form" id="comment-form" method="post" action="/api/comments">
+    <div class="comment-form-head">
+      <h3>leave one<span>:</span></h3>
+      <p>it shows up here once I’ve read it.</p>
+    </div>
+    <input type="hidden" name="post" value="$slug">
+    <div class="comment-fields">
+      <div class="comment-field">
+        <label for="comment-name">name</label>
+        <input id="comment-name" name="name" required maxlength="80" autocomplete="name">
+      </div>
+      <div class="comment-field">
+        <div class="comment-label"><label for="comment-email">email</label> <span id="comment-email-note">never shown</span></div>
+        <input id="comment-email" name="email" type="email" required maxlength="254" autocomplete="email" aria-describedby="comment-email-note">
+      </div>
+    </div>
+    <div class="comment-field">
+      <label for="comment-text">comment</label>
+      <textarea id="comment-text" name="text" rows="5" required maxlength="4000"></textarea>
+    </div>
+    <div class="comment-trap" aria-hidden="true"><label>website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+    <button type="submit">send</button>
+  </form>
+</section>
+EOF
 }
 
 # Renders the page of every post in $1 (lines of posts.tsv), a few at a time.
