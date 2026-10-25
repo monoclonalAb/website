@@ -91,7 +91,7 @@ Steps:
 - [ ] 2b. `COMMENTS_PREFIX` set to `preview:` for Preview and Development in Vercel (Eric to confirm).
 - [x] (2026-10-25 17:30) 3a. Three drafts on the Paper page **Planning · Comments**: A ledger, B slips, C thread, each at 1440 and 390, with a notes board. Every word on them is a placeholder.
 - [x] (2026-10-25 18:10) 3b. Eric picked C. Its other states are drawn on C3 to C7 (see step 3).
-- [ ] 3c. Eric writes the words.
+- [x] (2026-10-25 18:40) 3c. Eric approved the boards' words as written.
 - [x] (2026-10-25 17:40) 4a. api/comments.py written. It was tested against the real database under a throwaway key prefix that the test deleted afterwards, on Python 3.12 (Vercel's) and 3.14. 35 checks passed:
   - A good comment lands in `pending`, email included, and isn't shown.
   - The hidden field saves nothing but looks sent.
@@ -103,9 +103,17 @@ Steps:
 - [x] (2026-10-25 18:00) 4b. On the preview of d7386f3, Eric got `{"error": "couldn't load the comments"}` from `/api/comments?post=group-theory`. So outside production the 502 now also says why, as the error's repr: a missing variable's name or an HTTP status, never a token.
 - [x] (2026-10-25 18:10) 4c. The preview's "why" was `KeyError('KV_REST_API_READ_ONLY_TOKEN')`: the read-only token isn't set for Preview (see Surprises).
 - [x] (2026-10-25 18:25) 4d. Eric added the missing variables in Vercel. On the preview of 2511f62, `/api/comments?post=group-theory` answers `[]`. Sending a comment on a preview waits for the form (step 5), because previews need a Vercel login that curl doesn't have.
-- [ ] 5. The comments section in `build.sh` and `public/css/article.css`.
-- [ ] 6. public/js/comments.js.
-- [ ] 7. Local testing through `make serve`.
+- [x] (2026-10-25 19:40) 5. `comments_section` in `build.sh` writes the section under every blog post. The styles are in `public/css/article.css`, the not-sent page is `pages/comment-not-sent.html`, and `public/robots.txt` keeps that page out of search engines.
+- [x] (2026-10-25 19:40) 6. `public/js/comments.js` fetches the list and shows the line for its state.
+- [x] (2026-10-25 19:40) 7. `make serve` runs api/comments.py as a script. It serves `out/` and /api/comments together on port 4000, reading `.env.local` with the `preview:` keys. Checked in headless Chrome, at 1440 and in a 390px frame, against the Paper boards C1 to C5, using comments added under `preview:` and deleted afterwards (the database is empty again):
+  - Comments drawn, Eric's on the rule, line breaks and paragraphs kept, and a long link wrapped. A name and a comment containing HTML show as plain text.
+  - The "4 so far" count.
+  - "No comments yet" on another post (from the page's final DOM).
+  - "Couldn't load", with the database address pointed at a closed port.
+  - The no-JavaScript line, in a sandboxed frame without scripts.
+  - A curl send answers 303 to `#comment-sent`, and the "thanks!" note shows there.
+  - A bad send goes to /comment-not-sent.
+  - `make check` passes.
 - [ ] 8. scripts/comments.sh and make comments.
 - [ ] 9. Checks in `make check` and `scripts/check-docs.sh`.
 - [ ] 10. Docs.
@@ -126,6 +134,8 @@ Steps:
 - Decision: draft C, the thread: name and date on one line, Eric's replies indented on the 2px quote rule, labelled fields on slip-coloured paper, and an ink "send" button. Why: Eric's pick. (2026-10-25)
 - Decision: a failed send goes to a plain not-sent page, and the reader presses Back. Why: the browser restores what they wrote when they go back. A redirect to the post would reload it and lose the text. (2026-10-25)
 - Decision: the "thanks!" note after a send uses the same rule as Eric's replies, filled with slip paper. Why: it's Eric speaking, and `:target` can show it without JavaScript. (2026-10-25)
+- Decision: the comment section's words live in `comments_section` in `build.sh`, and `public/js/comments.js` only shows or hides the lines already in the page (`data-state`) and fills in the count. Why: all the copy stays in one place in the HTML, and the script has no words of its own. (2026-10-25)
+- Decision: `make serve` runs api/comments.py, which serves `out/` and /api/comments together, instead of `python3 -m http.server`. Why: the same code that runs on Vercel answers on the laptop, with no second server to keep in step. (2026-10-25)
 - Decision: blog posts only, not Leetcode. Why: Eric asked for comments on his blog. (2026-10-25)
 - Decision: comments are plain text, with no Markdown and no links. Why: nothing a stranger writes becomes HTML on the page, and spam links earn nothing. (2026-10-25)
 - Decision: the form asks for an email address and never shows it. It lives only in `pending`, and approving or deleting the comment drops it. Why: Eric wants a way to contact a commenter, as ericzheng.org has. (2026-10-25)
@@ -135,6 +145,7 @@ Steps:
 
 ## Surprises
 
+- Headless Chrome won't make a window narrower than 500px, so a `--window-size=390,…` screenshot shows a 500px page cut off at 390px. To check the 390px layout, load the page in a 390px-wide iframe instead.
 - On Vercel, the preview had no `KV_REST_API_READ_ONLY_TOKEN`, though Eric's `.env.local` has it. The function looks up the token before the URL, so `KV_REST_API_URL` may be missing too. All three variables need ticking for every environment.
 - The preview deployment of 6adbe80 (step 1) failed. GitHub shows only Vercel's "Deployment has failed" and the deployment id, dpl_4JD1or8View8GpTP58Chj2XWJ55m. The build log needs a Vercel login, which agents here don't have, so Eric pasted it. The site built, and then the Python step stopped: `Error: [RUNTIME_DEPENDENCY_INSTALLATION_FAILED] Total bundle size (490.36 MB) exceeds the maximum function size`. A Python function's bundle includes every file in the project. That took in pandoc, which `scripts/install-pandoc.sh` downloads into `.pandoc/`, plus `out/` and `public/`. The error's advice about the lock file and pre-built wheels doesn't apply, because there are no dependencies.
 

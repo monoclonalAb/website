@@ -1,5 +1,5 @@
 # make            build the site into out/
-# make serve      build it, and show it at http://localhost:4000
+# make serve      build it, and show it at http://localhost:4000, comments and all
 # make check      what CI runs: shellcheck, the docs check and a build
 # make daily      start today's Leetcode entry; DATE=2026-09-14 for another day
 # make photos     add photos to About: ADD="~/Pictures/IMG_1234.heic"
@@ -11,7 +11,7 @@ site:
 	./build.sh
 
 serve: site
-	python3 -m http.server 4000 --bind 127.0.0.1 --directory out
+	python3 api/comments.py
 
 check:
 	shellcheck build.sh scripts/*.sh

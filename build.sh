@@ -425,7 +425,7 @@ article() {
   description=${summary:-"$title — writing by eric zheng"}
   mkdir -p "$out/$collection/$slug"
   {
-    page_start "$title | Eric Zheng" "/$collection/$slug" "$description" article "" "$title" "$date"
+    page_start "$title | Eric Zheng" "/$collection/$slug" "$description" article "$([[ $collection == blog ]] && echo comments)" "$title" "$date"
     reading_start "$collection"
     cat <<EOF
 <p class="meta"><a href="/$collection">← $collection</a></p>
@@ -439,8 +439,58 @@ $toc
 EOF
     cat "$body"
     echo "</article>"
+    [[ $collection == blog ]] && comments_section "$slug"
     reading_end
   } >"$out/$collection/$slug/index.html"
+}
+
+# The comments under a blog post. api/comments.py keeps them: the form sends a
+# new one there, and public/js/comments.js fetches the approved ones, fills
+# the list and shows the line for its state (data-state). Without JavaScript
+# the <noscript> line shows instead, and the form still sends. After a send,
+# api/comments.py comes back to #comment-sent, which CSS shows by :target.
+comments_section() {
+  local slug=$1
+  cat <<EOF
+<section class="comments" id="comments" data-post="$slug" aria-labelledby="comments-heading">
+  <div class="comments-head">
+    <h2 id="comments-heading">comments<span>:</span></h2>
+    <p class="comments-count" hidden><span></span> so far</p>
+  </div>
+  <p class="comments-status" data-state="loading" hidden>loading comments…</p>
+  <p class="comments-status" data-state="none" hidden>no comments yet. be the first to leave one.</p>
+  <p class="comments-status" data-state="failed" hidden>comments couldn’t load right now. <a href="/blog/$slug">try again</a></p>
+  <noscript><p class="comments-status">comments need JavaScript to show. you can still leave one below.</p></noscript>
+  <ol class="comment-list" hidden></ol>
+  <div class="comment-sent" id="comment-sent">
+    <p class="comment-sent-title">thanks!</p>
+    <p>your comment is with me now. it’ll show up here once I’ve read it.</p>
+  </div>
+  <form class="comment-form" method="post" action="/api/comments">
+    <div class="comment-form-head">
+      <h3>leave one<span>:</span></h3>
+      <p>it shows up here once I’ve read it.</p>
+    </div>
+    <input type="hidden" name="post" value="$slug">
+    <div class="comment-fields">
+      <div class="comment-field">
+        <label for="comment-name">name</label>
+        <input id="comment-name" name="name" required maxlength="80" autocomplete="name">
+      </div>
+      <div class="comment-field">
+        <div class="comment-label"><label for="comment-email">email</label> <span id="comment-email-note">never shown</span></div>
+        <input id="comment-email" name="email" type="email" required maxlength="254" autocomplete="email" aria-describedby="comment-email-note">
+      </div>
+    </div>
+    <div class="comment-field">
+      <label for="comment-text">comment</label>
+      <textarea id="comment-text" name="text" rows="5" required maxlength="4000"></textarea>
+    </div>
+    <div class="comment-trap" aria-hidden="true"><label>website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+    <button type="submit">send</button>
+  </form>
+</section>
+EOF
 }
 
 # Renders every post's page, a few at a time.

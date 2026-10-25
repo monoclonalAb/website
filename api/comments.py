@@ -142,3 +142,38 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header("Content-Length", "0")
         self.end_headers()
+
+
+if __name__ == "__main__":
+    # make serve: the built site in out/ and this function together on
+    # http://localhost:4000, so a post's comments work on a laptop. It reads the
+    # database's address and tokens from .env.local, and keeps to the preview:
+    # keys unless COMMENTS_PREFIX says otherwise.
+    import functools
+    from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+
+    try:
+        with open(".env.local") as env:
+            for line in env:
+                name, _, value = line.strip().partition("=")
+                if value and not name.startswith("#"):
+                    os.environ.setdefault(name, value.strip('"'))
+    except FileNotFoundError:
+        print("No .env.local, so comments won't load; docs/writing.md says how to get one.")
+    os.environ.setdefault("COMMENTS_PREFIX", "preview:")
+
+    class Local(handler, SimpleHTTPRequestHandler):
+        def is_api(self):
+            return urllib.parse.urlsplit(self.path).path == "/api/comments"
+
+        def do_GET(self):
+            (handler.do_GET if self.is_api() else SimpleHTTPRequestHandler.do_GET)(self)
+
+        def do_POST(self):
+            if self.is_api():
+                handler.do_POST(self)
+            else:
+                self.send_error(405)
+
+    print("Serving out/ and /api/comments at http://localhost:4000")
+    ThreadingHTTPServer(("127.0.0.1", 4000), functools.partial(Local, directory="out")).serve_forever()
