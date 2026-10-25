@@ -1,5 +1,5 @@
 // The comments under a blog post. build.sh writes the section, every line of
-// its words and the form; api/comments.py keeps the comments. This script only
+// its words and the form; api/comments.mjs keeps the comments. This script only
 // fetches the approved ones, fills the list and shows the line for its state:
 // loading, none yet, or couldn't load. Sending is the plain form's job, so it
 // works without JavaScript, when the <noscript> line shows instead.
@@ -25,7 +25,7 @@
   };
   // 12 January 2025, like the site's other long dates, in the reader's time zone.
   const longDate = new Intl.DateTimeFormat("en-NZ", { day: "numeric", month: "long", year: "numeric" });
-  // What api/comments.py keeps of a name and a comment, to spot the reader's
+  // What api/comments.mjs keeps of a name and a comment, to spot the reader's
   // own once Eric has approved it.
   const tidy = (comment) => ({
     name: String(comment.name).trim().split(/\s+/).join(" "),

@@ -1,3 +1,7 @@
+## 2026-10-25
+
+added comments to every [blog post](/blog)
+
 ## 2026-10-24
 
 wrote up a [short blog post](/blog/what-is-your-goal-in-life) on life goals

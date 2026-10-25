@@ -17,12 +17,12 @@ This file is a map. The repository is the record: anything not written down in i
 
 - Check `git status` and preserve work you didn't make.
 - UI work: read [docs/design.md](docs/design.md). Designs live in Paper; use Paper for design work, never Penpot.
-- You need pandoc and shellcheck (`brew install pandoc shellcheck`); photos and book covers also need ImageMagick. `make serve` and `make check` also run python3, and `make comments` jq; recent macOS has both.
+- You need pandoc and shellcheck (`brew install pandoc shellcheck`); photos and book covers also need ImageMagick. `make serve` and `make check` also run Node (`brew install node`), and `make comments` jq, which recent macOS has.
 
 ## Rules
 
 - **Eric's words.** Copy comes from Eric or the Paper boards. Don't paraphrase it, and don't invent taglines, descriptions, summaries or biography.
-- **Bash, HTML, CSS and JavaScript.** `build.sh` and pandoc build the site; there is no framework, Node or package.json. Eric moved the site off Next.js on purpose: don't bring back a framework, bundler or package manager. The one piece that runs on a server is `api/comments.py`, the blog's comments: a Vercel Function in Python with no dependencies (Vercel can't run bash).
+- **Bash, HTML, CSS and JavaScript.** `build.sh` and pandoc build the site; there is no framework, npm or package.json. Eric moved the site off Next.js on purpose: don't bring back a framework, bundler or package manager. The one piece that runs on a server is `api/comments.mjs`, the blog's comments: a Vercel Function in JavaScript, using only Node's built-ins (Vercel can't run bash).
 - **HTML and CSS first.** JavaScript runs only from `public/js/waves.js` (the edge waves), `public/js/page-fit.js` (fits as many index entries as the screen holds on each page, and opens an old link to a changelog entry on the page it has moved to), `public/js/page-jump.js` (the page-number field) `public/js/fade-out.js` (the fade-out of About's photo sheet and a book picked on /books) and `public/js/comments.js` (fetches and shows a blog post's approved comments, and after a send the reader's own, waiting). Add a script only when unavoidable.
 - **Portable scripts.** `build.sh` and `scripts/` run on macOS (bash 3.2, BSD awk and sed) and on Linux (bash 5, GNU awk) for Vercel and CI, and must build the same site on both. No associative arrays, `mapfile`, `find`, `xargs` or GNU-only flags.
 - **Native browsing.** Plain links, native scrolling, history and zoom. No scroll libraries, smooth scrolling, pagers, scrollspy or drawers.
@@ -34,6 +34,6 @@ This file is a map. The repository is the record: anything not written down in i
 
 ## Done means
 
-`make check` passes: shellcheck, a syntax check of `api/comments.py`, `make docs` (which checks the docs against the code) and a build. For visual changes, also look at the affected pages at 1440px and 390px wide (`make serve`) and compare them with Paper.
+`make check` passes: shellcheck, a syntax check of `api/comments.mjs`, `make docs` (which checks the docs against the code) and a build. For visual changes, also look at the affected pages at 1440px and 390px wide (`make serve`) and compare them with Paper.
 
 If your change makes a doc wrong, fix the doc in the same change. When Eric corrects something an agent did, write the rule where the next agent will look, and if a script could check it, add the check to `scripts/check-docs.sh`.

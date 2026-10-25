@@ -541,11 +541,11 @@ EOF
   } >"$out/$collection/$slug/index.html"
 }
 
-# The comments under a blog post. api/comments.py keeps them: the form sends a
+# The comments under a blog post. api/comments.mjs keeps them: the form sends a
 # new one there, and public/js/comments.js fetches the approved ones, fills
 # the list and shows the line for its state (data-state). Without JavaScript
 # the <noscript> line shows instead, and the form still sends. After a send,
-# api/comments.py comes back to #comment-sent, which CSS shows by :target in
+# api/comments.mjs comes back to #comment-sent, which CSS shows by :target in
 # the form's place; with JavaScript, the reader's own comment also shows at
 # the end of the list, greyed, with data-waiting where the date goes.
 comments_section() {

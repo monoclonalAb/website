@@ -189,7 +189,7 @@
 .comment.waiting :is(.comment-name, p) {
   color: var(--muted);
 }
-/* After a send, api/comments.py comes back to #comment-sent, which takes the
+/* After a send, api/comments.mjs comes back to #comment-sent, which takes the
    form's place; "leave another" goes to #comment-form, which brings it back.
    Paper page "Audit · Comments · after sending", A and C. */
 .comment-sent {

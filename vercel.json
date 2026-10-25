@@ -5,7 +5,8 @@
   "buildCommand": "PATH=\"$PWD/.pandoc/bin:$PATH\" ./build.sh",
   "outputDirectory": "out",
   "functions": {
-    "api/comments.py": {
+    "api/comments.mjs": {
+      "includeFiles": "content/blog/*/index.md",
       "excludeFiles": "{.pandoc/**,out/**,public/**}"
     }
   },
