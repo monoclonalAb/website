@@ -102,7 +102,7 @@ Steps:
   - With the database down, a GET answers 502 and a POST goes to the not-sent page.
 - [x] (2026-10-25 18:00) 4b. On the preview of d7386f3, Eric got `{"error": "couldn't load the comments"}` from `/api/comments?post=group-theory`. So outside production the 502 now also says why, as the error's repr: a missing variable's name or an HTTP status, never a token.
 - [x] (2026-10-25 18:10) 4c. The preview's "why" was `KeyError('KV_REST_API_READ_ONLY_TOKEN')`: the read-only token isn't set for Preview (see Surprises).
-- [ ] 4d. Eric adds the missing variables in Vercel. Redeploy, and see `[]` on a preview. Sending a comment on a preview waits for the form (step 5), because previews need a Vercel login that curl doesn't have.
+- [x] (2026-10-25 18:25) 4d. Eric added the missing variables in Vercel. On the preview of 2511f62, `/api/comments?post=group-theory` answers `[]`. Sending a comment on a preview waits for the form (step 5), because previews need a Vercel login that curl doesn't have.
 - [ ] 5. The comments section in `build.sh` and `public/css/article.css`.
 - [ ] 6. public/js/comments.js.
 - [ ] 7. Local testing through `make serve`.
