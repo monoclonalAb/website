@@ -10,7 +10,7 @@
 #   q  stop
 #
 # Approving or deleting drops the email, which is never shown. It talks to the
-# Upstash Redis database that api/comments.py uses, with the address and token
+# Upstash Redis database that api/comments.mjs uses, with the address and token
 # in .env.local (docs/writing.md). The real comments by default; make comments
 # PREVIEW=1 (--preview) for the test ones that previews and make serve use.
 #
