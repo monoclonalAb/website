@@ -73,7 +73,10 @@ class handler(BaseHTTPRequestHandler):
             comments = [{k: c[k] for k in PUBLIC if k in c} for c in map(json.loads, stored)]
         except Exception as error:
             self.log_message("comments: couldn't read %s: %r", post, error)
-            return self.reply(502, b'{"error": "couldn\'t load the comments"}\n')
+            failed = {"error": "couldn't load the comments"}
+            if os.environ.get("VERCEL_ENV") != "production":
+                failed["why"] = repr(error)  # previews and laptops only; names, never a token
+            return self.reply(502, (json.dumps(failed) + "\n").encode())
         self.reply(200, json.dumps(comments, ensure_ascii=False).encode())
 
     def do_POST(self):

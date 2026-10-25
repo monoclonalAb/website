@@ -100,7 +100,8 @@ Steps:
   - A GET shows approved comments oldest first and never an email, even one stored there by mistake.
   - The read-only token can't write.
   - With the database down, a GET answers 502 and a POST goes to the not-sent page.
-- [ ] 4b. Eric opens `<preview URL>/api/comments?post=group-theory` and sees `[]`. That shows the function reaches the database on Vercel. Sending a comment on a preview waits for the form (step 5), because previews need a Vercel login that curl doesn't have.
+- [x] (2026-10-25 18:00) 4b. On the preview of d7386f3, Eric got `{"error": "couldn't load the comments"}` from `/api/comments?post=group-theory`. So outside production the 502 now also says why, as the error's repr: a missing variable's name or an HTTP status, never a token.
+- [ ] 4c. Find the cause from that "why", fix it, and see `[]` on a preview. Sending a comment on a preview waits for the form (step 5), because previews need a Vercel login that curl doesn't have.
 - [ ] 5. The comments section in `build.sh` and `public/css/article.css`.
 - [ ] 6. public/js/comments.js.
 - [ ] 7. Local testing through `make serve`.
