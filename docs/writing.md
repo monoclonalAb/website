@@ -2,6 +2,8 @@
 
 A post is published when it's committed to `main`. Keep work in progress uncommitted or on a branch.
 
+To see your changes first, run `make serve` and open http://localhost:4000. Each time you save a file it redoes the pages that show it, in under a second, and reloading the page shows the change. If a file breaks a rule, the terminal names it, and the page keeps showing the last version that built.
+
 **Leetcode:** `make daily` creates `content/leetcode/<today>.md` with the problem's title, number, link and difficulty filled in from LeetCode. The date is today in UTC, when the daily rolls over. Pass a date for an older one: `make daily DATE=2026-09-14`.
 
 **Blog:** create `content/blog/<slug>/index.md` by hand (and, optionally, a changelog entry):

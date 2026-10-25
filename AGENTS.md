@@ -30,6 +30,7 @@ This file is a map. The repository is the record: anything not written down in i
 - **Accessible.** Semantic HTML, one `h1` per page, visible focus, keyboard access, readable without JavaScript, and motion that stops for reduced motion.
 - **No new dependencies** without a concrete need.
 - Commit only when asked. Never push or deploy.
+- **Pull requests.** Match Eric's own PRs (#9 on): a sentence-case title, and a description of one simple sentence, like "added /books page". No summaries, test notes or footers.
 
 ## Done means
 
