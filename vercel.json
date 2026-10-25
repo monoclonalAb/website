@@ -4,6 +4,11 @@
   "installCommand": "scripts/install-pandoc.sh",
   "buildCommand": "PATH=\"$PWD/.pandoc/bin:$PATH\" ./build.sh",
   "outputDirectory": "out",
+  "functions": {
+    "api/comments.py": {
+      "excludeFiles": "{.pandoc/**,out/**,public/**}"
+    }
+  },
   "trailingSlash": false,
   "redirects": [
     {
