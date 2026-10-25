@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# make comments: goes through the comments waiting under blog posts, oldest
-# first. For each it shows the post, the name, the email, when it was sent and
-# the text, then reads one key:
+# make comments: goes through the comments waiting under blog posts and on
+# pages (/birthday-2026), oldest first. For each it shows the post, the name,
+# the email, when it was sent and the text, then reads one key:
 #
 #   a  approve: it shows under the post straight away
 #   e  approve as Eric: the same, set on the rule his replies use
