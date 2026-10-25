@@ -145,10 +145,11 @@ class handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    # make serve: the built site in out/ and this function together on
-    # http://localhost:4000, so a post's comments work on a laptop. It reads the
-    # database's address and tokens from .env.local, and keeps to the preview:
-    # keys unless COMMENTS_PREFIX says otherwise.
+    # make serve (scripts/serve.sh): the built site in out/ and this function
+    # together on http://localhost:4000, so a post's comments work on a laptop.
+    # It reads the database's address and tokens from .env.local, and keeps to
+    # the preview: keys unless COMMENTS_PREFIX says otherwise. The browser keeps
+    # no copies of pages, so a reload after a rebuild always shows the new one.
     import functools
     from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
@@ -164,7 +165,7 @@ if __name__ == "__main__":
 
     class Local(handler, SimpleHTTPRequestHandler):
         def is_api(self):
-            return urllib.parse.urlsplit(self.path).path == "/api/comments"
+            return urllib.parse.urlsplit(getattr(self, "path", "")).path == "/api/comments"
 
         def do_GET(self):
             (handler.do_GET if self.is_api() else SimpleHTTPRequestHandler.do_GET)(self)
@@ -175,5 +176,12 @@ if __name__ == "__main__":
             else:
                 self.send_error(405)
 
-    print("Serving out/ and /api/comments at http://localhost:4000")
+        def end_headers(self):
+            if not self.is_api():  # the function's own answers already say no-store
+                self.send_header("Cache-Control", "no-store")
+            super().end_headers()
+
+        def log_request(self, *args):
+            pass  # quiet, like make serve was; a comment that isn't sent still says why
+
     ThreadingHTTPServer(("127.0.0.1", 4000), functools.partial(Local, directory="out")).serve_forever()

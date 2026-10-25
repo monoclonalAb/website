@@ -1,5 +1,6 @@
 # make            build the site into out/
-# make serve      build it, and show it at http://localhost:4000, comments and all
+# make serve      build it, show it at http://localhost:4000 with its comments, and build it
+#                 again on every save
 # make check      what CI runs: shellcheck, a syntax check of api/comments.py,
 #                 the docs check and a build
 # make daily      start today's Leetcode entry; DATE=2026-09-14 for another day
@@ -13,8 +14,8 @@
 site:
 	./build.sh
 
-serve: site
-	python3 api/comments.py
+serve:
+	scripts/serve.sh
 
 check:
 	shellcheck build.sh scripts/*.sh

@@ -91,6 +91,10 @@ bag duty @ [auckland art gallery](https://www.google.com/maps/search/?api=1&quer
 
 really happy to be @ [rotorua](https://www.google.com/maps/search/?api=1&query=Rotorua%20New%20Zealand), 07/26
 
+## sesa-wdcc-hackathon.jpg | A selfie of Eric and two friends on a footpath at night, one hugging a body pillow printed with a photo of a man
+
+family photo @ sesa x wdcc hackathon, 08/26
+
 ## IMG_0057.jpg | Eric taking a selfie with a group of friends in a lobby with curved wooden walls
 
 secret tour of basement @ [auckland museum](https://www.google.com/maps/search/?api=1&query=Auckland%20War%20Memorial%20Museum), 09/26
@@ -110,3 +114,7 @@ william's birthday, 10/26
 ## IMG_4961.jpg | Eric taking a selfie with seven friends on wooden benches in a bar with plywood walls and a large wall fan
 
 last day of semester @ [the beer spot](https://www.google.com/maps/search/?api=1&query=The%20Beer%20Spot%20Morningside%20Auckland), 10/26
+
+## rainbows-end.jpg | Eric taking a selfie at the foot of a purple drop tower ride, two friends in costumes walking behind him
+
+not height legal for fearfall @ [rainbow's end](https://www.google.com/maps/search/?api=1&query=Rainbow%27s%20End%20Auckland), 10/26

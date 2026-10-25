@@ -124,6 +124,7 @@ Steps:
   - `docs/writing.md`: approving comments and `.env.local`.
   - `docs/design.md`: the comments section.
   - README.md, the Makefile's comments and the CI comment.
+- [x] (2026-10-25 22:50) 11a. Merged origin/main (five commits) into the branch. Main's `make serve` became `scripts/serve.sh`, which rebuilds on every save. It now runs api/comments.py, which also sends pages as no-store, in place of its built-in server. `comments_section` prints with main's `put` builtin. Built main and the branch side by side: the only differences are the four blog posts (each gained the script tag and the 40-line section, including the new "What is your Goal in Life?"), `article.css`, `robots.txt`, `comments.js` and the not-sent page. `make check` passes. `scripts/serve.sh` serves pages and /api/comments, and takes a comment.
 - [ ] 11. Working in production.
 
 ## Decision log
@@ -155,6 +156,7 @@ Steps:
 
 ## Surprises
 
+- While testing the merged `make serve`, `pkill -f scripts/serve.sh` probably also stopped a `make serve` Eric had running in his main checkout. Port 4000 was answered by main's server, and nothing was listening afterwards. Stop a test server by the PID you started, never by a name pattern.
 - Headless Chrome won't make a window narrower than 500px, so a `--window-size=390,…` screenshot shows a 500px page cut off at 390px. To check the 390px layout, load the page in a 390px-wide iframe instead.
 - On Vercel, the preview had no `KV_REST_API_READ_ONLY_TOKEN`, though Eric's `.env.local` has it. The function looks up the token before the URL, so `KV_REST_API_URL` may be missing too. All three variables need ticking for every environment.
 - The preview deployment of 6adbe80 (step 1) failed. GitHub shows only Vercel's "Deployment has failed" and the deployment id, dpl_4JD1or8View8GpTP58Chj2XWJ55m. The build log needs a Vercel login, which agents here don't have, so Eric pasted it. The site built, and then the Python step stopped: `Error: [RUNTIME_DEPENDENCY_INSTALLATION_FAILED] Total bundle size (490.36 MB) exceeds the maximum function size`. A Python function's bundle includes every file in the project. That took in pandoc, which `scripts/install-pandoc.sh` downloads into `.pandoc/`, plus `out/` and `public/`. The error's advice about the lock file and pre-built wheels doesn't apply, because there are no dependencies.
