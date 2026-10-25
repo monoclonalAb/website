@@ -45,6 +45,16 @@
   ],
   "headers": [
     {
+      "source": "/birthday-2026",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+    },
+    {
+      "source": "/birthday-2026.ics",
+      "headers": [
+        { "key": "Content-Type", "value": "text/calendar; charset=utf-8" }
+      ]
+    },
+    {
       "source": "/changelog.xml",
       "headers": [
         {

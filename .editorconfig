@@ -10,3 +10,7 @@ trim_trailing_whitespace = true
 
 [*.md]
 trim_trailing_whitespace = false
+
+# Calendar files end their lines with CRLF (RFC 5545).
+[*.ics]
+end_of_line = crlf
