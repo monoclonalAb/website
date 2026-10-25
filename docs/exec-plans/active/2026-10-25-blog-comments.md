@@ -84,8 +84,10 @@ Steps:
 - [x] (2026-10-25 16:40) Eric's three decisions: email, hearing about new comments, his replies.
 - [x] (2026-10-25 16:45) 1a. `api/comments.py` is a hello-world: a GET answers `comments: ok (python <version>)`, and other methods get 501. Tested locally by serving its `handler` class with Python's `HTTPServer`. `make check` passes, and the build leaves api/ out of `out/`. It has a row in ARCHITECTURE.md's code map.
 - [x] (2026-10-25 16:48) 1b. Pushed as 6adbe80 on `task/create-change-notification-email-list`, with Eric's permission. Vercel's preview deployment failed (see Surprises).
-- [ ] 1c. Read the build log, fix the cause, and see `comments: ok (python 3.12…)` at `<preview URL>/api/comments`.
-- [ ] 2. Database and environment variables set up.
+- [x] (2026-10-25 16:51) 1c. Fixed the bundle size with `excludeFiles` (374e5a3). The preview deployment succeeded: https://website-afrzsb4ga-monoclonalabs-projects.vercel.app.
+- [x] (2026-10-25 17:05) 1d. Eric opened `/api/comments` on that preview and saw `comments: ok`. Previews sit behind Vercel's login, so an agent's curl gets a redirect to sign-in.
+- [x] (2026-10-25 17:10) 2a. Eric added Upstash for Redis (database `sought-tadpole-237806`) and put its variables in `.env.local` in his main checkout: `KV_REST_API_URL`, `KV_REST_API_TOKEN`, `KV_REST_API_READ_ONLY_TOKEN`, `KV_URL` and `REDIS_URL`. This worktree's `.env.local` held only a copy of `vercel.json` as of cd8ae1e, so it was replaced with a copy of his. Checked with curl: PING answers PONG, DBSIZE is 0, and the read-only token is refused a SET.
+- [ ] 2b. `COMMENTS_PREFIX` set to `preview:` for Preview and Development in Vercel (Eric to confirm).
 - [x] (2026-10-25 17:30) 3a. Three drafts on the Paper page **Planning · Comments**: A ledger, B slips, C thread, each at 1440 and 390, with a notes board. Every word on them is a placeholder.
 - [x] (2026-10-25 18:10) 3b. Eric picked C. Its other states are drawn on C3 to C7 (see step 3).
 - [ ] 3c. Eric writes the words.
@@ -105,6 +107,7 @@ Steps:
 - Decision: Upstash Redis stores the comments. Why: Vercel doesn't store data itself, and Upstash is in Vercel's Marketplace, free at this size and usable with plain HTTPS from both Python and curl. (2026-10-25)
 - Decision: Eric approves in the terminal with make comments, not on an admin web page. Why: there's no login to build or secure. Eric agreed. (2026-10-25)
 - Decision: the form is a plain HTML POST answered with a redirect, and comments.js only draws the list. Why: sending works without JavaScript, and the script stays small. (2026-10-25)
+- Decision: a GET in api/comments.py reads with `KV_REST_API_READ_ONLY_TOKEN`; only a POST uses `KV_REST_API_TOKEN`. Why: the code path every page view runs then can't change the database, even with a bug. (2026-10-25)
 - Decision: `vercel.json` sets `excludeFiles` for api/comments.py to leave out everything in `.pandoc/`, `out/` and `public/`. Why: without it the function's bundle is 490 MB and won't deploy (see Surprises). `content/` stays in, because step 4 checks that `content/blog/<slug>/index.md` exists. (2026-10-25)
 - Decision: draft C, the thread: name and date on one line, Eric's replies indented on the 2px quote rule, labelled fields on slip-coloured paper, and an ink "send" button. Why: Eric's pick. (2026-10-25)
 - Decision: a failed send goes to a plain not-sent page, and the reader presses Back. Why: the browser restores what they wrote when they go back. A redirect to the post would reload it and lose the text. (2026-10-25)
