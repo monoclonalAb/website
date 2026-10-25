@@ -1,14 +1,10 @@
-// /api/comments: the comments under blog posts and on pages that have the line
-// <!-- comments -->, as a Vercel Function. JavaScript on Vercel's Node.js
-// runtime, with Node's built-ins only, so there's nothing to install and no
-// package.json. It ends in .mjs so Vercel runs it as it is, rather than
-// compiling it to CommonJS. The design and the reasons are in
+// /api/comments: the blog's comments, as a Vercel Function. JavaScript on
+// Vercel's Node.js runtime, with Node's built-ins only, so there's nothing to
+// install and no package.json. It ends in .mjs so Vercel runs it as it is,
+// rather than compiling it to CommonJS. The design and the reasons are in
 // docs/exec-plans/active/2026-10-25-blog-comments.md.
 //
-// A post names whose comments they are: a blog post's slug (group-theory), or
-// a page's path (/birthday-2026).
-//
-//   GET  /api/comments?post=<post>  the post's approved comments, as JSON
+//   GET  /api/comments?post=<slug>  the post's approved comments, as JSON
 //   POST /api/comments              a comment from the form under a post. It
 //                                   waits in the pending list until Eric
 //                                   approves it with make comments.
@@ -19,7 +15,7 @@
 //
 //   pending          comments waiting for approval, oldest first. Each is a
 //                    JSON object: id, post, name, email, text, time (UTC).
-//   comments:<post>  a post's approved comments, oldest first: id, name, text,
+//   comments:<slug>  a post's approved comments, oldest first: id, name, text,
 //                    time, and eric (true when Eric wrote it). Never an email:
 //                    anyone can read this list.
 import { randomBytes } from "node:crypto";
@@ -29,7 +25,6 @@ import { extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const SLUG = /^[A-Za-z0-9_-]+$/; // build.sh's rule for a post's folder
-const MARKER = "<!-- comments -->"; // where a page in pages/ takes comments
 const CONTROL = /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g; // all but tab and newline
 const PUBLIC = ["id", "name", "text", "time", "eric"]; // what a GET may show
 const MAX_BODY = 64 * 1024; // 4,000 characters of emoji, percent-encoded, still fit
@@ -68,20 +63,10 @@ async function redis(command, write = false) {
 // status, or why it couldn't be reached. Never a token.
 const why = (error) => `${error}${error?.cause ? ` (${error.cause})` : ""}`;
 
-const isFile = (path) => Boolean(statSync(path, { throwIfNoEntry: false })?.isFile());
-
-// The page a post's comments are on, like /blog/group-theory or
-// /birthday-2026, or null if nothing takes comments by that name. The function
-// runs from the project's root, and vercel.json puts the posts and the pages
-// in its bundle.
-function pageOf(post) {
-  if (SLUG.test(post) && isFile(`content/blog/${post}/index.md`)) return `/blog/${post}`;
-  const name = post.slice(1);
-  if (post.startsWith("/") && SLUG.test(name) && isFile(`pages/${name}.html`)) {
-    const lines = readFileSync(`pages/${name}.html`, "utf8").split("\n");
-    if (lines.some((line) => line.trim() === MARKER)) return post;
-  }
-  return null;
+// The function runs from the project's root, and vercel.json puts the posts in
+// its bundle.
+function isPost(slug) {
+  return SLUG.test(slug) && Boolean(statSync(`content/blog/${slug}/index.md`, { throwIfNoEntry: false })?.isFile());
 }
 
 // A field's text with Windows line breaks made plain and control characters gone.
@@ -106,7 +91,7 @@ function redirect(location) {
 async function list(request) {
   const post = new URL(request.url).searchParams.get("post") ?? "";
   try {
-    const stored = pageOf(post) ? await redis(["LRANGE", key(`comments:${post}`), "0", "-1"]) : [];
+    const stored = isPost(post) ? await redis(["LRANGE", key(`comments:${post}`), "0", "-1"]) : [];
     const comments = stored.map((item) => {
       const comment = JSON.parse(item);
       return Object.fromEntries(PUBLIC.filter((k) => Object.hasOwn(comment, k)).map((k) => [k, comment[k]]));
@@ -122,7 +107,7 @@ async function list(request) {
 
 async function send(request) {
   try {
-    return redirect(`${await save(request)}#comment-sent`);
+    return redirect(`/blog/${await save(request)}#comment-sent`);
   } catch (error) {
     // NotSent, or the database is down
     console.error(`comments: not sent: ${why(error)}`);
@@ -130,7 +115,7 @@ async function send(request) {
   }
 }
 
-// Checks the form and adds the comment to pending; returns the page it's on.
+// Checks the form and adds the comment to pending; returns the post's slug.
 async function save(request) {
   const declared = Number(request.headers.get("content-length") ?? 0);
   if (declared > MAX_BODY) throw new NotSent(`a body of ${declared} bytes`);
@@ -144,9 +129,8 @@ async function save(request) {
   const field = (name) => form.get(name) ?? "";
 
   const post = field("post");
-  const page = pageOf(post);
-  if (!page) throw new NotSent(`no post called ${JSON.stringify(post.slice(0, 80))}`);
-  if (field("website")) return page; // only bots fill the hidden field: look sent, save nothing
+  if (!isPost(post)) throw new NotSent(`no post called ${JSON.stringify(post.slice(0, 80))}`);
+  if (field("website")) return post; // only bots fill the hidden field: look sent, save nothing
   const name = clean(field("name")).replace(/\s+/g, " ");
   const email = clean(field("email"));
   const text = clean(field("text"));
@@ -167,7 +151,7 @@ async function save(request) {
     time: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
   };
   await redis(["RPUSH", key("pending"), JSON.stringify(comment)], true);
-  return page;
+  return post;
 }
 
 const handler = {

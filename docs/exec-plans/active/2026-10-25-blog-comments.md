@@ -157,6 +157,7 @@ Steps:
 - Decision: the comment section's words live in `comments_section` in `build.sh`, and `public/js/comments.js` only shows or hides the lines already in the page (`data-state`) and fills in the count. Why: all the copy stays in one place in the HTML, and the script has no words of its own. (2026-10-25)
 - Decision: `make serve` runs api/comments.py, which serves `out/` and /api/comments together, instead of `python3 -m http.server`. Why: the same code that runs on Vercel answers on the laptop, with no second server to keep in step. (2026-10-25)
 - Decision: blog posts only, not Leetcode. Why: Eric asked for comments on his blog. (2026-10-25)
+- Decision: comments on blog posts and nowhere else. The birthday page had them for a day, through a `<!-- comments -->` line any page in pages/ could use; that line and the code for it are gone. Why: Eric asked for comments only on blog posts. None had been left on the birthday page. (2026-10-26)
 - Decision: comments are plain text, with no Markdown and no links. Why: nothing a stranger writes becomes HTML on the page, and spam links earn nothing. (2026-10-25)
 - Decision: the form asks for an email address and never shows it. It lives only in `pending`, and approving or deleting the comment drops it. Why: Eric wants a way to contact a commenter, as ericzheng.org has. (2026-10-25)
 - Decision: nothing notifies Eric of new comments; he runs make comments now and then. Why: Eric's choice; it needs no email service. (2026-10-25)
