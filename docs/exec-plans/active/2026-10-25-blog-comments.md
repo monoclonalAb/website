@@ -130,7 +130,7 @@ Steps:
   - 46 checks against a fake Upstash in memory: the 35 of 4a, plus a path in the post field, no content type, an empty body, non-English text, the read-only token refused a write, and a missing setting named in the 502.
   - `make serve`'s server on a spare port (Eric's own was on 4000): pages, the 404 page, paths that try to leave `out/`, a send and a bad send.
   - Once against the real database: a read of `preview:comments:group-theory` (two approved test comments), and a send under a throwaway prefix, which was then deleted.
-- [ ] 12b. On a preview of the JavaScript function, send a comment, approve it with `make comments PREVIEW=1` and see it under the post.
+- [x] (2026-10-25 23:09) 12b. Pushed as 4705b32, with Eric's permission; its preview deployment succeeded. On the preview, Eric saw the earlier test comments load, then sent one. It reached `preview:pending` in compact JSON, the JavaScript function's format (the Python one put spaces after colons), and `make comments PREVIEW=1` approved it, without its email.
 - [ ] 11. Working in production.
 
 ## Decision log
