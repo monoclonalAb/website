@@ -6,7 +6,7 @@
   "outputDirectory": "out",
   "functions": {
     "api/comments.mjs": {
-      "includeFiles": "content/blog/*/index.md",
+      "includeFiles": "{content/blog/*/index.md,pages/*.html}",
       "excludeFiles": "{.pandoc/**,out/**,public/**}"
     }
   },
