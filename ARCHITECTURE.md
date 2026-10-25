@@ -7,7 +7,7 @@ Eric Zheng's personal site: a split-alphabet home page plus About, Blog, Content
 1. Eric commits Markdown to `content/`: blog posts, Leetcode entries, the changelog, the list of About photos and the books he's read. [docs/writing.md](docs/writing.md) has the format.
 2. `make` runs `build.sh`. It checks every file in `content/`, turns the Markdown into HTML with pandoc, and wraps it and the copy in `pages/` in the shared head, masthead and footer. Each page goes in its own folder in `out/` (`out/blog/page/2/index.html`), beside the feed, the sitemap and a copy of `public/`.
 3. A file that breaks a rule stops the build and names the file: a misspelt frontmatter key, raw HTML, a photo that still has camera data, or a book without a cover.
-4. Vercel runs the same build (`vercel.json`), with pandoc from `scripts/install-pandoc.sh`, and serves `out/`. `vercel.json` also redirects the old static site's links, and the page-number field's `?page=N` when JavaScript is off.
+4. Vercel runs the same build (`vercel.json`), with pandoc from `scripts/install-pandoc.sh`, serves `out/`, and runs `api/comments.py` at /api/comments. `vercel.json` also redirects the old static site's links, and the page-number field's `?page=N` when JavaScript is off.
 5. In the browser, five small scripts in `public/js/` add the edge waves, index pages that hold as many entries as fit on the screen (which also opens an old changelog link on the right page), the page-number field's in-place jump, the fade-out of the photo sheet and of a picked book, and a blog post's comments, which they fetch from /api/comments. Every page reads fine without them, and the comment form sends without them.
 
 ## Code map
@@ -49,4 +49,4 @@ Most of these are things that are absent, so they're easy to break without notic
 
 ## Checks
 
-`make check` is what CI runs (`.github/workflows/ci.yml`): shellcheck, `make docs` and a build. There are no unit or browser tests. The build is the content test, because `build.sh` checks every file it reads.
+`make check` is what CI runs (`.github/workflows/ci.yml`): shellcheck, a syntax check of `api/comments.py`, `make docs` and a build. There are no unit or browser tests. The build is the content test, because `build.sh` checks every file it reads.

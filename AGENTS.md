@@ -17,7 +17,7 @@ This file is a map. The repository is the record: anything not written down in i
 
 - Check `git status` and preserve work you didn't make.
 - UI work: read [docs/design.md](docs/design.md). Designs live in Paper; use Paper for design work, never Penpot.
-- You need pandoc and shellcheck (`brew install pandoc shellcheck`); photos and book covers also need ImageMagick.
+- You need pandoc and shellcheck (`brew install pandoc shellcheck`); photos and book covers also need ImageMagick. `make serve` and `make check` also run python3, and `make comments` jq; recent macOS has both.
 
 ## Rules
 
@@ -33,6 +33,6 @@ This file is a map. The repository is the record: anything not written down in i
 
 ## Done means
 
-`make check` passes: shellcheck, `make docs` (which checks the docs against the code) and a build. For visual changes, also look at the affected pages at 1440px and 390px wide (`make serve`) and compare them with Paper.
+`make check` passes: shellcheck, a syntax check of `api/comments.py`, `make docs` (which checks the docs against the code) and a build. For visual changes, also look at the affected pages at 1440px and 390px wide (`make serve`) and compare them with Paper.
 
 If your change makes a doc wrong, fix the doc in the same change. When Eric corrects something an agent did, write the rule where the next agent will look, and if a script could check it, add the check to `scripts/check-docs.sh`.

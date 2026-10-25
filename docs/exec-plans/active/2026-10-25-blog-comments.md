@@ -117,8 +117,13 @@ Steps:
 - [x] (2026-10-25 20:10) 5b. On the preview, Eric found the "thanks!" box awkward: indented, and sitting where the comments go. Paper page **Audit · Comments · after sending** compares today's version with four others. The pick is A: after a send, the form gives its place to "sent:", the thanks and a "leave another" link. That needs only CSS, and the none-yet line hides.
 - [x] (2026-10-25 21:45) 5c. Eric chose C on top of A, and it's built. After a send, "sent:" takes the form's place (CSS, `:target`), and the reader's own comment ends the list greyed, "waiting for me to read it". `public/js/comments.js` keeps a copy in sessionStorage as the form sends, and drops it from view once an approved comment has the same name and text. Checked by driving headless Chrome over the DevTools protocol at 1440 and 390: before a send, after it, "leave another", and after approval (shown once, counted). Test comments removed; Eric's preview test is still pending.
 - [x] (2026-10-25 22:05) 8. `scripts/comments.sh` and `make comments`, with `PREVIEW=1` for the test keys. Tested under a throwaway prefix, with four comments sent through the function on `make serve`: approve, approve as Eric, delete, skip, a stray key and quit, on bash 3.2 and 5. A comment with quotes, a backslash, an emoji and a blank line was approved and removed intact. Readers' GETs never include an email. A dry run (`q`) against the real keys says none are waiting. Eric's three preview tests are left for him.
-- [ ] 9. Checks in `make check` and `scripts/check-docs.sh`.
-- [ ] 10. Docs.
+- [x] (2026-10-25 22:30) 9. `make check` parses api/comments.py with Python's `ast` and writes no files. A broken file fails it. The code-map check in `scripts/check-docs.sh` now covers api/: an unmapped api/zz-probe.py failed it.
+- [x] (2026-10-25 22:30) 10. Docs, kept up with each step and gardened at the end with `.agents/skills/doc-gardening/`:
+  - AGENTS.md: the five scripts, the one server function, the comments exception to "runtime authoring", python3 and jq, and what `make check` runs.
+  - ARCHITECTURE.md: how a page gets built, the code map, the invariants and the checks.
+  - `docs/writing.md`: approving comments and `.env.local`.
+  - `docs/design.md`: the comments section.
+  - README.md, the Makefile's comments and the CI comment.
 - [ ] 11. Working in production.
 
 ## Decision log

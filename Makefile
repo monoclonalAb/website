@@ -1,6 +1,7 @@
 # make            build the site into out/
 # make serve      build it, and show it at http://localhost:4000, comments and all
-# make check      what CI runs: shellcheck, the docs check and a build
+# make check      what CI runs: shellcheck, a syntax check of api/comments.py,
+#                 the docs check and a build
 # make daily      start today's Leetcode entry; DATE=2026-09-14 for another day
 # make photos     add photos to About: ADD="~/Pictures/IMG_1234.heic"
 # make covers     ready the book covers saved in public/books/
@@ -17,6 +18,7 @@ serve: site
 
 check:
 	shellcheck build.sh scripts/*.sh
+	python3 -c 'import ast, sys; ast.parse(open(sys.argv[1]).read(), sys.argv[1])' api/comments.py
 	scripts/check-docs.sh
 	./build.sh
 
