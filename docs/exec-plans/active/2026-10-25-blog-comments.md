@@ -125,6 +125,7 @@ Steps:
   - `docs/design.md`: the comments section.
   - README.md, the Makefile's comments and the CI comment.
 - [x] (2026-10-25 22:50) 11a. Merged origin/main (five commits) into the branch. Main's `make serve` became `scripts/serve.sh`, which rebuilds on every save. It now runs api/comments.py, which also sends pages as no-store, in place of its built-in server. `comments_section` prints with main's `put` builtin. Built main and the branch side by side: the only differences are the four blog posts (each gained the script tag and the 40-line section, including the new "What is your Goal in Life?"), `article.css`, `robots.txt`, `comments.js` and the not-sent page. `make check` passes. `scripts/serve.sh` serves pages and /api/comments, and takes a comment.
+- [x] (2026-10-25 23:05) 11b. Opened PR #16. It conflicted with main again (#15, the birthday page), so merged origin/main again. Only the docs conflicted: ARCHITECTURE.md's intro and code map, and `docs/design.md`'s list. Both kept. Built against main: the same differences as in 11a, and the birthday page is identical.
 - [ ] 11. Working in production.
 
 ## Decision log
