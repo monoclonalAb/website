@@ -378,6 +378,47 @@ page_body() {
   done <"$1"
 }
 
+# Each page's comment is as strict as a post's frontmatter, so a misspelt key
+# or value fails the build rather than vanishing. A page needs a title and a
+# description unless it has a layout.
+check_pages() {
+  awk '
+    function fail(message) {
+      printf "%s: %s\n", file, message > "/dev/stderr"; failed = 1; exit 1
+    }
+    function exists(path,   line, ok) { ok = (getline line < path) >= 0; close(path); return ok }
+    function finish() {
+      if (inside) fail("close the comment at the top with --> on a line of its own")
+      if (!("layout" in value) && !("title" in value)) fail("title: add one")
+      if (!("layout" in value) && !("description" in value)) fail("description: add one")
+    }
+    FNR == 1 {
+      if (NR > 1) finish()
+      file = FILENAME; split("", value); inside = 0
+      if (/^<!--/) {
+        if ($0 != "<!--") fail("put the <!-- that opens the comment at the top on a line of its own")
+        inside = 1; next
+      }
+    }
+    !inside { next }
+    /-->/ { if ($0 != "-->") fail("put --> on a line of its own"); inside = 0; next }
+    {
+      if ($0 !~ /^[a-z]+: [^ \t]/) fail("can'\''t read \"" $0 "\"; write key: value")
+      key = substr($0, 1, index($0, ":") - 1); v = substr($0, length(key) + 3)
+      if (!index(" title description nav main css js layout ", " " key " ")) fail("unknown key " key "; use title, description, nav, main, css, js or layout")
+      if (key in value) fail(key " appears twice")
+      value[key] = v
+      if (key == "layout" && v !~ /^(home|bare)$/) fail("layout: use home or bare")
+      if (key == "nav" && v !~ /^(about|blog|contents|changelog)$/) fail("nav: use about, blog, contents or changelog")
+      if (key == "css" || key == "js") {
+        n = split(v, names, " ")
+        for (i = 1; i <= n; i++) if (!exists("public/" key "/" names[i] "." key)) fail(key ": there is no public/" key "/" names[i] "." key)
+      }
+    }
+    END { if (failed) exit 1; if (NR) finish() }
+  ' pages/*.html
+}
+
 # --- Posts -------------------------------------------------------------------
 
 # Every post becomes a line of posts.tsv, newest first, fields separated by
@@ -1156,6 +1197,7 @@ fi
 if [[ -z $whole ]]; then
   out=out
   # Read and check everything first, so a mistake changes nothing.
+  check_pages # quick enough to check every page each time
   ((${#checks[@]} == 0)) || check_markdown "${checks[@]}"
   if [[ -n $read_them ]]; then read_posts; fi
   if [[ -n $redo_changelog ]]; then read_changelog; fi
@@ -1201,6 +1243,7 @@ fi
 
 rm -rf "$out"
 mkdir -p "$out"
+check_pages
 # The check takes a while, so the rest of the build goes on beside it.
 check_markdown content/blog/*/index.md content/leetcode/*.md content/changelog.md content/photos.md content/books.md &
 checking=$!
