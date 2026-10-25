@@ -1,8 +1,10 @@
-// The comments under a blog post. build.sh writes the section, every line of
-// its words and the form; api/comments.mjs keeps the comments. This script only
-// fetches the approved ones, fills the list and shows the line for its state:
-// loading, none yet, or couldn't load. Sending is the plain form's job, so it
-// works without JavaScript, when the <noscript> line shows instead.
+// The comments under a blog post, or on a page with the line
+// <!-- comments -->, like the birthday page. build.sh writes the section,
+// every line of its words and the form; api/comments.mjs keeps the comments.
+// This script only fetches the approved ones, fills the list and shows the
+// line for its state: loading, none yet, or couldn't load. Sending is the
+// plain form's job, so it works without JavaScript, when the <noscript> line
+// shows instead.
 //
 // After a send, the page comes back at #comment-sent, where CSS puts "sent:"
 // in the form's place. This script adds the reader's own comment to the end
