@@ -83,7 +83,7 @@ Steps:
 - [x] (2026-10-25 08:56) Looked at how ericzheng.org does comments (see Purpose).
 - [x] (2026-10-25 16:20) Eric chose live comments from a server, approved from the terminal. Plan written.
 - [x] (2026-10-25 16:40) Eric's three decisions: email, hearing about new comments, his replies.
-- [x] (2026-10-25 16:45) 1a. `api/comments.py` is a hello-world: a GET answers `comments: ok (python <version>)`, and other methods get 501. Tested locally by serving its `handler` class with Python's `HTTPServer`. `make check` passes, and the build leaves api/ out of `out/`. It has a row in ARCHITECTURE.md's code map.
+- [x] (2026-10-25 16:45) 1a. api/comments.py is a hello-world: a GET answers `comments: ok (python <version>)`, and other methods get 501. Tested locally by serving its `handler` class with Python's `HTTPServer`. `make check` passes, and the build leaves api/ out of `out/`. It has a row in ARCHITECTURE.md's code map.
 - [x] (2026-10-25 16:48) 1b. Pushed as 6adbe80 on `task/create-change-notification-email-list`, with Eric's permission. Vercel's preview deployment failed (see Surprises).
 - [x] (2026-10-25 16:51) 1c. Fixed the bundle size with `excludeFiles` (374e5a3). The preview deployment succeeded: https://website-afrzsb4ga-monoclonalabs-projects.vercel.app.
 - [x] (2026-10-25 17:05) 1d. Eric opened `/api/comments` on that preview and saw `comments: ok`. Previews sit behind Vercel's login, so an agent's curl gets a redirect to sign-in.
@@ -126,12 +126,20 @@ Steps:
   - README.md, the Makefile's comments and the CI comment.
 - [x] (2026-10-25 22:50) 11a. Merged origin/main (five commits) into the branch. Main's `make serve` became `scripts/serve.sh`, which rebuilds on every save. It now runs api/comments.py, which also sends pages as no-store, in place of its built-in server. `comments_section` prints with main's `put` builtin. Built main and the branch side by side: the only differences are the four blog posts (each gained the script tag and the 40-line section, including the new "What is your Goal in Life?"), `article.css`, `robots.txt`, `comments.js` and the not-sent page. `make check` passes. `scripts/serve.sh` serves pages and /api/comments, and takes a comment.
 - [x] (2026-10-25 23:05) 11b. Opened PR #16. It conflicted with main again (#15, the birthday page), so merged origin/main again. Only the docs conflicted: ARCHITECTURE.md's intro and code map, and `docs/design.md`'s list. Both kept. Built against main: the same differences as in 11a, and the birthday page is identical.
+- [x] (2026-10-25 22:48) 12a. Eric asked for the function in JavaScript, after PR #16 merged. api/comments.py became `api/comments.mjs`, on Vercel's Node.js runtime with only Node's built-ins and no package.json. It has the same checks, limits, keys, answers and log lines; a refusal is logged as, for example, `NotSent: a name of 0 characters`. `make serve` runs it with node, `make check` checks it with `node --check`, and nothing needs python3 any more. `vercel.json` adds `includeFiles` for the posts. Tested three ways:
+  - 46 checks against a fake Upstash in memory: the 35 of 4a, plus a path in the post field, no content type, an empty body, non-English text, the read-only token refused a write, and a missing setting named in the 502.
+  - `make serve`'s server on a spare port (Eric's own was on 4000): pages, the 404 page, paths that try to leave `out/`, a send and a bad send.
+  - Once against the real database: a read of `preview:comments:group-theory` (two approved test comments), and a send under a throwaway prefix, which was then deleted.
+- [ ] 12b. On a preview of the JavaScript function, send a comment, approve it with `make comments PREVIEW=1` and see it under the post.
 - [ ] 11. Working in production.
 
 ## Decision log
 
 - Decision: comments load live from a server, as on ericzheng.org. A pull request per comment plus a rebuild was the alternative. Why: Eric wants a comment to show the moment he approves it, and Vercel runs the server, so there's no machine to maintain. The accepted costs: comments need JavaScript to show, every view of a post calls the function, and some AGENTS.md rules change (step 10). (2026-10-25)
-- Decision: the function is Python, using only the standard library. Why: Vercel functions can't be bash, AGENTS.md rules out Node and package.json, and Upstash's HTTPS interface needs no client library. (2026-10-25)
+- Decision: the function is Python, using only the standard library. Why: Vercel functions can't be bash, AGENTS.md rules out Node and package.json, and Upstash's HTTPS interface needs no client library. (2026-10-25) Replaced the same day by the JavaScript function below.
+- Decision: the function is JavaScript, `api/comments.mjs`, using only Node's built-ins, with no package.json. It replaces api/comments.py and does the same things. Why: Eric asked for it. It's the option step 1 named if Python hadn't worked. (2026-10-25)
+- Decision: `api/comments.mjs` ends in .mjs and exports a `fetch(request)` handler that takes a Web `Request` and returns a `Response`. Why: Vercel runs a .mjs file as an ES module without a package.json; a .js file it would compile to CommonJS first. Node has the same `Request` and `Response`, so `make serve` hands the function requests as they are, and the same code answers on the laptop and on Vercel. (2026-10-25)
+- Decision: `vercel.json` gives the JavaScript function `includeFiles` for every `content/blog/<slug>/index.md`, and keeps `excludeFiles`. Why: a Node function's bundle holds only the files Vercel traces its code to, which may miss a path built from the slug; the exclusions keep `out/` out in case the trace follows `make serve`'s code to it. (2026-10-25)
 - Decision: Upstash Redis stores the comments. Why: Vercel doesn't store data itself, and Upstash is in Vercel's Marketplace, free at this size and usable with plain HTTPS from both Python and curl. (2026-10-25)
 - Decision: Eric approves in the terminal with make comments, not on an admin web page. Why: there's no login to build or secure. Eric agreed. (2026-10-25)
 - Decision: the form is a plain HTML POST answered with a redirect, and comments.js only draws the list. Why: sending works without JavaScript, and the script stays small. (2026-10-25)
@@ -156,6 +164,8 @@ Steps:
 - Decision: the email list for changelog updates is separate work, not part of this plan. What was suggested: Buttondown's free plan keeps the list, and a make announce script sends the newest changelog entry through Buttondown's API. (2026-10-25)
 
 ## Surprises
+
+- Run from /tmp, which is a link to /private/tmp on macOS, `api/comments.mjs` didn't start its server: its check for being run with node compared the two names of the same file. It compares real paths now, so a checkout reached through a link works too.
 
 - While testing the merged `make serve`, `pkill -f scripts/serve.sh` probably also stopped a `make serve` Eric had running in his main checkout. Port 4000 was answered by main's server, and nothing was listening afterwards. Stop a test server by the PID you started, never by a name pattern.
 - Headless Chrome won't make a window narrower than 500px, so a `--window-size=390,…` screenshot shows a 500px page cut off at 390px. To check the 390px layout, load the page in a 390px-wide iframe instead.
