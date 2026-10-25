@@ -56,10 +56,11 @@ Steps:
 4. **The function: api/comments.py.**
    - GET `?post=<slug>` answers with the post's approved comments as JSON, with `Cache-Control: no-store` so an approval shows at once. An unknown post gets `[]`.
    - POST takes the form's fields: post, name, email, text and a hidden field called website.
-     - The post must match `[a-z0-9-]+`, and `content/blog/<slug>/index.md` must exist. A Python function's bundle includes the repository, and it runs from the project's root folder.
-     - After trimming spaces, the name must be 1 to 80 characters, the email 3 to 254 with an @ in it, and the text 1 to 4000. The body may be at most 16 KB.
+     - The post must match `[A-Za-z0-9_-]+`, the rule `build.sh` sets for a post's folder, and `content/blog/<slug>/index.md` must exist. A Python function's bundle includes the repository, and it runs from the project's root folder.
+     - After trimming spaces, the name must be 1 to 80 characters, the email 3 to 254 with an @ in it, and the text 1 to 4000. Windows line breaks become plain ones, and control characters other than tab and newline are dropped. The body may be at most 64 KB.
      - Only bots fill the hidden website field. If it's filled, answer as if the comment was saved, and save nothing.
-     - If `pending` already holds 100 comments, refuse with 503, so a flood can't fill the database.
+     - If `pending` already holds 100 comments, refuse it, so a flood can't fill the database.
+     - Every refusal goes in the function's log on Vercel, with the reason but never the comment or the email.
      - Otherwise save the comment and answer 303 to `/blog/<slug>#comment-sent`.
      - Any failure answers 303 to /comment-not-sent. That covers bad input that got past the browser, a full `pending` list and a database error. The form's `required`, `type="email"` and `maxlength` catch most mistakes before that.
    - Check it with curl on the preview: a POST, then a GET of the post, shows no comment, but the comment is in `preview:pending`. An approved comment's GET never includes an email.
@@ -91,7 +92,15 @@ Steps:
 - [x] (2026-10-25 17:30) 3a. Three drafts on the Paper page **Planning · Comments**: A ledger, B slips, C thread, each at 1440 and 390, with a notes board. Every word on them is a placeholder.
 - [x] (2026-10-25 18:10) 3b. Eric picked C. Its other states are drawn on C3 to C7 (see step 3).
 - [ ] 3c. Eric writes the words.
-- [ ] 4. api/comments.py.
+- [x] (2026-10-25 17:40) 4a. api/comments.py written. It was tested against the real database under a throwaway key prefix that the test deleted afterwards, on Python 3.12 (Vercel's) and 3.14. 35 checks passed:
+  - A good comment lands in `pending`, email included, and isn't shown.
+  - The hidden field saves nothing but looks sent.
+  - Thirteen kinds of bad input go to /comment-not-sent: no post, an unknown post, a Leetcode slug, an empty name, a name of 81 characters, an email with no @, an email with a space, an empty comment, a comment of 4,001 characters, too many fields, a multipart body, a body over 64 KB, and a full `pending`.
+  - 4,000 emoji fit.
+  - A GET shows approved comments oldest first and never an email, even one stored there by mistake.
+  - The read-only token can't write.
+  - With the database down, a GET answers 502 and a POST goes to the not-sent page.
+- [ ] 4b. Eric opens `<preview URL>/api/comments?post=group-theory` and sees `[]`. That shows the function reaches the database on Vercel. Sending a comment on a preview waits for the form (step 5), because previews need a Vercel login that curl doesn't have.
 - [ ] 5. The comments section in `build.sh` and `public/css/article.css`.
 - [ ] 6. public/js/comments.js.
 - [ ] 7. Local testing through `make serve`.
@@ -107,6 +116,9 @@ Steps:
 - Decision: Upstash Redis stores the comments. Why: Vercel doesn't store data itself, and Upstash is in Vercel's Marketplace, free at this size and usable with plain HTTPS from both Python and curl. (2026-10-25)
 - Decision: Eric approves in the terminal with make comments, not on an admin web page. Why: there's no login to build or secure. Eric agreed. (2026-10-25)
 - Decision: the form is a plain HTML POST answered with a redirect, and comments.js only draws the list. Why: sending works without JavaScript, and the script stays small. (2026-10-25)
+- Decision: a post's slug is checked with `build.sh`'s rule, `[A-Za-z0-9_-]+`, not `[a-z0-9-]+`. Why: every post the build accepts can take comments. (2026-10-25)
+- Decision: a POST's body may be 64 KB, not 16 KB. Why: the form percent-encodes each byte of non-English text as three characters, so 4,000 emoji make about 48 KB. (2026-10-25)
+- Decision: a full `pending` goes to the not-sent page like every other refusal, not to a bare 503. Why: a reader always lands on a page of the site that says what to do. (2026-10-25)
 - Decision: a GET in api/comments.py reads with `KV_REST_API_READ_ONLY_TOKEN`; only a POST uses `KV_REST_API_TOKEN`. Why: the code path every page view runs then can't change the database, even with a bug. (2026-10-25)
 - Decision: `vercel.json` sets `excludeFiles` for api/comments.py to leave out everything in `.pandoc/`, `out/` and `public/`. Why: without it the function's bundle is 490 MB and won't deploy (see Surprises). `content/` stays in, because step 4 checks that `content/blog/<slug>/index.md` exists. (2026-10-25)
 - Decision: draft C, the thread: name and date on one line, Eric's replies indented on the 2px quote rule, labelled fields on slip-coloured paper, and an ink "send" button. Why: Eric's pick. (2026-10-25)
