@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # make serve: shows the site at http://localhost:4000, comments and all
-# (api/comments.py, with the test comments; docs/writing.md), and runs build.sh
+# (api/comments.mjs, with the test comments; docs/writing.md), and runs build.sh
 # --update whenever a file in content/, pages/ or public/ (or build.sh)
 # changes, which redoes only the pages that show it, in well under a second,
 # so saving a post and reloading the page shows the change. A file that breaks
@@ -62,11 +62,11 @@ stamp=$(mktemp)
 trap 'rm -f "$stamp"' EXIT
 scan
 build
-# api/comments.py, run as a script, serves out/ like python3 -m http.server,
-# and the blog's comments at /api/comments. The browser keeps no copies, so it
-# never shows an old one after a rebuild. (Revalidating isn't enough: two
-# saves in the same second have the same Last-Modified.)
-python3 api/comments.py &
+# api/comments.mjs, run with node, serves out/ as Vercel does, and the blog's
+# comments at /api/comments. The browser keeps no copies, so it never shows an
+# old one after a rebuild. (Revalidating isn't enough: two saves in the same
+# second have the same Last-Modified.)
+node api/comments.mjs &
 server=$!
 trap 'kill "$server" 2>/dev/null; rm -f "$stamp"' EXIT
 echo "Showing the site at http://localhost:4000. Saving a file builds it again; reload to see the change."
