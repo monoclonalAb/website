@@ -6,8 +6,8 @@
 # make daily      start today's Leetcode entry; DATE=2026-09-14 for another day
 # make photos     add photos to About: ADD="~/Pictures/IMG_1234.heic"
 # make covers     ready the book covers saved in public/books/
-# make comments   approve or delete the comments waiting under blog posts and
-#                 the birthday page; PREVIEW=1 for the test ones
+# make comments   approve or delete the comments waiting under blog posts;
+#                 PREVIEW=1 for the test ones
 
 .PHONY: site serve check docs daily photos covers comments clean
 

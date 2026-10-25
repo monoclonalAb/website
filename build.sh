@@ -536,32 +536,29 @@ $toc
 EOF
     cat "$body"
     echo "</article>"
-    [[ $collection == blog ]] && comments_section "$slug" "/blog/$slug"
+    [[ $collection == blog ]] && comments_section "$slug"
     reading_end
   } >"$out/$collection/$slug/index.html"
 }
 
-# The comments under a blog post, or on a page in pages/ at the line
-# "<!-- comments -->": $1 names them (a post's slug, or a page's path, like
-# /birthday-2026) and $2 is the page they're on. api/comments.mjs keeps them:
-# the form sends a new one there, and public/js/comments.js fetches the
-# approved ones, fills the list and shows the line for its state (data-state).
-# Without JavaScript the <noscript> line shows instead, and the form still
-# sends. After a send, api/comments.mjs comes back to #comment-sent, which CSS
-# shows by :target in the form's place; with JavaScript, the reader's own
-# comment also shows at the end of the list, greyed, with data-waiting where
-# the date goes.
+# The comments under a blog post. api/comments.mjs keeps them: the form sends a
+# new one there, and public/js/comments.js fetches the approved ones, fills
+# the list and shows the line for its state (data-state). Without JavaScript
+# the <noscript> line shows instead, and the form still sends. After a send,
+# api/comments.mjs comes back to #comment-sent, which CSS shows by :target in
+# the form's place; with JavaScript, the reader's own comment also shows at
+# the end of the list, greyed, with data-waiting where the date goes.
 comments_section() {
-  local post=$1 path=$2
+  local slug=$1
   put <<EOF
-<section class="comments" id="comments" data-post="$post" data-waiting="waiting for me to read it" aria-labelledby="comments-heading">
+<section class="comments" id="comments" data-post="$slug" data-waiting="waiting for me to read it" aria-labelledby="comments-heading">
   <div class="comments-head">
     <h2 id="comments-heading">comments<span>:</span></h2>
     <p class="comments-count" hidden><span></span> so far</p>
   </div>
   <p class="comments-status" data-state="loading" hidden>loading comments…</p>
   <p class="comments-status" data-state="none" hidden>no comments yet. be the first to leave one.</p>
-  <p class="comments-status" data-state="failed" hidden>comments couldn’t load right now. <a href="$path">try again</a></p>
+  <p class="comments-status" data-state="failed" hidden>comments couldn’t load right now. <a href="/blog/$slug">try again</a></p>
   <noscript><p class="comments-status">comments need javascript to show. you can still leave one below.</p></noscript>
   <ol class="comment-list" hidden></ol>
   <div class="comment-sent" id="comment-sent">
@@ -574,7 +571,7 @@ comments_section() {
       <h3>leave one<span>:</span></h3>
       <p>it shows up here once i’ve read it.</p>
     </div>
-    <input type="hidden" name="post" value="$post">
+    <input type="hidden" name="post" value="$slug">
     <div class="comment-fields">
       <div class="comment-field">
         <label for="comment-name">name</label>
@@ -1095,7 +1092,7 @@ photos() {
 # The pages in pages/ named (pages/about.html), or all of them, but the
 # indexes: Home, About, Contents, Friends, 404.
 static_pages() {
-  local source name path target comments
+  local source name path target
   (($#)) || set -- pages/*.html
   for source in "$@"; do
     name=${source#pages/}
@@ -1104,10 +1101,6 @@ static_pages() {
     blog | leetcode | changelog | books) continue ;; # the indexes, built with their lists
     esac
     page_fields "$source"
-    # A page with the line <!-- comments --> takes comments there, with their
-    # stylesheet before its own, so its own can adjust them.
-    comments=''
-    grep -qx '[[:blank:]]*<!-- comments -->[[:blank:]]*' "$source" && comments=1
     case $name in
     index) path=/ target=$out/index.html ;;
     404) path=/404 target=$out/404.html ;; # Vercel shows it for unknown paths
@@ -1123,14 +1116,11 @@ static_pages() {
       elif [[ $page_layout == bare ]]; then
         page_body "$source"
       else
-        page_start "$page_title | Eric Zheng" "$path" "$page_description" "${comments:+comments }$page_css" "$page_js${comments:+ comments}"
+        page_start "$page_title | Eric Zheng" "$path" "$page_description" "$page_css" "$page_js"
         reading_start "$page_nav" "$page_main"
         if [[ $name == about ]]; then
           [[ -f $work/photos.html ]] || photos >"$work/photos.html" # an update makes it first
           page_body "$source" photos "$work/photos.html"
-        elif [[ -n $comments ]]; then
-          comments_section "$path" "$path" >"$work/comments.$name.html"
-          page_body "$source" comments "$work/comments.$name.html"
         else
           page_body "$source"
         fi
