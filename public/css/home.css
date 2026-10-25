@@ -125,7 +125,18 @@ body {
  * is the plain alphabet in grey; a dark curtain falls through it, top down.
  * After a beat, the curtain's left half lifts, bottom up, to show the name.
  * Each moving edge is a 2px red line.
+ *
+ * --edge is how far the edge has moved, and drives both the clip and its line.
+ * Animating clip-path and the line separately let one run on the GPU and the
+ * other on the main thread, so on a busy phone the line ran ahead of its edge.
+ * A custom property always animates on the main thread, so they move together.
  */
+@property --edge {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 0px;
+}
+
 .cover,
 .curtain {
   position: absolute;
@@ -137,19 +148,23 @@ body {
   overflow: hidden;
   pointer-events: none;
   user-select: none;
+  /* Until the edge sets off, its line waits just outside the box, hidden. */
+  --edge: -2px;
 }
 
 .cover::before,
 .curtain::before {
   content: "";
   position: absolute;
-  inset: 0;
+  inset-inline: 0;
+  height: 2px;
+  background: var(--accent);
 }
 
 .cover {
   background: var(--paper);
-  clip-path: inset(0);
-  animation: fall 600ms cubic-bezier(0.65, 0, 0.35, 1) 150ms forwards;
+  clip-path: inset(var(--edge) 0 0 0);
+  animation: move-edge 600ms cubic-bezier(0.65, 0, 0.35, 1) 150ms forwards;
 }
 
 .cover .row * {
@@ -157,16 +172,14 @@ body {
 }
 
 .cover::before {
-  background: linear-gradient(var(--accent) 2px, transparent 0);
-  translate: 0 -2px;
-  animation: fall-edge 600ms cubic-bezier(0.65, 0, 0.35, 1) 150ms forwards;
+  top: var(--edge);
 }
 
 /* 1px past the split, as in the original, so no seam shows. */
 .curtain {
   background: #30312e;
-  clip-path: inset(0 calc(50% - 1px) 0 0);
-  animation: lift 600ms cubic-bezier(0.22, 1, 0.36, 1) 900ms forwards;
+  clip-path: inset(0 calc(50% - 1px) var(--edge) 0);
+  animation: move-edge 600ms cubic-bezier(0.22, 1, 0.36, 1) 900ms forwards;
 }
 
 .curtain .row * {
@@ -174,9 +187,7 @@ body {
 }
 
 .curtain::before {
-  background: linear-gradient(to top, var(--accent) 2px, transparent 0);
-  translate: 0 2px;
-  animation: lift-edge 600ms cubic-bezier(0.22, 1, 0.36, 1) 900ms forwards;
+  bottom: var(--edge);
 }
 
 /*
@@ -207,36 +218,13 @@ body {
   }
 }
 
-@keyframes fall {
+/* The cover's edge falls from the top; the curtain's lifts from the bottom. */
+@keyframes move-edge {
   from {
-    clip-path: inset(0);
+    --edge: 0%;
   }
   to {
-    clip-path: inset(100% 0 0 0);
-  }
-}
-
-@keyframes fall-edge {
-  from {
-    translate: 0 0;
-  }
-  to {
-    translate: 0 100%;
-  }
-}
-
-@keyframes lift {
-  to {
-    clip-path: inset(0 calc(50% - 1px) 100% 0);
-  }
-}
-
-@keyframes lift-edge {
-  from {
-    translate: 0 0;
-  }
-  to {
-    translate: 0 -100%;
+    --edge: 100%;
   }
 }
 
