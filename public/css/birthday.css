@@ -1,5 +1,5 @@
 /* The birthday page: the details and the menu in Contents' 132px label
-   column, the calendar buttons, the guests and the comments.
+   column, the calendar buttons, and the guests.
    Paper: "Planning · Birthday · RSVP". */
 
 .rows {
@@ -75,20 +75,6 @@
   gap: 6px 24px;
 }
 
-/* The comments (comments.css), set below their hairline like the menu and
-   the guests, under a heading their size. */
-.comments {
-  margin-top: 8px;
-}
-.comments h2 {
-  font-size: 20px;
-  line-height: 26px;
-}
-.comments h3 {
-  font-size: 18px;
-  line-height: 26px;
-}
-
 @media (max-width: 599px) {
   .rows > div {
     grid-template-columns: minmax(0, 1fr);
@@ -100,8 +86,7 @@
     flex-direction: column;
     justify-self: stretch;
   }
-  .part,
-  .comments {
+  .part {
     padding-top: 28px;
   }
   .guests {

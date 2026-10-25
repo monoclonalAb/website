@@ -1,6 +1,5 @@
-/* Comments under a blog post, or on a page with the line <!-- comments -->
-   (comments_section in build.sh). Paper page "Planning · Comments", draft C.
-   A page's own stylesheet loads after this one, so it can adjust them.
+/* Comments under a blog post (comments_section in build.sh). Paper page
+   "Planning · Comments", draft C.
    All in lower case, like the rest of the site: the dates, and readers' names
    and words too. What a reader types in the form keeps its case. */
 .comments {
