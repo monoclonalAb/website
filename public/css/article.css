@@ -81,6 +81,17 @@
 .prose math {
   font-size: 1.21em;
 }
+/* Firefox draws a fraction's bar right on top of a √ under it. */
+.prose mfrac > msqrt:last-child {
+  margin-top: 0.15em;
+}
+/* LaTeX's thin space around \left( and \right). */
+.prose mo[stretchy="true"][form="prefix"] {
+  padding-inline-start: 0.17em;
+}
+.prose mo[stretchy="true"][form="postfix"] {
+  padding-inline-end: 0.17em;
+}
 .prose .table-scroll,
 .prose math[display="block"] {
   max-width: 100%;
