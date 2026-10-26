@@ -1,0 +1,10 @@
+blog: a new post from ericzheng.nz
+
+{{title}}
+{{date}}
+{{summary}}
+
+read it → {{url}}
+
+--
+you subscribed at ericzheng.nz · unsubscribe: {{unsubscribe}}
