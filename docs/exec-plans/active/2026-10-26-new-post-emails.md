@@ -95,6 +95,7 @@ Steps:
 - Decision: the confirm link's token becomes the subscriber's unsubscribe token, and a subscriber is stored under their address in lower case. Why: one random token per reader, and an address can't be on the list twice. (2026-10-26)
 - Decision: at most 50 confirm emails a day, and one a day to any address. Why: half of Resend's free 100 stays for the posts, and nobody can use the form to flood an inbox. (2026-10-26)
 - Decision: make announce reads the post from `out.posts.tsv` after `build.sh --update`, and saves the email as `out.email.html` before asking. Why: the post is read by the same strict reader as the site, and Eric can see the email in a browser before it goes. (2026-10-26)
+- Decision: `make subscribers` lists the addresses on the list, and those waiting to confirm, for Eric; they still never show on the site. Why: Eric asked for a way to see who has signed up. It reads with the database's read-only token. (2026-10-26)
 
 ## Surprises
 
