@@ -1,0 +1,10 @@
+blog: confirm your email
+
+click below and i’ll email you each time i put up a new blog post.
+
+yes, email me → {{confirm}}
+
+if this wasn’t you, ignore this email and you won’t hear from me.
+
+--
+someone entered this address at ericzheng.nz. the link works for 7 days.

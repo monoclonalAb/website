@@ -1,0 +1,109 @@
+/* The sign-up for emails about new blog posts (subscribe_form in build.sh).
+   On /blog, "subscribe by email" beside the heading opens it under the
+   heading; on a post, the same line at the top links to a section at the end,
+   before the comments. Paper page "Audit · New-post emails · sign-up and
+   email", D and D2. */
+
+/* A post's top line: "← blog" at the left, "subscribe by email ↓" at the
+   right. */
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 20px;
+}
+/* The arrow stays out of the underline, which would cut across its tip. An
+   inline block doesn't take its link's underline. */
+.meta-row a span {
+  display: inline-block;
+}
+
+/* /blog: folded away until the link opens it. Opening it leaves the page at
+   the top, rather than scrolling the heading away. */
+.subscribe-fold {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scroll-margin-top: 100vh;
+}
+.subscribe-fold:not(:target) {
+  display: none;
+}
+
+/* A post: a section below a hairline, like the comments. */
+.subscribe-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 32px;
+  border-top: 1px solid var(--rule);
+  scroll-margin-top: 24px;
+}
+.subscribe-section .subscribe-form {
+  padding-top: 16px;
+}
+
+.subscribe-note {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+/* The field and the button on one line, in the comment form's style. */
+.subscribe-form {
+  display: flex;
+  gap: 12px;
+}
+.subscribe-form input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--muted);
+  border-radius: 0;
+  background: #f7f6f2;
+  color: var(--ink);
+  font: 16px / 25px var(--font-body);
+  appearance: none;
+}
+.subscribe-form input::placeholder {
+  color: #9a9890;
+  opacity: 1;
+}
+.subscribe-form input:hover {
+  border-bottom-color: var(--ink);
+}
+.subscribe-form input:is(:focus-visible, :user-invalid) {
+  border-bottom-color: var(--accent);
+  outline: none;
+  box-shadow: 0 1px 0 var(--accent);
+}
+.subscribe-trap {
+  display: none;
+}
+.subscribe-form button {
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 22px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+  cursor: pointer;
+}
+.subscribe-form button:hover {
+  text-decoration: underline 1.5px var(--accent);
+  text-underline-offset: 5px;
+}
+
+@media (max-width: 599px) {
+  .subscribe-form {
+    flex-direction: column;
+  }
+  .subscribe-form :is(input, button) {
+    flex: none;
+    height: 44px;
+  }
+}

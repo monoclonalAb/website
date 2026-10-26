@@ -9,9 +9,10 @@
 //                                   waits in the pending list until Eric
 //                                   approves it with make comments.
 //
-// The comments live in Upstash Redis, which takes commands over HTTPS. Every
-// key starts with COMMENTS_PREFIX: empty in production, "preview:" on preview
-// deployments and laptops, so test comments never mix with real ones.
+// The comments live in Upstash Redis (api/_shared.mjs, which this function
+// shares with api/subscribe.mjs). Every key starts with COMMENTS_PREFIX: empty
+// in production, "preview:" on preview deployments and laptops, so test
+// comments never mix with real ones.
 //
 //   pending          comments waiting for approval, oldest first. Each is a
 //                    JSON object: id, post, name, email, text, time (UTC).
@@ -23,57 +24,18 @@ import { readFileSync, realpathSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { NotSent, clean, isEmail, key, length, readForm, redirect, redis, why } from "./_shared.mjs";
 
 const SLUG = /^[A-Za-z0-9_-]+$/; // build.sh's rule for a post's folder
-const CONTROL = /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g; // all but tab and newline
 const PUBLIC = ["id", "name", "text", "time", "eric"]; // what a GET may show
-const MAX_BODY = 64 * 1024; // 4,000 characters of emoji, percent-encoded, still fit
-const MAX_FIELDS = 10;
 const MAX_PENDING = 100; // so a flood can't fill the database
 const NOT_SENT = "/comment-not-sent";
-
-// A comment that can't be saved. The reason goes to the log, not the reader.
-class NotSent extends Error {
-  name = "NotSent";
-}
-
-const key = (name) => (process.env.COMMENTS_PREFIX ?? "") + name;
-
-function setting(name) {
-  const value = process.env[name];
-  if (!value) throw new Error(`${name} isn't set`);
-  return value;
-}
-
-// Runs one Redis command, like ["LLEN", "pending"], and returns its result.
-// Reads use the read-only token, so a bug in them can't change anything.
-async function redis(command, write = false) {
-  const token = setting(write ? "KV_REST_API_TOKEN" : "KV_REST_API_READ_ONLY_TOKEN");
-  const response = await fetch(setting("KV_REST_API_URL"), {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify(command),
-    signal: AbortSignal.timeout(5000),
-  });
-  if (!response.ok) throw new Error(`the database answered ${response.status}`);
-  return (await response.json()).result;
-}
-
-// What went wrong, for the log: a missing setting's name, the database's
-// status, or why it couldn't be reached. Never a token.
-const why = (error) => `${error}${error?.cause ? ` (${error.cause})` : ""}`;
 
 // The function runs from the project's root, and vercel.json puts the posts in
 // its bundle.
 function isPost(slug) {
   return SLUG.test(slug) && Boolean(statSync(`content/blog/${slug}/index.md`, { throwIfNoEntry: false })?.isFile());
 }
-
-// A field's text with Windows line breaks made plain and control characters gone.
-const clean = (value) => value.replace(/\r\n?/g, "\n").replace(CONTROL, "").trim();
-
-// Lengths count characters, not UTF-16 units, so an emoji counts as one.
-const length = (text) => [...text].length;
 
 function reply(status, body) {
   const headers = {
@@ -82,10 +44,6 @@ function reply(status, body) {
     "X-Content-Type-Options": "nosniff",
   };
   return new Response(body, { status, headers });
-}
-
-function redirect(location) {
-  return new Response(null, { status: 303, headers: { Location: location, "Cache-Control": "no-store" } });
 }
 
 async function list(request) {
@@ -117,17 +75,7 @@ async function send(request) {
 
 // Checks the form and adds the comment to pending; returns the post's slug.
 async function save(request) {
-  const declared = Number(request.headers.get("content-length") ?? 0);
-  if (declared > MAX_BODY) throw new NotSent(`a body of ${declared} bytes`);
-  const type = (request.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
-  if (type !== "application/x-www-form-urlencoded") throw new NotSent(`a body of ${type || "no type"}`);
-  const bytes = await request.arrayBuffer();
-  if (!(bytes.byteLength > 0 && bytes.byteLength <= MAX_BODY)) throw new NotSent(`a body of ${bytes.byteLength} bytes`);
-  const body = new TextDecoder().decode(bytes);
-  if (body.split("&").length > MAX_FIELDS) throw new NotSent(`more than ${MAX_FIELDS} fields`);
-  const form = new URLSearchParams(body);
-  const field = (name) => form.get(name) ?? "";
-
+  const field = await readForm(request);
   const post = field("post");
   if (!isPost(post)) throw new NotSent(`no post called ${JSON.stringify(post.slice(0, 80))}`);
   if (field("website")) return post; // only bots fill the hidden field: look sent, save nothing
@@ -135,9 +83,7 @@ async function save(request) {
   const email = clean(field("email"));
   const text = clean(field("text"));
   if (!(length(name) >= 1 && length(name) <= 80)) throw new NotSent(`a name of ${length(name)} characters`);
-  if (!(length(email) >= 3 && length(email) <= 254 && email.includes("@") && !/\s/.test(email))) {
-    throw new NotSent("an email that isn't one");
-  }
+  if (!isEmail(email)) throw new NotSent("an email that isn't one");
   if (!(length(text) >= 1 && length(text) <= 4000)) throw new NotSent(`a comment of ${length(text)} characters`);
   if ((await redis(["LLEN", key("pending")])) >= MAX_PENDING) {
     throw new NotSent(`${MAX_PENDING} comments already pending`);
@@ -164,8 +110,8 @@ const handler = {
 export default handler;
 
 // make serve (scripts/serve.sh) runs this file with node: the built site in
-// out/ and this function together on http://localhost:4000, so a post's
-// comments work on a laptop. It reads the database's address and tokens from
+// out/, this function and api/subscribe.mjs together on http://localhost:4000,
+// so a post's comments and sign-up work on a laptop. It reads the database's address and tokens from
 // .env.local, and keeps to the preview: keys unless COMMENTS_PREFIX says
 // otherwise. The browser keeps no copies of pages, so a reload after a rebuild
 // always shows the new one.
@@ -199,11 +145,13 @@ function find(site, pathname) {
 
 async function answer(site, req) {
   const url = new URL(req.url, "http://localhost:4000");
-  if (url.pathname === "/api/comments") {
+  if (url.pathname === "/api/comments" || url.pathname === "/api/subscribe") {
     const chunks = [];
     for await (const chunk of req) chunks.push(chunk);
     const body = req.method === "GET" || req.method === "HEAD" ? undefined : Buffer.concat(chunks);
-    return handler.fetch(new Request(url, { method: req.method, headers: req.headers, body }));
+    const request = new Request(url, { method: req.method, headers: req.headers, body });
+    if (url.pathname === "/api/comments") return handler.fetch(request);
+    return (await import("./subscribe.mjs")).default.fetch(request);
   }
   if (req.method !== "GET" && req.method !== "HEAD") return new Response(null, { status: 405 });
   const file = find(site, url.pathname);
