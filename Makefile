@@ -1,15 +1,17 @@
 # make            build the site into out/
 # make serve      build it, show it at http://localhost:4000 with its comments, and build it
 #                 again on every save
-# make check      what CI runs: shellcheck, a syntax check of api/comments.mjs,
-#                 the docs check and a build
+# make check      what CI runs: shellcheck, a syntax check of the functions in
+#                 api/, the docs check and a build
 # make daily      start today's Leetcode entry; DATE=2026-09-14 for another day
 # make photos     add photos to About: ADD="~/Pictures/IMG_1234.heic"
 # make covers     ready the book covers saved in public/books/
 # make comments   approve or delete the comments waiting under blog posts;
 #                 PREVIEW=1 for the test ones
+# make announce   email a blog post to everyone subscribed, once it's live:
+#                 POST=group-theory; PREVIEW=1 for the test list
 
-.PHONY: site serve check docs daily photos covers comments clean
+.PHONY: site serve check docs daily photos covers comments announce clean
 
 site:
 	./build.sh
@@ -19,7 +21,9 @@ serve:
 
 check:
 	shellcheck build.sh scripts/*.sh
+	node --check api/_shared.mjs
 	node --check api/comments.mjs
+	node --check api/subscribe.mjs
 	scripts/check-docs.sh
 	./build.sh
 
@@ -37,6 +41,9 @@ covers:
 
 comments:
 	scripts/comments.sh $(if $(PREVIEW),--preview)
+
+announce:
+	scripts/announce.sh $(POST) $(if $(PREVIEW),--preview)
 
 clean:
 	rm -rf out
