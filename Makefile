@@ -10,8 +10,10 @@
 #                 PREVIEW=1 for the test ones
 # make announce   email a blog post to everyone subscribed, once it's live:
 #                 POST=group-theory; PREVIEW=1 for the test list
+# make subscribers  list who is subscribed to those emails; PREVIEW=1 for
+#                 the test list
 
-.PHONY: site serve check docs daily photos covers comments announce clean
+.PHONY: site serve check docs daily photos covers comments announce subscribers clean
 
 site:
 	./build.sh
@@ -44,6 +46,9 @@ comments:
 
 announce:
 	scripts/announce.sh $(POST) $(if $(PREVIEW),--preview)
+
+subscribers:
+	scripts/subscribers.sh $(if $(PREVIEW),--preview)
 
 clean:
 	rm -rf out

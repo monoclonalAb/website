@@ -24,7 +24,8 @@
 // The keys, each with COMMENTS_PREFIX in front (api/_shared.mjs):
 //   subscribers          a hash from each address, in lower case, to its
 //                        unsubscribe token and when it confirmed, as JSON.
-//                        Never shown: make announce is the only reader.
+//                        Never shown on the site: only make announce and
+//                        make subscribers read it.
 //   unconfirmed:<token>  an address waiting for its confirm click, gone after
 //                        7 days.
 //   asked:<hash>         set for a day once a confirm email has gone to an
