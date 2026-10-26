@@ -1,3 +1,7 @@
+## 2026-10-26
+
+added email updates for new [blog posts](/blog#subscribe)
+
 ## 2026-10-25
 
 added comments to every [blog post](/blog)

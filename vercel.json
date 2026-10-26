@@ -8,6 +8,10 @@
     "api/comments.mjs": {
       "includeFiles": "content/blog/*/index.md",
       "excludeFiles": "{.pandoc/**,out/**,public/**}"
+    },
+    "api/subscribe.mjs": {
+      "includeFiles": "emails/*",
+      "excludeFiles": "{.pandoc/**,out/**,public/**}"
     }
   },
   "trailingSlash": false,
@@ -52,6 +56,10 @@
   "headers": [
     {
       "source": "/birthday-2026",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+    },
+    {
+      "source": "/:page(check-your-email|subscribed|unsubscribed|not-subscribed)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
     },
     {

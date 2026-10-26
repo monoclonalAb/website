@@ -361,7 +361,8 @@ page_fields() {
   } <"$1"
 }
 # A page's HTML, without that comment, and with the line "<!-- $2 -->" (if
-# $2 is given) replaced by the file $3.
+# $2 is given) replaced by the file $3. The line "<!-- subscribe -->" becomes
+# the sign-up for emails about new posts, folded away (subscribe_form).
 page_body() {
   local line n=0 skip=''
   while IFS= read -r line || [[ -n $line ]]; do
@@ -372,6 +373,8 @@ page_body() {
       if [[ $line == '-->'* ]]; then skip=''; fi
     elif [[ -n ${2:-} && $line =~ ^[[:blank:]]*"<!-- $2 -->"[[:blank:]]*$ ]]; then
       cat "$3"
+    elif [[ $line =~ ^[[:blank:]]*"<!-- subscribe -->"[[:blank:]]*$ ]]; then
+      subscribe_form fold
     else
       printf '%s\n' "$line"
     fi
@@ -501,9 +504,9 @@ read_posts() {
 # A post's page: /blog/<slug> or /leetcode/<slug>.
 article() {
   local collection=$1 slug=$2 date=$3 title=$4 summary=$5 problem_id=$6 problem_url=$7 difficulty=$8
-  local file base outline body description meta="" link="" toc="" css=article js="" entry entries=() tab=$'\t'
+  local file base outline body description back meta="" link="" toc="" css=article js="" entry entries=() tab=$'\t'
   if [[ $collection == blog ]]; then
-    file=content/blog/$slug/index.md base=/writing-assets/blog/$slug css="article comments" js=comments
+    file=content/blog/$slug/index.md base=/writing-assets/blog/$slug css="article subscribe comments" js=comments
   else
     file=content/$collection/$slug.md base=/writing-assets/$collection
   fi
@@ -521,11 +524,18 @@ article() {
     link="  <p><a href=\"$(esc "$problem_url")\" target=\"_blank\">LeetCode problem $problem_id</a></p>"
   fi
   description=${summary:-"$title — writing by eric zheng"}
+  back="<p class=\"meta\"><a href=\"/$collection\">← $collection</a></p>"
+  if [[ $collection == blog ]]; then
+    back="<div class=\"meta-row\">
+$back
+<p class=\"meta\">subscribe by <a href=\"#subscribe\">email<span aria-hidden=\"true\">&nbsp;↓</span></a></p>
+</div>"
+  fi
   {
     page_start "$title | Eric Zheng" "/$collection/$slug" "$description" "$css" "$js" "$title" "$date"
     reading_start "$collection"
     put <<EOF
-<p class="meta"><a href="/$collection">← $collection</a></p>
+$back
 <header class="article-header">
   <h1>$(esc "$title")</h1>
   <p class="meta"><time datetime="$date">$(long_date "$date")</time>$meta</p>
@@ -536,7 +546,10 @@ $toc
 EOF
     cat "$body"
     echo "</article>"
-    [[ $collection == blog ]] && comments_section "$slug"
+    if [[ $collection == blog ]]; then
+      subscribe_form section
+      comments_section "$slug"
+    fi
     reading_end
   } >"$out/$collection/$slug/index.html"
 }
@@ -591,6 +604,40 @@ comments_section() {
   </form>
 </section>
 EOF
+}
+
+# The sign-up for emails about new blog posts: an address, sent to
+# api/subscribe.mjs. $1 is where. "fold" is under the heading on /blog, at
+# <!-- subscribe --> in pages/blog.html: hidden until "subscribe by email"
+# beside the heading opens it (CSS, :target). "section" ends a blog post,
+# before the comments, and the same line at the top of the post links to it.
+# Paper page "Audit · New-post emails · sign-up and email", D and D2.
+subscribe_form() {
+  local note='one email each time i post. unsubscribe from any of them in one click.' form
+  IFS= read -r -d '' form <<'EOF' || true
+  <form class="subscribe-form" method="post" action="/api/subscribe">
+    <input id="subscribe-email" name="email" type="email" required maxlength="254" autocomplete="email" placeholder="you@example.com" aria-label="email" aria-describedby="subscribe-note">
+    <div class="subscribe-trap" aria-hidden="true"><label>website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+    <button type="submit">subscribe</button>
+  </form>
+EOF
+  form=${form%$'\n'}
+  if [[ $1 == fold ]]; then
+    put <<EOF
+<div class="subscribe subscribe-fold" id="subscribe">
+$form
+  <p class="subscribe-note" id="subscribe-note">$note</p>
+</div>
+EOF
+  else
+    put <<EOF
+<section class="subscribe subscribe-section" id="subscribe" aria-labelledby="subscribe-heading">
+  <h2 id="subscribe-heading">new posts by email<span>:</span></h2>
+  <p class="subscribe-note" id="subscribe-note">$note</p>
+$form
+</section>
+EOF
+  fi
 }
 
 # Renders the page of every post in $1 (lines of posts.tsv), a few at a time.
