@@ -65,6 +65,16 @@ esc() {
   printf '%s' "$s"
 }
 
+# Text as a JSON string, quotes included, safe inside a <script> too.
+json() {
+  local s=$1
+  s=${s//\\/\\\\}
+  s=${s//\"/\\\"}
+  s=${s//$'\t'/\\t}
+  s=${s//</\\u003c}
+  printf '"%s"' "$s"
+}
+
 # Prints a here-document, like cat but without starting a process; the site
 # has hundreds of pages, each printed from several. (For files, cat is faster.)
 put() {
@@ -227,12 +237,16 @@ og_image_alt="The home page: the split alphabet, with ERIC and ZHENG in red and 
 #   $6 og_title     the link preview's title, if not $1
 #   $7 published    an article's date, which makes the preview an article's
 page_start() {
-  local title description url css js name og_title
+  local title description url css js name og_title image=${8:-/opengraph-image.jpg} alt=${9:-$og_image_alt} size=""
   title=$(esc "$1")
   description=$(esc "$3")
   url=$SITE_URL$2
   [[ $2 == / ]] && url=$SITE_URL
   og_title=$(esc "${6:-$1}")
+  [[ $image == http* ]] || image=$SITE_URL$image
+  alt=$(esc "$alt")
+  # The site's own preview is 1200 by 630; a post's own picture can be any size.
+  [[ -n ${8:-} ]] || size=$'<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n'
   css=""
   for name in site $4; do css+="<link rel=\"stylesheet\" href=\"/css/$name.css\">"$'\n'; done
   js=""
@@ -261,10 +275,8 @@ page_start() {
 <meta property="og:url" content="$url">
 <meta property="og:site_name" content="Eric Zheng">
 <meta property="og:locale" content="en_NZ">
-<meta property="og:image" content="$SITE_URL/opengraph-image.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="$og_image_alt">
+<meta property="og:image" content="$image">
+${size}<meta property="og:image:alt" content="$alt">
 EOF
   if [[ -n ${7:-} ]]; then
     put <<EOF
@@ -279,8 +291,8 @@ EOF
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="$title">
 <meta name="twitter:description" content="$description">
-<meta name="twitter:image" content="$SITE_URL/opengraph-image.jpg">
-<meta name="twitter:image:alt" content="$og_image_alt">
+<meta name="twitter:image" content="$image">
+<meta name="twitter:image:alt" content="$alt">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-icon.png">
@@ -288,7 +300,7 @@ EOF
 <link rel="preload" href="/fonts/helvetica/Helvetica-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/helvetica/Helvetica.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/fira-code/FiraCode-Regular.woff2" as="font" type="font/woff2" crossorigin>
-$css$js</head>
+$css$js${10:-}</head>
 EOF
 }
 
@@ -505,6 +517,7 @@ read_posts() {
 article() {
   local collection=$1 slug=$2 date=$3 title=$4 summary=$5 problem_id=$6 problem_url=$7 difficulty=$8
   local file base outline body description back meta="" link="" toc="" css=article js="" entry entries=() tab=$'\t'
+  local url image="" alt="" picture="" data
   if [[ $collection == blog ]]; then
     file=content/blog/$slug/index.md base=/writing-assets/blog/$slug css="article subscribe comments" js=comments
   else
@@ -524,6 +537,19 @@ article() {
     link="  <p><a href=\"$(esc "$problem_url")\" target=\"_blank\">LeetCode problem $problem_id</a></p>"
   fi
   description=${summary:-"$title — writing by eric zheng"}
+  # A post with a picture shows its first one when it's shared, and says so
+  # to search engines too.
+  image=$(grep -o -m 1 '<img src="[^"]*"[^>]*>' "$body" | head -n 1) || true
+  if [[ -n $image ]]; then
+    [[ $image != *' alt="'* ]] || { alt=${image#*' alt="'} alt=${alt%%\"*}; }
+    image=${image#'<img src="'} image=${image%%\"*}
+    [[ $image == http* ]] || picture=$SITE_URL$image
+    picture=${picture:-$image}
+  fi
+  url=$SITE_URL/$collection/$slug
+  data=$'<script type="application/ld+json">\n'
+  data+="{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\",\"headline\":$(json "$title"),\"description\":$(json "$description"),\"datePublished\":\"$date\",\"url\":\"$url\",\"mainEntityOfPage\":\"$url\",\"inLanguage\":\"en-NZ\",\"image\":$(json "${picture:-$SITE_URL/opengraph-image.jpg}"),\"author\":{\"@type\":\"Person\",\"name\":\"Eric Zheng\",\"url\":\"$SITE_URL\"},\"isPartOf\":{\"@type\":\"Blog\",\"name\":\"$collection\",\"url\":\"$SITE_URL/$collection\"}}"
+  data+=$'\n</script>\n'
   back="<p class=\"meta\"><a href=\"/$collection\">← $collection</a></p>"
   if [[ $collection == blog ]]; then
     back="<div class=\"meta-row\">
@@ -532,7 +558,7 @@ $back
 </div>"
   fi
   {
-    page_start "$title | Eric Zheng" "/$collection/$slug" "$description" "$css" "$js" "$title" "$date"
+    page_start "$title | Eric Zheng" "/$collection/$slug" "$description" "$css" "$js" "$title" "$date" "$image" "$alt" "$data"
     reading_start "$collection"
     put <<EOF
 $back
