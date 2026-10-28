@@ -158,3 +158,50 @@
 .sourceCode .wa {
   color: #e36209;
 }
+
+/* After the prose: the posts either side, previous (older) left and next
+   (newer) right, each a muted label over the title in Eiko and its date. */
+.post-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  border-top: 1px solid var(--rule);
+  padding-top: 24px;
+}
+.post-nav a {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.post-nav a[rel="next"] {
+  grid-column: 2;
+  text-align: right;
+}
+.post-nav .title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 26px;
+  overflow-wrap: anywhere;
+}
+.post-nav time {
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 22px;
+}
+.post-nav a:hover .title {
+  text-decoration: underline 1.5px var(--accent);
+  text-underline-offset: 4px;
+}
+@media (max-width: 599px) {
+  .post-nav {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .post-nav a[rel="next"] {
+    grid-column: 1;
+  }
+}
