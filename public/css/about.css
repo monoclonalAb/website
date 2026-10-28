@@ -42,7 +42,7 @@ main.about {
 }
 /* The yearbook quote. The rule is --link at 45%. */
 .quote {
-  border-left: 2px solid #7c414773;
+  border-left: 2px solid var(--link-rule);
   padding-left: 20px;
   font-style: italic;
 }
@@ -317,7 +317,7 @@ main.about {
   width: min(640px, 100vw - 128px, min(100svh - 176px, 600px) * var(--ratio));
   max-width: none;
   aspect-ratio: var(--ratio);
-  background: #e4e1d9;
+  background: var(--mat);
   box-shadow:
     0 2px 4px rgb(22 23 27 / 10%),
     0 32px 64px -20px rgb(22 23 27 / 45%);
@@ -329,7 +329,7 @@ main.about {
   width: max-content;
   max-width: min(300px, 90%);
   padding: 16px 20px 18px;
-  background: #f7f6f2;
+  background: var(--field);
   box-shadow:
     0 1px 2px rgb(22 23 27 / 10%),
     0 16px 32px -12px rgb(22 23 27 / 35%);

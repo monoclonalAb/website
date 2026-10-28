@@ -37,9 +37,42 @@
   --font-display: "PP Eiko", Georgia, serif;
   --font-sans: "Helvetica", Arial, sans-serif;
   --font-code: "Fira Code", ui-monospace, monospace;
+  /* Surfaces and tints the dark scheme swaps too. */
+  --field: #f7f6f2;
+  --hint: #9a9890;
+  --mat: #e4e1d9;
+  --sheet: rgb(240 238 232 / 72%);
+  --link-rule: #7c414773;
+  --selection: #ffd987;
+  --code-paper: #fff;
+  --code-ink: #24292e;
+  --code-inline: #e7e4dc;
   color-scheme: light;
   -webkit-text-size-adjust: 100%;
   tab-size: 4;
+}
+
+/* Dark: the reader's system asks for it. Ink and paper swap, and the reds and
+   tints lighten to keep their contrast. Home keeps its split (home.css). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #16171b;
+    --ink: #ebe9e3;
+    --muted: #9a9890;
+    --rule: #3b3c40;
+    --accent: #f0434a;
+    --link: #dba5aa;
+    --field: #1f2025;
+    --hint: #6f6e68;
+    --mat: #26272c;
+    --sheet: rgb(22 23 27 / 72%);
+    --link-rule: #dba5aa73;
+    --selection: #6b5420;
+    --code-paper: #0f1013;
+    --code-ink: #e1e4e8;
+    --code-inline: #26272c;
+    color-scheme: dark;
+  }
 }
 
 /* Reset */
@@ -106,7 +139,7 @@ body {
 }
 
 ::selection {
-  background: #ffd987;
+  background: var(--selection);
 }
 
 h1,
@@ -356,7 +389,7 @@ pre {
 
 .waves[data-side="left"] {
   inset: 0 auto 0 0;
-  color: #c8c5bc;
+  color: var(--rule);
   --wave-unread: currentColor;
   --wave-read: currentColor;
 }

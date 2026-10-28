@@ -28,6 +28,8 @@ Defined in `public/css/site.css`.
 
 Type: Georgia 16/25 for body; PP Eiko Medium for headings (h1 36/42, 30/36 below 600px; h2 24/30; h3 20/26), navigation and the footer (15px); Helvetica Bold for the alphabet and `ez._` logo; Fira Code for code. All fonts are self-hosted.
 
+- Dark (not in Paper yet; set by the reader's system, `prefers-color-scheme`): paper `#16171b`, ink `#ebe9e3`, muted `#9a9890`, rule `#3b3c40`, accent `#f0434a`, link `#dba5aa`, fields `#1f2025`, code on `#0f1013` in github-dark's colours. Home keeps its light and dark split as it is.
+
 ## Layout
 
 - Reading pages share one layout (`reading_start` and `reading_end` in `build.sh`): a 720px column with 24px gutters, masthead (logo + `about ~ blog ~ contents ~ changelog`, no underlines at rest; after the first ericzheng.nz, hovering a link grows a 1.5px red line out from its middle, just below the descenders, over 250ms, instantly with reduced motion), content with 24px gaps, and a footer with GitHub/LinkedIn/Strava icons and “back to top ↑”. Below 600px the masthead stacks.
