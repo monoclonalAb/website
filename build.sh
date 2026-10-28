@@ -143,8 +143,9 @@ check_markdown() {
 
 # Turns Markdown on stdin into the site's HTML. $1: where relative image paths
 # are served from. $2: a file to list the h2s in, one "id<TAB>text" a line.
+# $3: anything, to end each heading with a link to it (a post's, not the lists').
 markdown() {
-  pandoc_md | awk -v base="$1" -v outline="$2" '
+  pandoc_md | awk -v base="$1" -v outline="$2" -v anchors="${3:-}" '
     BEGIN { used["top"] = 1; used["main"] = 1 }
     function esc(s) {
       gsub(/&/, "\\&amp;", s); gsub(/</, "\\&lt;", s); gsub(/>/, "\\&gt;", s); gsub(/"/, "\\&quot;", s)
@@ -177,6 +178,8 @@ markdown() {
       text = plain(substr(rest, 1, end - 1))
       id = slug(text)
       if (n == 2) print id "\t" esc(text) > outline
+      # On a post, a "#" at the end links to the heading, to copy or share.
+      if (anchors) rest = substr(rest, 1, end - 1) " <a class=\"anchor\" href=\"#" id "\"><span class=\"sr-only\">link to this section</span><span aria-hidden=\"true\">#</span></a>" substr(rest, end)
       return pre "<h" n " id=\"" id "\">" rest
     }
     # Relative image paths are served from base, and every image loads lazily.
@@ -512,7 +515,7 @@ article() {
   fi
   outline=$work/outline.$collection.$slug body=$work/body.$collection.$slug
   : >"$outline"
-  body_of "$file" | markdown "$base" "$outline" >"$body"
+  body_of "$file" | markdown "$base" "$outline" anchors >"$body"
   while IFS= read -r entry; do entries+=("$entry"); done <"$outline"
   if ((${#entries[@]} > 1)); then
     toc=$'<details class="outline">\n  <summary>On this page</summary>\n  <ul>'

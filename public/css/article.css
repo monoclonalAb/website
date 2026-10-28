@@ -35,6 +35,25 @@
 .prose :is(h2, h3, h4, h5, h6):first-child {
   margin-top: 0;
 }
+/* The "#" after each heading, a link to it: shown on hover or focus, and
+   always where there's no hover. */
+.prose .anchor {
+  color: var(--muted);
+  text-decoration: none;
+  opacity: 0;
+}
+.prose :is(h2, h3, h4, h5, h6):hover .anchor,
+.prose .anchor:focus-visible {
+  opacity: 1;
+}
+.prose .anchor:hover {
+  color: var(--accent);
+}
+@media (hover: none) {
+  .prose .anchor {
+    opacity: 1;
+  }
+}
 .prose :is(ul, ol) {
   padding-left: 28px;
 }
