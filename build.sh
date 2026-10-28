@@ -179,7 +179,7 @@ markdown() {
       id = slug(text)
       if (n == 2) print id "\t" esc(text) > outline
       # On a post, a "#" at the end links to the heading, to copy or share.
-      if (anchors) rest = substr(rest, 1, end - 1) " <a class=\"anchor\" href=\"#" id "\"><span class=\"sr-only\">link to this section</span><span aria-hidden=\"true\">#</span></a>" substr(rest, end)
+      if (anchors) rest = substr(rest, 1, end - 1) " <a class=\"anchor\" href=\"#" id "\"><span class=\"sr-only\">link to " esc(text) "</span><span aria-hidden=\"true\">#</span></a>" substr(rest, end)
       return pre "<h" n " id=\"" id "\">" rest
     }
     # Relative image paths are served from base, and every image loads lazily.
