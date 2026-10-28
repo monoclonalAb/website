@@ -515,6 +515,7 @@ read_posts() {
         if (value["problemId"] !~ /^[0-9]+$/ || quoted["problemId"]) fail("problemId: use a number")
         if (value["problemUrl"] !~ /^https?:\/\/[^ ]+$/) fail("problemUrl: use a link")
         if (value["difficulty"] !~ /^(Easy|Medium|Hard)$/) fail("difficulty: use Easy, Medium or Hard")
+        if (slug ~ /^(easy|medium|hard|page)$/) fail("/leetcode/" slug " is one of the list'\''s pages; name it by its date")
       }
       print collection sep slug sep value["date"] sep value["title"] sep value["summary"] sep value["problemId"] sep value["problemUrl"] sep value["difficulty"]
     }
@@ -772,10 +773,11 @@ EOF
 # public/js/page-fit.js can show as many as fit on the screen.
 index_page() {
   local collection=$1 page=$2 pages=$3 list=$4 js=${5:-}
-  local source=pages/$collection.html path title dir
+  local source=pages/${collection%%/*}.html path title dir
   path=$(page_path "$collection" "$page")
   page_fields "$source"
   title=$page_title
+  [[ $collection != */* ]] || title="$title, ${collection#*/}"
   ((page > 1)) && title="$title, page $page"
   ((pages > 1)) && js="$js page-fit page-jump"
   dir=$out${path}
@@ -801,47 +803,64 @@ drop_pages_after() {
 # The indexes of the collections named, /blog and /leetcode, PAGE_SIZE posts a
 # page.
 post_indexes() {
-  local collection count pages page list
+  local collection view level count pages page list
   for collection in "$@"; do
-    # Every page's list in one go: the whole collection, with the entries not
-    # on that page hidden. Prints how many entries there are.
-    count=$(awk -F "$SEP" -v c="$collection" -v size="$PAGE_SIZE" -v dir="$work" '
-      function esc(s) { gsub(/&/, "\\&amp;", s); gsub(/</, "\\&lt;", s); gsub(/>/, "\\&gt;", s); gsub(/"/, "\\&quot;", s); return s }
-      function long_date(d,   months) {
-        split("January February March April May June July August September October November December", months, " ")
-        return (substr(d, 9, 2) + 0) " " months[substr(d, 6, 2) + 0] " " substr(d, 1, 4)
-      }
-      $1 == c {
-        n++
-        if ($8 != "") {
-          start[n] = "  <li data-difficulty=\"" $8 "\""
-          title = $6 ". " esc($4); summary = $8
-        } else {
-          start[n] = "  <li"
-          title = esc($4); summary = esc($5)
+    for view in "$collection" $([[ $collection != leetcode ]] || echo leetcode/easy leetcode/medium leetcode/hard); do
+      level=${view#"$collection"} level=${level#/}
+      # Every page's list in one go: the whole collection (or the posts of one
+      # difficulty), with the entries not on that page hidden. Prints how many
+      # entries there are.
+      count=$(awk -F "$SEP" -v c="$collection" -v name="${view//\//.}" -v d="$level" -v size="$PAGE_SIZE" -v dir="$work" '
+        function esc(s) { gsub(/&/, "\\&amp;", s); gsub(/</, "\\&lt;", s); gsub(/>/, "\\&gt;", s); gsub(/"/, "\\&quot;", s); return s }
+        function long_date(d,   months) {
+          split("January February March April May June July August September October November December", months, " ")
+          return (substr(d, 9, 2) + 0) " " months[substr(d, 6, 2) + 0] " " substr(d, 1, 4)
         }
-        rest[n] = "    <time datetime=\"" $3 "\">" long_date($3) "</time>\n    <div>\n      <h2><a href=\"/" c "/" $2 "\">" title "</a></h2>\n"
-        if (summary != "") rest[n] = rest[n] "      <p class=\"summary\">" summary "</p>\n"
-        rest[n] = rest[n] "    </div>\n  </li>"
-      }
-      END {
-        pages = n ? int((n + size - 1) / size) : 1
-        for (page = 1; page <= pages; page++) {
-          file = dir "/list." c "." page
-          print "<ul class=\"entries\">" > file
-          for (i = 1; i <= n; i++) print start[i] (i > (page - 1) * size && i <= page * size ? "" : " hidden") ">\n" rest[i] > file
-          print "</ul>" > file
-          close(file)
+        # Leetcode: a link to each difficulty above the list, the one shown marked.
+        function difficulties(   out, i, name, label) {
+          out = "<nav class=\"difficulties\" aria-label=\"Difficulty\">\n"
+          for (i = 0; i <= 3; i++) {
+            name = i ? level[i] : ""; label = i ? tolower(name) : "all"
+            out = out "  <a href=\"/" c (i ? "/" label : "") "\"" (i ? " data-difficulty=\"" name "\"" : "") \
+              (label == (d == "" ? "all" : d) ? " aria-current=\"page\"" : "") ">" label " <span>" (i ? per[name] : all) + 0 "</span></a>\n"
+          }
+          return out "</nav>"
         }
-        print n + 0
-      }' "$work/posts.tsv")
-    pages=$(page_count "$count")
-    for ((page = 1; page <= pages; page++)); do
-      list="$work/list.$collection.$page"
-      pagination "$collection" "$page" "$pages" >>"$list"
-      index_page "$collection" "$page" "$pages" "$list"
+        $1 == c && $8 != "" { per[$8]++; all++ }
+        $1 == c && (d == "" || tolower($8) == d) {
+          n++
+          if ($8 != "") {
+            start[n] = "  <li data-difficulty=\"" $8 "\""
+            title = $6 ". " esc($4); summary = $8
+          } else {
+            start[n] = "  <li"
+            title = esc($4); summary = esc($5)
+          }
+          rest[n] = "    <time datetime=\"" $3 "\">" long_date($3) "</time>\n    <div>\n      <h2><a href=\"/" c "/" $2 "\">" title "</a></h2>\n"
+          if (summary != "") rest[n] = rest[n] "      <p class=\"summary\">" summary "</p>\n"
+          rest[n] = rest[n] "    </div>\n  </li>"
+        }
+        END {
+          split("Easy Medium Hard", level, " ")
+          pages = n ? int((n + size - 1) / size) : 1
+          for (page = 1; page <= pages; page++) {
+            file = dir "/list." name "." page
+            if (c == "leetcode") print difficulties() > file
+            print "<ul class=\"entries\">" > file
+            for (i = 1; i <= n; i++) print start[i] (i > (page - 1) * size && i <= page * size ? "" : " hidden") ">\n" rest[i] > file
+            print "</ul>" > file
+            close(file)
+          }
+          print n + 0
+        }' "$work/posts.tsv")
+      pages=$(page_count "$count")
+      for ((page = 1; page <= pages; page++)); do
+        list="$work/list.${view//\//.}.$page"
+        pagination "$view" "$page" "$pages" >>"$list"
+        index_page "$view" "$page" "$pages" "$list"
+      done
+      drop_pages_after "$view" "$pages"
     done
-    drop_pages_after "$collection" "$pages"
   done
 }
 
@@ -1258,7 +1277,7 @@ sitemap() {
   {
     echo '<?xml version="1.0" encoding="UTF-8"?>'
     echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-    for path in "" /about /blog /contents /changelog /leetcode /friends /books; do
+    for path in "" /about /blog /contents /changelog /leetcode /leetcode/easy /leetcode/medium /leetcode/hard /friends /books; do
       printf '<url>\n<loc>%s</loc>\n</url>\n' "$SITE_URL$path"
     done
     for collection in blog leetcode; do
