@@ -31,6 +31,7 @@
   --ink: #16171b;
   --muted: #666;
   --rule: #c8c5bc;
+  --wave-left: #c8c5bc;
   --accent: #d91620;
   --link: #7c4147;
   --font-body: Georgia, "Times New Roman", serif;
@@ -60,6 +61,7 @@
     --ink: #ebe9e3;
     --muted: #9a9890;
     --rule: #3b3c40;
+    --wave-left: #4c4d52;
     --accent: #f0434a;
     --link: #dba5aa;
     --field: #1f2025;
@@ -389,7 +391,7 @@ pre {
 
 .waves[data-side="left"] {
   inset: 0 auto 0 0;
-  color: var(--rule);
+  color: var(--wave-left);
   --wave-unread: currentColor;
   --wave-read: currentColor;
 }
