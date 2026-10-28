@@ -501,10 +501,26 @@ read_posts() {
   sort -t "$SEP" -k3,3r -k2,2 "$work/posts.unsorted" >"$work/posts.tsv"
 }
 
+# Each post's neighbours in its collection, from a posts.tsv: collection, slug,
+# then the slug, title and date of the post before it (older) and after it (newer),
+# empty at either end. A post's page links to both.
+neighbours() {
+  awk -F "$SEP" -v OFS="$SEP" '
+    { c = $1; n[c]++; i = n[c]; slug[c, i] = $2; title[c, i] = ($8 != "" ? $6 ". " : "") $4; date[c, i] = $3; order[++all] = c SUBSEP i }
+    END {
+      for (k = 1; k <= all; k++) {
+        split(order[k], at, SUBSEP); c = at[1]; i = at[2] + 0
+        print c, slug[c, i], slug[c, i + 1], title[c, i + 1], date[c, i + 1], slug[c, i - 1], title[c, i - 1], date[c, i - 1]
+      }
+    }' "$1"
+}
+
 # A post's page: /blog/<slug> or /leetcode/<slug>.
 article() {
   local collection=$1 slug=$2 date=$3 title=$4 summary=$5 problem_id=$6 problem_url=$7 difficulty=$8
+  local older_slug=$9 older_title=${10} older_date=${11} newer_slug=${12} newer_title=${13} newer_date=${14}
   local file base outline body description back meta="" link="" toc="" css=article js="" entry entries=() tab=$'\t'
+  local older="" newer=""
   if [[ $collection == blog ]]; then
     file=content/blog/$slug/index.md base=/writing-assets/blog/$slug css="article subscribe comments" js=comments
   else
@@ -524,6 +540,12 @@ article() {
     link="  <p><a href=\"$(esc "$problem_url")\" target=\"_blank\">LeetCode problem $problem_id</a></p>"
   fi
   description=${summary:-"$title — writing by eric zheng"}
+  if [[ -n $older_slug ]]; then
+    older="<a href=\"/$collection/$older_slug\" rel=\"prev\"><span class=\"meta\"><span aria-hidden=\"true\">←&nbsp;</span>previous</span><span class=\"title\">$(esc "$older_title")</span><time datetime=\"$older_date\">$(long_date "$older_date")</time></a>"
+  fi
+  if [[ -n $newer_slug ]]; then
+    newer="<a href=\"/$collection/$newer_slug\" rel=\"next\"><span class=\"meta\">next<span aria-hidden=\"true\">&nbsp;→</span></span><span class=\"title\">$(esc "$newer_title")</span><time datetime=\"$newer_date\">$(long_date "$newer_date")</time></a>"
+  fi
   back="<p class=\"meta\"><a href=\"/$collection\">← $collection</a></p>"
   if [[ $collection == blog ]]; then
     back="<div class=\"meta-row\">
@@ -546,6 +568,14 @@ $toc
 EOF
     cat "$body"
     echo "</article>"
+    if [[ -n $older_slug$newer_slug ]]; then
+      put <<EOF
+<nav class="post-nav" aria-label="More posts">
+  $older
+  $newer
+</nav>
+EOF
+    fi
     if [[ $collection == blog ]]; then
       subscribe_form section
       comments_section "$slug"
@@ -647,11 +677,14 @@ articles() {
   ((${#dirs[@]})) || return 0
   mkdir -p "${dirs[@]}"
   jobs=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
-  awk -v jobs="$jobs" -v dir="$work" '{ print > (dir "/chunk." (NR % jobs)) }' "$1"
+  # Each line gets its post's neighbours, for the links at the end of its page.
+  awk -F "$SEP" -v jobs="$jobs" -v dir="$work" '
+    NR == FNR { near[$1 FS $2] = $3 FS $4 FS $5 FS $6 FS $7 FS $8; next }
+    { print $0 FS near[$1 FS $2] > (dir "/chunk." (FNR % jobs)) }' <(neighbours "$work/posts.tsv") "$1"
   for chunk in "$work"/chunk.*; do
     (
-      while IFS=$SEP read -r collection slug date title summary problem_id problem_url difficulty; do
-        article "$collection" "$slug" "$date" "$title" "$summary" "$problem_id" "$problem_url" "$difficulty"
+      while IFS=$SEP read -r collection slug date title summary problem_id problem_url difficulty older_slug older_title older_date newer_slug newer_title newer_date; do
+        article "$collection" "$slug" "$date" "$title" "$summary" "$problem_id" "$problem_url" "$difficulty" "$older_slug" "$older_title" "$older_date" "$newer_slug" "$newer_title" "$newer_date"
       done <"$chunk"
     ) &
     pids+=($!)
@@ -1253,7 +1286,8 @@ keep_sources() {
 # make serve runs build.sh --update, which redoes in out/ only the pages that
 # show the files changed since the last build, in a fraction of a second:
 #   a post            its page, and if its title, date or summary changed, or
-#                     it's new or gone, its collection's indexes and the sitemap
+#                     it's new or gone, its collection's indexes, the sitemap
+#                     and the pages of the posts either side of it
 #   the changelog, books.md, photos.md, a page in pages/    those pages
 #   a file in public/, an image in content/    copied (and a cover or photo
 #                     redoes Books or About)
@@ -1320,6 +1354,9 @@ if [[ -z $whole ]]; then
       post=${file#content/} post=${post%/index.md} post=${post%.md} # blog/<slug>
       if [[ -f $file ]]; then want+=" $post"; else rm -rf "out/$post"; fi
     done
+    # And the posts whose neighbours changed: a post's page links to both.
+    want+=$(awk -F "$SEP" 'NR == FNR { old[$0] = 1; next } !($0 in old) { printf " %s/%s", $1, $2 }' \
+      <(neighbours out.posts.tsv) <(neighbours "$work/posts.tsv"))
     awk -F "$SEP" -v want="$want " 'index(want, " " $1 "/" $2 " ")' "$work/posts.tsv" >"$work/posts.changed"
     articles "$work/posts.changed"
     # The collections whose list is different: a title, date or summary, or a
