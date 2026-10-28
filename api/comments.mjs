@@ -7,7 +7,8 @@
 //   GET  /api/comments?post=<slug>  the post's approved comments, as JSON
 //   POST /api/comments              a comment from the form under a post. It
 //                                   waits in the pending list until Eric
-//                                   approves it with make comments.
+//                                   approves it with make comments, and an
+//                                   email to Eric says it's there.
 //
 // The comments live in Upstash Redis (api/_shared.mjs, which this function
 // shares with api/subscribe.mjs). Every key starts with COMMENTS_PREFIX: empty
@@ -19,17 +20,24 @@
 //   comments:<slug>  a post's approved comments, oldest first: id, name, text,
 //                    time, and eric (true when Eric wrote it). Never an email:
 //                    anyone can read this list.
+//   notices:<day>    how many emails about new comments went to Eric that day
+//                    (UTC), so a flood can't use up the day's emails.
 import { randomBytes } from "node:crypto";
 import { readFileSync, realpathSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { NotSent, clean, isEmail, key, length, readForm, redirect, redis, why } from "./_shared.mjs";
+import { NotSent, clean, isEmail, key, length, readForm, redirect, redis, sendEmail, transaction, why } from "./_shared.mjs";
 
 const SLUG = /^[A-Za-z0-9_-]+$/; // build.sh's rule for a post's folder
 const PUBLIC = ["id", "name", "text", "time", "eric"]; // what a GET may show
 const MAX_PENDING = 100; // so a flood can't fill the database
 const NOT_SENT = "/comment-not-sent";
+// The email about a new comment: from the address the post emails use, to
+// Eric's Gmail. scripts/announce.sh counts these against the day's emails.
+const FROM = "eric zheng <posts@ericzheng.nz>";
+const ERIC = "ericzheng.nz@gmail.com";
+const MAX_NOTICES = 10; // a day, of Resend's free 100; after that, make comments still has them
 
 // The function runs from the project's root, and vercel.json puts the posts in
 // its bundle.
@@ -97,7 +105,27 @@ async function save(request) {
     time: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
   };
   await redis(["RPUSH", key("pending"), JSON.stringify(comment)], true);
+  // The comment is saved, so an email that fails only goes to the log.
+  await tellEric(comment, new URL(request.url).origin).catch((error) => console.error(`comments: no email to Eric: ${why(error)}`));
   return post;
+}
+
+// An email to Eric that a comment is waiting: who, on which post, and what
+// they wrote. Never the commenter's email, which stays in pending.
+async function tellEric(comment, origin) {
+  const day = key(`notices:${comment.time.slice(0, 10)}`);
+  const [count] = await transaction([
+    ["INCR", day],
+    ["EXPIRE", day, String(2 * 24 * 60 * 60)],
+  ]);
+  if (count > MAX_NOTICES) return;
+  const test = process.env.COMMENTS_PREFIX ? "(test) " : "";
+  await sendEmail({
+    from: FROM,
+    to: [ERIC],
+    subject: `${test}new comment on ${comment.post}`,
+    text: `${comment.name} on ${origin}/blog/${comment.post}:\n\n${comment.text}\n\nmake comments${test ? " PREVIEW=1" : ""} to approve or delete it.\n`,
+  });
 }
 
 const handler = {
