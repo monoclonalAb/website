@@ -17,7 +17,7 @@
   "trailingSlash": false,
   "redirects": [
     {
-      "source": "/:collection(blog|leetcode|changelog|books)/page",
+      "source": "/:collection(blog|leetcode|leetcode/easy|leetcode/medium|leetcode/hard|changelog|books)/page",
       "has": [
         { "type": "query", "key": "page", "value": "0*(?<n>[2-9]|[1-9]\\d+)" }
       ],
@@ -25,7 +25,7 @@
       "permanent": false
     },
     {
-      "source": "/:collection(blog|leetcode|changelog|books)/page",
+      "source": "/:collection(blog|leetcode|leetcode/easy|leetcode/medium|leetcode/hard|changelog|books)/page",
       "destination": "/:collection",
       "permanent": false
     },
