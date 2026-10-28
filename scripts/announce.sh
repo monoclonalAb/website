@@ -112,7 +112,8 @@ if ((count == 0)); then
   exit 0
 fi
 today=$(date -u +%Y-%m-%d)
-used=$(redis / "$(jq -cn --arg a "${prefix}confirms:$today" --arg b "${prefix}sent:$today" --arg c "${prefix}notices:$today" '["MGET", $a, $b, $c]')" |
+# Previews send through the same Resend account, so their emails count too.
+used=$(redis / "$(jq -cn --arg day "$today" '["MGET"] + [("", "preview:") as $p | ("confirms", "sent", "notices") | "\($p)\(.):\($day)"]')" |
   jq '.result | map(if . == null then 0 else tonumber end) | add')
 left=$((DAILY - used))
 if ((count > left)); then

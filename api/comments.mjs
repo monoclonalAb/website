@@ -118,13 +118,15 @@ async function tellEric(comment, origin) {
     ["INCR", day],
     ["EXPIRE", day, String(2 * 24 * 60 * 60)],
   ]);
-  if (count > MAX_NOTICES) return;
+  // Past the cap, take it back, so the count stays the emails actually sent.
+  if (count > MAX_NOTICES) return redis(["DECR", day], true);
   const test = process.env.COMMENTS_PREFIX ? "(test) " : "";
   await sendEmail({
     from: FROM,
     to: [ERIC],
     subject: `${test}new comment on ${comment.post}`,
-    text: `${comment.name} on ${origin}/blog/${comment.post}:\n\n${comment.text}\n\nmake comments${test ? " PREVIEW=1" : ""} to approve or delete it.\n`,
+    // The reader's words come last, quoted, so they can't pass for these lines.
+    text: `${comment.name} on ${origin}/blog/${comment.post}. make comments${test ? " PREVIEW=1" : ""} to approve or delete it.\n\n${comment.text.replace(/^/gm, "> ")}\n`,
   });
 }
 
