@@ -65,6 +65,17 @@ esc() {
   printf '%s' "$s"
 }
 
+# An attribute pandoc wrote, back to plain text.
+unesc() {
+  local s=$1
+  s=${s//&quot;/'"'}
+  s=${s//&#39;/"'"}
+  s=${s//&lt;/'<'}
+  s=${s//&gt;/'>'}
+  s=${s//&amp;/'&'}
+  printf '%s' "$s"
+}
+
 # Text as a JSON string, quotes included, safe inside a <script> too.
 json() {
   local s=$1
@@ -236,14 +247,17 @@ og_image_alt="The home page: the split alphabet, with ERIC and ZHENG in red and 
 #   $5 js           scripts in public/js besides waves.js, by name
 #   $6 og_title     the link preview's title, if not $1
 #   $7 published    an article's date, which makes the preview an article's
+#   $8 image        the preview's picture as a full URL, if not the site's
+#   $9 alt          that picture's text, unescaped
+#   $10 head        more for the <head>, like structured data
 page_start() {
-  local title description url css js name og_title image=${8:-/opengraph-image.jpg} alt=${9:-$og_image_alt} size=""
+  local title description url css js name og_title image alt=${9:-$og_image_alt} size=""
   title=$(esc "$1")
   description=$(esc "$3")
   url=$SITE_URL$2
   [[ $2 == / ]] && url=$SITE_URL
   og_title=$(esc "${6:-$1}")
-  [[ $image == http* ]] || image=$SITE_URL$image
+  image=$(esc "${8:-$SITE_URL/opengraph-image.jpg}")
   alt=$(esc "$alt")
   # The site's own preview is 1200 by 630; a post's own picture can be any size.
   [[ -n ${8:-} ]] || size=$'<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n'
@@ -541,10 +555,13 @@ article() {
   # to search engines too.
   image=$(grep -o -m 1 '<img src="[^"]*"[^>]*>' "$body" | head -n 1) || true
   if [[ -n $image ]]; then
-    [[ $image != *' alt="'* ]] || { alt=${image#*' alt="'} alt=${alt%%\"*}; }
-    image=${image#'<img src="'} image=${image%%\"*}
-    [[ $image == http* ]] || picture=$SITE_URL$image
-    picture=${picture:-$image}
+    [[ $image != *' alt="'* ]] || { alt=${image#*' alt="'} alt=$(unesc "${alt%%\"*}"); }
+    image=${image#'<img src="'} image=$(unesc "${image%%\"*}")
+    case $image in
+      //*) picture=https:$image ;;
+      /*) picture=$SITE_URL$image ;;
+      *) picture=$image ;;
+    esac
   fi
   url=$SITE_URL/$collection/$slug
   data=$'<script type="application/ld+json">\n'
@@ -558,7 +575,7 @@ $back
 </div>"
   fi
   {
-    page_start "$title | Eric Zheng" "/$collection/$slug" "$description" "$css" "$js" "$title" "$date" "$image" "$alt" "$data"
+    page_start "$title | Eric Zheng" "/$collection/$slug" "$description" "$css" "$js" "$title" "$date" "$picture" "$alt" "$data"
     reading_start "$collection"
     put <<EOF
 $back
