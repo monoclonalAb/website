@@ -60,6 +60,43 @@
   padding-left: 10px;
 }
 
+/* Leetcode's difficulties, above the list: muted links with their counts, the
+   one shown in ink on a highlighter stroke of its colour. */
+.difficulties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 22px;
+}
+.difficulties a {
+  --difficulty: var(--rule);
+  display: inline-block;
+  padding-block: 11px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.difficulties a span {
+  font-style: italic;
+}
+.difficulties a:hover {
+  color: var(--ink);
+}
+.difficulties a[aria-current="page"] {
+  color: var(--ink);
+  background: linear-gradient(transparent 50%, color-mix(in srgb, var(--difficulty) 35%, transparent) 50% 84%, transparent 84%) 0 11px / 100% 22px no-repeat;
+}
+.difficulties [data-difficulty="Easy"] {
+  --difficulty: #1cb8b8;
+}
+.difficulties [data-difficulty="Medium"] {
+  --difficulty: #ffb800;
+}
+.difficulties [data-difficulty="Hard"] {
+  --difficulty: var(--accent);
+}
+
 @media (max-width: 599px) {
   .entries > li {
     grid-template-columns: minmax(0, 1fr);
