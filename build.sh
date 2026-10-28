@@ -502,15 +502,15 @@ read_posts() {
 }
 
 # Each post's neighbours in its collection, from a posts.tsv: collection, slug,
-# then the slug and title of the post before it (older) and after it (newer),
+# then the slug, title and date of the post before it (older) and after it (newer),
 # empty at either end. A post's page links to both.
 neighbours() {
   awk -F "$SEP" -v OFS="$SEP" '
-    { c = $1; n[c]++; i = n[c]; slug[c, i] = $2; title[c, i] = ($8 != "" ? $6 ". " : "") $4; order[++all] = c SUBSEP i }
+    { c = $1; n[c]++; i = n[c]; slug[c, i] = $2; title[c, i] = ($8 != "" ? $6 ". " : "") $4; date[c, i] = $3; order[++all] = c SUBSEP i }
     END {
       for (k = 1; k <= all; k++) {
         split(order[k], at, SUBSEP); c = at[1]; i = at[2] + 0
-        print c, slug[c, i], slug[c, i + 1], title[c, i + 1], slug[c, i - 1], title[c, i - 1]
+        print c, slug[c, i], slug[c, i + 1], title[c, i + 1], date[c, i + 1], slug[c, i - 1], title[c, i - 1], date[c, i - 1]
       }
     }' "$1"
 }
@@ -518,7 +518,7 @@ neighbours() {
 # A post's page: /blog/<slug> or /leetcode/<slug>.
 article() {
   local collection=$1 slug=$2 date=$3 title=$4 summary=$5 problem_id=$6 problem_url=$7 difficulty=$8
-  local older_slug=$9 older_title=${10} newer_slug=${11} newer_title=${12}
+  local older_slug=$9 older_title=${10} older_date=${11} newer_slug=${12} newer_title=${13} newer_date=${14}
   local file base outline body description back meta="" link="" toc="" css=article js="" entry entries=() tab=$'\t'
   local older="" newer=""
   if [[ $collection == blog ]]; then
@@ -541,10 +541,10 @@ article() {
   fi
   description=${summary:-"$title — writing by eric zheng"}
   if [[ -n $older_slug ]]; then
-    older="<a href=\"/$collection/$older_slug\" rel=\"prev\"><span class=\"meta\"><span aria-hidden=\"true\">←&nbsp;</span>previous</span><span class=\"title\">$(esc "$older_title")</span></a>"
+    older="<a href=\"/$collection/$older_slug\" rel=\"prev\"><span class=\"meta\"><span aria-hidden=\"true\">←&nbsp;</span>previous</span><span class=\"title\">$(esc "$older_title")</span><time datetime=\"$older_date\">$(long_date "$older_date")</time></a>"
   fi
   if [[ -n $newer_slug ]]; then
-    newer="<a href=\"/$collection/$newer_slug\" rel=\"next\"><span class=\"meta\">next<span aria-hidden=\"true\">&nbsp;→</span></span><span class=\"title\">$(esc "$newer_title")</span></a>"
+    newer="<a href=\"/$collection/$newer_slug\" rel=\"next\"><span class=\"meta\">next<span aria-hidden=\"true\">&nbsp;→</span></span><span class=\"title\">$(esc "$newer_title")</span><time datetime=\"$newer_date\">$(long_date "$newer_date")</time></a>"
   fi
   back="<p class=\"meta\"><a href=\"/$collection\">← $collection</a></p>"
   if [[ $collection == blog ]]; then
@@ -679,12 +679,12 @@ articles() {
   jobs=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
   # Each line gets its post's neighbours, for the links at the end of its page.
   awk -F "$SEP" -v jobs="$jobs" -v dir="$work" '
-    NR == FNR { near[$1 FS $2] = $3 FS $4 FS $5 FS $6; next }
+    NR == FNR { near[$1 FS $2] = $3 FS $4 FS $5 FS $6 FS $7 FS $8; next }
     { print $0 FS near[$1 FS $2] > (dir "/chunk." (FNR % jobs)) }' <(neighbours "$work/posts.tsv") "$1"
   for chunk in "$work"/chunk.*; do
     (
-      while IFS=$SEP read -r collection slug date title summary problem_id problem_url difficulty older_slug older_title newer_slug newer_title; do
-        article "$collection" "$slug" "$date" "$title" "$summary" "$problem_id" "$problem_url" "$difficulty" "$older_slug" "$older_title" "$newer_slug" "$newer_title"
+      while IFS=$SEP read -r collection slug date title summary problem_id problem_url difficulty older_slug older_title older_date newer_slug newer_title newer_date; do
+        article "$collection" "$slug" "$date" "$title" "$summary" "$problem_id" "$problem_url" "$difficulty" "$older_slug" "$older_title" "$older_date" "$newer_slug" "$newer_title" "$newer_date"
       done <"$chunk"
     ) &
     pids+=($!)
