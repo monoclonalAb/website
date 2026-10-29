@@ -18,7 +18,7 @@ summary: one line for the blog index and the page description # optional
 
 Put a value in 'single' or "double" quotes if it has `: ` in it or starts with a symbol, as YAML wants.
 
-The body is ordinary Markdown: GFM (tables, footnotes, task lists), fenced code with a language (highlighted by pandoc), `$inline$` and `$$display$$` maths (MathML, which the browser draws), and local images placed next to the post (`![alt text](diagram.png)`). Start headings at `##`; the title is the page's `h1`. Raw HTML is rejected.
+The body is ordinary Markdown: GFM (tables, footnotes, task lists), fenced code with a language (highlighted by pandoc), `$inline$` and `$$display$$` maths (MathML, which the browser draws), and local images placed next to the post (`![alt text](diagram.png)`). A post's first image, with its alt text, is the picture shown when the post is shared; a post without one shows the site's. Start headings at `##`; the title is the page's `h1`. Raw HTML is rejected.
 
 **Changelog:** add an entry to the top of `content/changelog.md`, one a day. The heading is the date, and the text below it is Markdown, so a link sits where it reads:
 
