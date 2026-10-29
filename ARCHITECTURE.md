@@ -41,7 +41,7 @@ Eric Zheng's personal site: a split-alphabet home page plus About, Blog, Content
 
 Most of these are things that are absent, so they're easy to break without noticing.
 
-- JavaScript runs only from the five files [AGENTS.md](AGENTS.md) lists, and pages in `pages/` carry no scripts of their own (Home's structured data aside). `make docs` fails otherwise.
+- JavaScript runs only from the five files [AGENTS.md](AGENTS.md) lists, and pages in `pages/` carry no scripts of their own (Home's structured data aside; `build.sh` writes each post's). `make docs` fails otherwise.
 - Markdown never runs code: `build.sh` rejects raw HTML and `#` headings, and there's no MDX.
 - Writing lives in `content/`, photos in `public/photos/` and book covers in `public/books/`; page copy lives in `pages/`, the comment section's and the sign-up's copy in `comments_section` and `subscribe_form` in `build.sh`, and the emails' in `emails/`. Nothing is fetched from a service when a page is viewed, except a blog post's comments from /api/comments.
 - Comments are plain text: the function stores what was typed, and `public/js/comments.js` sets it with `textContent`, never as HTML. A commenter's email waits with the comment until Eric approves or deletes it, and is never shown or kept beyond that.
