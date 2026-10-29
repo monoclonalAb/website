@@ -61,13 +61,13 @@
   padding: 0 12px;
   border-bottom: 1px solid var(--muted);
   border-radius: 0;
-  background: #f7f6f2;
+  background: var(--field);
   color: var(--ink);
   font: 16px / 25px var(--font-body);
   appearance: none;
 }
 .subscribe-form input::placeholder {
-  color: #9a9890;
+  color: var(--hint);
   opacity: 1;
 }
 .subscribe-form input:hover {

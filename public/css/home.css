@@ -1,5 +1,17 @@
 /* Home: the split alphabet, and its opening curtain. */
 
+/* Home is half light and half dark already, so it keeps the light scheme. */
+:root {
+  --paper: #f0eee8;
+  --ink: #16171b;
+  --muted: #666;
+  --rule: #c8c5bc;
+  --accent: #d91620;
+  --link: #7c4147;
+  --selection: #ffd987;
+  color-scheme: light;
+}
+
 /* The dark half runs into the scrollbar gutter that site.css reserves, so it
    still reaches the window edge. */
 body {
