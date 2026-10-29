@@ -1,6 +1,6 @@
 // What the two functions share: api/comments.mjs (the comments) and
 // api/subscribe.mjs (the list for emails about new posts). The database, the
-// form a reader sends, and the redirect that answers it. Vercel doesn't make a
+// form a reader sends, sending an email, and the redirect that answers it. Vercel doesn't make a
 // function of a file in api/ whose name starts with _, so this one is only
 // ever imported.
 //
@@ -64,6 +64,26 @@ export const length = (text) => [...text].length;
 // Something that looks like an email address: what the form's type="email"
 // lets through, give or take.
 export const isEmail = (text) => length(text) >= 3 && length(text) <= 254 && text.includes("@") && !/\s/.test(text);
+
+// Sends one email through Resend (resend.com), as its HTTPS API takes it. On a
+// laptop without RESEND_API_KEY, it's printed in the terminal instead.
+export async function sendEmail(email) {
+  if (!process.env.RESEND_API_KEY && !process.env.VERCEL) {
+    console.log(`make serve: no RESEND_API_KEY in .env.local, so here's the email:\n\n${email.text}`);
+    return;
+  }
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${setting("RESEND_API_KEY")}`, "Content-Type": "application/json" },
+    body: JSON.stringify(email),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!response.ok) {
+    // Resend's error has a name, like validation_error; its message can hold the address.
+    const name = await response.json().then((error) => error.name, () => "");
+    throw new Error(`Resend answered ${response.status} ${name}`);
+  }
+}
 
 export function redirect(location) {
   return new Response(null, { status: 303, headers: { Location: location, "Cache-Control": "no-store" } });
