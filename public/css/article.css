@@ -81,15 +81,15 @@
   overflow-x: auto;
   padding: 20px;
   border: 1px solid var(--rule);
-  background: #fff;
-  color: #24292e;
+  background: var(--code-paper);
+  color: var(--code-ink);
   font-size: 13px;
   line-height: 21px;
   tab-size: 4;
 }
 .prose :not(pre) > code {
   font-size: 0.85em;
-  background: #e7e4dc;
+  background: var(--code-inline);
   padding: 2px 4px;
   overflow-wrap: anywhere;
 }
@@ -176,6 +176,30 @@
 }
 .sourceCode .wa {
   color: #e36209;
+}
+/* And after github-dark, in the dark scheme. */
+@media (prefers-color-scheme: dark) {
+  .sourceCode :is(.kw, .cf, .dt, .pp, .im) {
+    color: #ff7b72;
+  }
+  .sourceCode :is(.fu, .ex, .at) {
+    color: #d2a8ff;
+  }
+  .sourceCode :is(.dv, .bn, .fl, .cn, .bu) {
+    color: #79c0ff;
+  }
+  .sourceCode :is(.st, .ch, .vs, .ss, .sc) {
+    color: #a5d6ff;
+  }
+  .sourceCode :is(.co, .do, .an, .cv, .in) {
+    color: #8b949e;
+  }
+  .sourceCode :is(.al, .er) {
+    color: #ffa198;
+  }
+  .sourceCode .wa {
+    color: #ffa657;
+  }
 }
 
 /* After the prose: the posts either side, previous (older) left and next

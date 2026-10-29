@@ -60,7 +60,7 @@
 .comment.eric {
   margin-left: 24px;
   padding-left: 20px;
-  border-left: 2px solid #7c414773;
+  border-left: 2px solid var(--link-rule);
 }
 /* The reader's own comment after a send, until Eric has read it. */
 .comment.waiting :is(.comment-name, p) {
@@ -135,7 +135,7 @@
   padding: 0 12px;
   border-bottom: 1px solid var(--muted);
   border-radius: 0;
-  background: #f7f6f2;
+  background: var(--field);
   color: var(--ink);
   font: 16px / 25px var(--font-body);
   appearance: none;
