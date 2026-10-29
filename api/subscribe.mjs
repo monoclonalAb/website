@@ -17,7 +17,8 @@
 //
 // Emails go out through Resend (resend.com), from posts@ericzheng.nz with
 // replies to Eric's Gmail, and their words are in emails/. This sends the
-// confirm email; scripts/announce.sh (make announce) sends the posts. On a
+// confirm email; scripts/announce.sh (make announce) sends the posts, and
+// api/comments.mjs tells Eric about each new comment. On a
 // laptop without RESEND_API_KEY, the confirm email is printed in the terminal
 // instead.
 //
@@ -35,7 +36,7 @@
 //                        flood of sign-ups can't use up the day's emails.
 import { createHash, randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { NotSent, clean, isEmail, key, readForm, redirect, redis, setting, transaction, why } from "./_shared.mjs";
+import { NotSent, clean, isEmail, key, readForm, redirect, redis, sendEmail, transaction, why } from "./_shared.mjs";
 
 // Who the emails are from, and where replies go. scripts/announce.sh has the
 // same two.
@@ -44,7 +45,7 @@ const REPLY_TO = "ericzheng.nz@gmail.com";
 const CONFIRM_SUBJECT = "confirm: new posts from ericzheng.nz";
 const DAY = 24 * 60 * 60; // seconds
 const WEEK = 7 * DAY; // how long a confirm link works; emails/confirm.html says so
-const MAX_CONFIRMS = 50; // a day: half of Resend's free 100, leaving the rest for posts
+const MAX_CONFIRMS = 50; // a day: half of Resend's free 100, leaving the rest for posts and comments
 const TOKEN = /^[0-9a-f]{32}$/;
 const NOT_SUBSCRIBED = "/not-subscribed";
 
@@ -115,21 +116,7 @@ async function sendConfirm(to, link) {
     html: words("confirm.html"),
     text: words("confirm.txt"),
   };
-  if (!process.env.RESEND_API_KEY && !process.env.VERCEL) {
-    console.log(`make serve: no RESEND_API_KEY in .env.local, so here's the confirm email:\n\n${email.text}`);
-    return;
-  }
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${setting("RESEND_API_KEY")}`, "Content-Type": "application/json" },
-    body: JSON.stringify(email),
-    signal: AbortSignal.timeout(10000),
-  });
-  if (!response.ok) {
-    // Resend's error has a name, like validation_error; its message can hold the address.
-    const name = await response.json().then((error) => error.name, () => "");
-    throw new Error(`Resend answered ${response.status} ${name}`);
-  }
+  await sendEmail(email);
 }
 
 const handler = {

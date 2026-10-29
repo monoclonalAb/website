@@ -39,7 +39,7 @@ The pieces:
 Eric decided these on 2026-10-25 (see the Decision log):
 
 - **Email.** The form asks for an email address, as ericzheng.org's does, and never shows it.
-- **Hearing about new comments.** Nothing tells Eric. He runs make comments now and then.
+- **Hearing about new comments.** An email to Eric says one is waiting, at most 10 a day. He approves it with make comments.
 - **Eric's replies.** They're marked as his. A form can't prove who's writing, so make comments offers "approve as Eric" (`e`) beside approve.
 
 Steps:
@@ -161,6 +161,7 @@ Steps:
 - Decision: comments are plain text, with no Markdown and no links. Why: nothing a stranger writes becomes HTML on the page, and spam links earn nothing. (2026-10-25)
 - Decision: the form asks for an email address and never shows it. It lives only in `pending`, and approving or deleting the comment drops it. Why: Eric wants a way to contact a commenter, as ericzheng.org has. (2026-10-25)
 - Decision: nothing notifies Eric of new comments; he runs make comments now and then. Why: Eric's choice; it needs no email service. (2026-10-25)
+- Decision: an email tells Eric of each new comment, through the Resend account the post emails set up, at most 10 a day, which make announce counts. Why: Eric asked for it once Resend was there; comments sat unseen until he remembered to look. Replaces the decision above. (2026-10-29)
 - Decision: Eric's replies are marked as his, set when he approves them (`e` in make comments). Why: Eric wants them marked, and a form can't prove who's writing. (2026-10-25)
 - Decision: the email list for changelog updates is separate work, not part of this plan. What was suggested: Buttondown's free plan keeps the list, and a make announce script sends the newest changelog entry through Buttondown's API. (2026-10-25)
 
