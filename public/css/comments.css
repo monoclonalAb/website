@@ -1,7 +1,7 @@
 /* Comments under a blog post (comments_section in build.sh). Paper page
    "Planning · Comments", draft C.
-   All in lower case, like the rest of the site: the dates, and readers' names
-   and words too. What a reader types in the form keeps its case. */
+   All in lower case, like the rest of the site, except readers' names and
+   words, which keep the case they were typed in. */
 .comments {
   text-transform: lowercase;
   display: flex;
@@ -43,6 +43,7 @@
 }
 .comment > p:not(.comment-meta) {
   white-space: pre-line;
+  text-transform: none;
 }
 .comment-meta {
   display: flex;
@@ -55,6 +56,7 @@
   font-size: 18px;
   font-weight: 500;
   line-height: 26px;
+  text-transform: none;
 }
 /* Eric's replies sit on the rule the yearbook quote on About uses. */
 .comment.eric {
