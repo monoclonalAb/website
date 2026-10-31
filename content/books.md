@@ -1,3 +1,9 @@
+## Manipulation: What It Is, Why It’s Bad, What to Do About It | Cass R. Sunstein | 2026-10-31
+
+interesting (but also *slightly* boring) shower-thoughts on manipulation. 
+
+only objectively false statement the author makes is that "a life that is devoted to watching short videos on a cell phone might not [be objectively good]"
+
 ## Thinking in Systems: A Primer | Donella Meadows | 2026-10-20
 
 “one of the worst ideas humanity ever had was the interest rate…” often times, the problem really lies within the system structures we place from the very beginning.
