@@ -5,7 +5,8 @@
 # changes, which redoes only the pages that show it, in well under a second,
 # so saving a post and reloading the page shows the change. A file that breaks
 # a rule prints its error, and the page keeps showing the last site that built.
-# Ctrl-C stops it.
+# Ctrl-C stops it. A make serve left running in another terminal is stopped
+# first.
 set -euo pipefail
 shopt -s nullglob
 cd "$(dirname "$0")/.."
@@ -58,6 +59,31 @@ build() {
   ./build.sh --update || echo "The page still shows the last site that built." >&2
 }
 
+# Stops an old make serve's server on port 4000; that make serve's loop sees it
+# go and stops too. Anything else on the port is left alone, and this make serve
+# stops, naming it. Without lsof (some Linuxes), it leaves the port be.
+free_port() {
+  local pid cmd pids=() tries=0
+  command -v lsof >/dev/null || return 0
+  while read -r pid; do
+    cmd=$(ps -o command= -p "$pid" || true)
+    if [[ $cmd != *api/comments.mjs* ]]; then
+      echo "Port 4000 is in use by ${cmd:-process $pid}, which isn't a make serve. Stop it and try again." >&2
+      exit 1
+    fi
+    pids+=("$pid")
+  done < <(lsof -tiTCP:4000 -sTCP:LISTEN || true)
+  ((${#pids[@]})) || return 0
+  echo "Stopping the make serve already running at http://localhost:4000."
+  kill "${pids[@]}" 2>/dev/null || true
+  while lsof -tiTCP:4000 -sTCP:LISTEN >/dev/null; do
+    if ((++tries == 25)); then kill -9 "${pids[@]}" 2>/dev/null || true; fi
+    if ((tries > 50)); then break; fi
+    sleep 0.2
+  done
+}
+
+free_port
 stamp=$(mktemp)
 trap 'rm -f "$stamp"' EXIT
 scan
@@ -75,4 +101,6 @@ while sleep 0.2 && kill -0 "$server" 2>/dev/null; do
   changed || continue
   build
 done
-exit 1 # the server stopped, perhaps because port 4000 is in use
+# The server stopped: perhaps another make serve took over port 4000.
+echo "The site at http://localhost:4000 stopped." >&2
+exit 1
