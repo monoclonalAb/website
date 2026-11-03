@@ -68,11 +68,19 @@
   line-height: 26px;
 }
 
-/* Alphabetical, left to right, then down. */
+/* Alphabetical, left to right, then down, in five columns: the label
+   column, then four sharing the values' width. */
 .guests {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 132px));
+  grid-template-columns: 132px repeat(4, minmax(0, 1fr));
   gap: 6px 24px;
+}
+
+/* Too narrow for five without breaking a name. */
+@media (max-width: 767px) {
+  .guests {
+    grid-template-columns: repeat(4, minmax(0, 132px));
+  }
 }
 
 @media (max-width: 599px) {
