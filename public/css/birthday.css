@@ -68,19 +68,13 @@
   line-height: 26px;
 }
 
-/* Alphabetical, left to right, then down, in five columns: the label
-   column, then four sharing the values' width. */
+/* Alphabetical, left to right, then down, in four columns as wide as
+   their longest names, spread so the last ends at the section's right edge. */
 .guests {
   display: grid;
-  grid-template-columns: 132px repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, auto);
+  justify-content: space-between;
   gap: 6px 24px;
-}
-
-/* Too narrow for five without breaking a name. */
-@media (max-width: 767px) {
-  .guests {
-    grid-template-columns: repeat(4, minmax(0, 132px));
-  }
 }
 
 @media (max-width: 599px) {
