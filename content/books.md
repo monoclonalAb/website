@@ -1,3 +1,7 @@
+## Meditations | Marcus Aurelius, translated by Gregory Hays | 2026-11-04
+
+this stoicism handbook singlehandedly lowered my resting heart rate by 12
+
 ## Manipulation: What It Is, Why It’s Bad, What to Do About It | Cass R. Sunstein | 2026-10-31
 
 interesting (but also *slightly* boring) shower-thoughts on manipulation. 
@@ -71,7 +75,7 @@ i feel like i just lost a part of my soul reading this book... surely the next b
 
 second read of this book! i love hunger-games trope and underdog academy slop, this is my jam (mustang is my goat)
 
-## The Odyssey (Emily Wilson translation) | Homer | 2026-09-06
+## The Odyssey | Homer, translated by Emily Wilson | 2026-09-06
 
 a mandatory read after watching the odyssey movie, the book is really different (the greek gods basically dictated the flow of the epic).
 
