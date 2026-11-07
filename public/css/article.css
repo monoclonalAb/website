@@ -11,16 +11,37 @@
 .article-header h1 {
   overflow-wrap: anywhere;
 }
+/* "on this page:", always open: each h2 in Eiko, its h3s under it in Georgia
+   on a 2px rule, like a Leetcode entry's difficulty. */
 .outline {
+  display: grid;
+  gap: 16px;
   border-block: 1px solid var(--rule);
-  padding-block: 16px;
+  padding-block: 24px;
 }
-.outline summary {
-  cursor: pointer;
+.outline ol {
+  display: grid;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 26px;
 }
-.outline ul {
-  padding: 12px 0 0 24px;
-  list-style: disc;
+.outline ol ol {
+  gap: 4px;
+  margin-top: 6px;
+  border-left: 2px solid var(--rule);
+  padding-left: 14px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 22px;
+}
+.outline a {
+  color: var(--ink);
+  text-decoration: none;
+}
+.outline a:hover {
+  text-decoration: underline 1.5px var(--accent);
+  text-underline-offset: 4px;
 }
 .prose {
   min-width: 0;
