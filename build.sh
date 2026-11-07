@@ -163,11 +163,12 @@ check_markdown() {
 }
 
 # Turns Markdown on stdin into the site's HTML. $1: where relative image paths
-# are served from. $2: a file to list the h2s in, one "id<TAB>text" a line.
+# are served from. $2: a file to list the h2s and h3s in, one
+# "level<TAB>id<TAB>text" a line.
 # $3: anything, to end each heading with a link to it (a post's, not the lists').
 markdown() {
   pandoc_md | awk -v base="$1" -v outline="$2" -v anchors="${3:-}" '
-    BEGIN { used["top"] = 1; used["main"] = 1 }
+    BEGIN { used["top"] = 1; used["main"] = 1; used["on-this-page"] = 1 }
     function esc(s) {
       gsub(/&/, "\\&amp;", s); gsub(/</, "\\&lt;", s); gsub(/>/, "\\&gt;", s); gsub(/"/, "\\&quot;", s)
       return s
@@ -198,7 +199,7 @@ markdown() {
       if (!end) return line
       text = plain(substr(rest, 1, end - 1))
       id = slug(text)
-      if (n == 2) print id "\t" esc(text) > outline
+      if (n <= 3) print n "\t" id "\t" esc(text) > outline
       # On a post, a "#" at the end links to the heading, to copy or share.
       if (anchors) rest = substr(rest, 1, end - 1) " <a class=\"anchor\" href=\"#" id "\"><span class=\"sr-only\">link to " esc(text) "</span><span aria-hidden=\"true\">#</span></a>" substr(rest, end)
       return pre "<h" n " id=\"" id "\">" rest
@@ -219,7 +220,7 @@ markdown() {
     /^<section id="footnotes"/ {
       print "<section class=\"footnotes\" role=\"doc-endnotes\">"
       print "<h2 class=\"sr-only\" id=\"" slug("Footnotes") "\">Footnotes</h2>"
-      print "footnotes\tFootnotes" > outline
+      print "2\tfootnotes\tfootnotes" > outline
       next
     }
     {
@@ -545,11 +546,42 @@ neighbours() {
     }' "$1"
 }
 
+# "on this page:", from a post's outline (see markdown): each h2, with its h3s
+# in a list under it; an h3 before the first h2 stands alone. Prints nothing
+# unless there are two h2s or more, the footnotes counting as one.
+outline_nav() {
+  awk -F '\t' '
+    # Closes the last h2 item, on its own line if it has h3s.
+    function finish() { return nested ? "      </ol>\n    </li>" : "</li>" }
+    { level[NR] = $1; id[NR] = $2; text[NR] = $3; if ($1 == 2) h2s++ }
+    END {
+      if (h2s < 2) exit
+      print "<nav class=\"outline\" aria-labelledby=\"on-this-page\">"
+      print "  <h2 id=\"on-this-page\">on this page<span>:</span></h2>"
+      print "  <ol>"
+      for (i = 1; i <= NR; i++) {
+        link = "<a href=\"#" id[i] "\">" text[i] "</a>"
+        if (level[i] == 3 && item) {
+          if (!nested) print "\n      <ol>"
+          print "        <li>" link "</li>"
+          nested = 1
+          continue
+        }
+        if (item) print finish()
+        printf "    <li>%s", link
+        item = 1; nested = 0
+      }
+      print finish()
+      print "  </ol>"
+      print "</nav>"
+    }' "$1"
+}
+
 # A post's page: /blog/<slug> or /leetcode/<slug>.
 article() {
   local collection=$1 slug=$2 date=$3 title=$4 summary=$5 problem_id=$6 problem_url=$7 difficulty=$8
   local older_slug=$9 older_title=${10} older_date=${11} newer_slug=${12} newer_title=${13} newer_date=${14}
-  local file base outline body description back meta="" link="" toc="" css=article js="" entry entries=() tab=$'\t'
+  local file base outline body description back meta="" link="" toc css=article js=""
   local url image="" alt="" picture="" data
   local older="" newer=""
   if [[ $collection == blog ]]; then
@@ -560,12 +592,7 @@ article() {
   outline=$work/outline.$collection.$slug body=$work/body.$collection.$slug
   : >"$outline"
   body_of "$file" | markdown "$base" "$outline" anchors >"$body"
-  while IFS= read -r entry; do entries+=("$entry"); done <"$outline"
-  if ((${#entries[@]} > 1)); then
-    toc=$'<details class="outline">\n  <summary>On this page</summary>\n  <ul>'
-    for entry in "${entries[@]}"; do toc+=$'\n'"    <li><a href=\"#${entry%%"$tab"*}\">${entry#*"$tab"}</a></li>"; done
-    toc+=$'\n  </ul>\n</details>'
-  fi
+  toc=$(outline_nav "$outline")
   if [[ -n $difficulty ]]; then
     meta=" · $difficulty"
     link="  <p><a href=\"$(esc "$problem_url")\" target=\"_blank\">LeetCode problem $problem_id</a></p>"
