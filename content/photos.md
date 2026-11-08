@@ -114,3 +114,19 @@ last day of semester @ [the beer spot](https://www.google.com/maps/search/?api=1
 ## rainbows-end.jpg | Eric taking a selfie at the foot of a purple drop tower ride, two friends in costumes walking behind him
 
 not height legal for fearfall @ [rainbow's end](https://www.google.com/maps/search/?api=1&query=Rainbow%27s%20End%20Auckland), 10/26
+
+## stack
+
+bday 2026 @ [hello beasty](https://www.google.com/maps/search/?api=1&query=Hello%20Beasty%20Auckland), 11/26
+
+### IMG_5100.jpg | Eric taking a selfie with a group of friends on a city street at night, one holding a bouquet of pink flowers
+
+human selfie stick back at it again
+
+### IMG_5071.jpg | Eric taking a selfie from above a long dinner table of friends with plates of food, a pile of printed photos in the middle
+
+this side of the table looks a lot happier-
+
+### IMG_5079.jpg | Eric taking a selfie at the end of a long dinner table of friends under a pink neon sign
+
+-than this side of the table

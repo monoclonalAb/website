@@ -38,7 +38,23 @@ The date becomes the entry's permanent `#changelog-2026-09-14` anchor and its ti
 September 2026
 ```
 
-The line below the heading is the caption, in Markdown, shown when the photo is picked. Missing alt text, a missing or unlisted file, a repeated entry or a photo that still has camera data fails the build.
+The line below the heading is the caption, in Markdown, shown when the photo is picked. Missing alt text, a missing or unlisted file, a repeated entry, a stack in the wrong place or with fewer than two photos, or a photo that still has camera data fails the build.
+
+Photos of one event can go in a stack: one print on the sheet, with the next two askew behind the first. Picking it fans them all out with the stack's caption, and picking one of those shows it large with its own. A `## stack` entry starts one: the line below it is the stack's caption, and the `###` entries under it are its photos, two or more, the first on top. A photo without a caption of its own shows the stack's. `make photos STACK="<image or folder>"` adds photos to a stack with the last photo listed, making that photo a stack first if it isn't in one (its caption becomes the stack's), so `make photos ADD="<first image>" STACK="<the rest>"` starts a new one:
+
+```md
+## stack
+
+bday 2026 @ [hello beasty](https://www.google.com/maps/search/?api=1&query=Hello%20Beasty%20Auckland), 11/26
+
+### IMG_5100.jpg | Eric taking a selfie with a group of friends on a city street at night
+
+the caption shown with this photo
+
+### IMG_5071.jpg | Eric taking a selfie from above a long dinner table of friends
+
+the caption shown with this one
+```
 
 **Friends:** add a name, link and note to the list in `pages/friends.html`, copying one of its `<div>`s.
 

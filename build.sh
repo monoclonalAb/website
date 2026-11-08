@@ -1178,17 +1178,32 @@ photo_img() { # file width height alt sizes
 # sheet of every photo it opens (HTML and CSS, apart from public/js/fade-out.js).
 # content/photos.md lists the photos in public/photos in order: each is a
 # "## photo.jpg | alt text" heading over a line of Markdown, the caption that
-# shows when the photo is picked.
+# shows when the photo is picked. A "## stack" entry is photos of one event,
+# one print on the sheet: its caption shows while they're fanned out, and the
+# "### photo.jpg | alt text" entries under it are its photos, each with its
+# own caption (or the stack's, if it has none).
 photos() {
-  local list=content/photos.md files=() alts=() widths=() heights=() file alt size n i
-  local lie caption described print_class ratio
-  local portrait_sizes="(max-width: 599px) 96px, 160px"
+  local list=content/photos.md files=() alts=() widths=() heights=() headings=()
+  local starts=() stacks=() heading=0 in_stack="" level file alt size n items i j k end
+  local lie print_class ratio caption described stack_caption
+  local portrait_sizes="(max-width: 599px) 96px, 160px" print_sizes="(max-width: 599px) 160px, 320px"
   awk '/^## / { exit } !/^[ \t\r]*$/ { exit 1 }' "$list" ||
     fail "$list: start with an entry, like \"## photo.jpg | alt\""
-  awk '/^## / { print substr($0, 4) }' "$list" >"$work/photos.list"
-  while IFS='|' read -r file alt; do
+  awk '/^### / { print "3|" substr($0, 5); next } /^## / { print "2|" substr($0, 4) }' "$list" >"$work/photos.list"
+  while IFS='|' read -r level file alt; do
+    heading=$((heading + 1))
     trim file "$file"
     trim alt "$alt"
+    if [[ $level == 2 && $file == stack ]]; then
+      ((${#starts[@]})) || fail "$list: the first entry is the portrait, so it can't be a stack"
+      starts+=("${#files[@]}") stacks+=("$heading") in_stack=1
+      continue
+    fi
+    if [[ $level == 3 ]]; then
+      [[ -n $in_stack ]] || fail "$list: $file is a ### entry, so it goes under a \"## stack\""
+    else
+      starts+=("${#files[@]}") stacks+=(0) in_stack=""
+    fi
     [[ -n $alt ]] || fail "$list: $file needs alt text: describe the photo after a |"
     for ((i = 0; i < ${#files[@]}; i++)); do
       [[ ${files[i]} != "$file" ]] || fail "$list: $file appears twice"
@@ -1197,7 +1212,7 @@ photos() {
     [[ -f public/photos/320/$file && -f public/photos/640/$file ]] ||
       fail "$list: $file has no smaller copies; run make photos"
     size=$(jpeg_size "public/photos/$file" "$list" "add it with make photos")
-    files+=("$file") alts+=("$(esc "$alt")") widths+=("${size% *}") heights+=("${size#* }")
+    files+=("$file") alts+=("$(esc "$alt")") widths+=("${size% *}") heights+=("${size#* }") headings+=("$heading")
   done <"$work/photos.list"
   ((${#files[@]})) || fail "$list: list at least one photo"
   for file in public/photos/*; do
@@ -1205,10 +1220,15 @@ photos() {
     for ((i = 0; i < ${#files[@]}; i++)); do [[ ${files[i]} == "${file##*/}" ]] && continue 2; done
     fail "$list: list or delete $file"
   done
+  n=${#files[@]} items=${#starts[@]}
+  starts+=("$n") # the photos of print j run from starts[j] to starts[j + 1]
+  for ((j = 0; j < items; j++)); do
+    ((stacks[j] == 0 || starts[j + 1] - starts[j] > 1)) ||
+      fail "$list: a \"## stack\" needs two photos or more under it, each a ### entry"
+  done
 
-  # Captions: one pandoc pass, each caption what follows its <h2>.
-  markdown /photos /dev/null <"$list" | awk -v dir="$work" '/^<h2[ >]/ { n++; next } n { print > (dir "/caption." n) }'
-  n=${#files[@]}
+  # Captions: one pandoc pass, each caption what follows its heading.
+  markdown /photos /dev/null <"$list" | awk -v dir="$work" '/^<h[23][ >]/ { n++; next } n { print > (dir "/caption." n) }'
 
   if ((n == 1)); then
     echo '  <figure class="portrait">'
@@ -1221,7 +1241,8 @@ photos() {
   # HTML command buttons open and close the dialog without JavaScript.
   echo '  <figure class="portrait">'
   echo '    <button type="button" class="fan" commandfor="photos" command="show-modal" aria-haspopup="dialog" aria-describedby="photos-hint">'
-  for ((i = (n > 3 ? 3 : n - 1); i >= 1; i--)); do
+  for ((j = (items > 3 ? 3 : items - 1); j >= 1; j--)); do
+    i=${starts[j]}
     echo "      $(photo_img "${files[i]}" "${widths[i]}" "${heights[i]}" "" "$portrait_sizes")"
   done
   echo "      $(photo_img "${files[0]}" "${widths[0]}" "${heights[0]}" "${alts[0]}" "$portrait_sizes")"
@@ -1230,33 +1251,83 @@ photos() {
   echo '  </figure>'
   echo '  <dialog id="photos" class="sheet" aria-label="more photos">'
   echo '    <button type="button" class="close" commandfor="photos" command="close">close <span aria-hidden="true">×</span></button>'
-  echo "    <form class=\"pile\" style=\"--count: $n\">"
+  echo "    <form class=\"pile\" style=\"--count: $items\">"
   echo '      <!-- Bare paper closes the sheet, or puts a picked photo back. -->'
   echo '      <button type="button" class="paper" commandfor="photos" command="close" tabindex="-1" aria-hidden="true"></button>'
   echo '      <button type="reset" class="paper" tabindex="-1" aria-hidden="true"></button>'
-  for ((i = 0; i < n; i++)); do
-    file=${files[i]} caption="" described="" print_class=print
+  for ((j = 0; j < items; j++)); do
+    i=${starts[j]} end=${starts[j + 1]}
     ratio=$(awk -v w="${widths[i]}" -v h="${heights[i]}" 'BEGIN { printf "%.4f", w / h }')
-    if ((i == 0)); then
+    if ((j == 0)); then
       lie="--size: 2; --x: 0; --y: 0; --turn: -0.25" print_class="print me"
     else
-      lie="--size: $(spread "$file size"); --x: $(spread "$file x"); --y: $(spread "$file y"); --turn: $(spread "$file turn")"
+      lie="--size: $(spread "${files[i]} size"); --x: $(spread "${files[i]} x"); --y: $(spread "${files[i]} y"); --turn: $(spread "${files[i]} turn")" print_class=print
     fi
-    [[ -s $work/caption.$((i + 1)) ]] && caption=$(cat "$work/caption.$((i + 1))")
-    [[ -n $caption ]] && described=" aria-describedby=\"caption-$i\""
-    echo "      <div class=\"item\" style=\"--i: $i; --ratio: $ratio; $lie\">"
-    echo "        <input type=\"radio\" name=\"photo\" id=\"photo-$i\" class=\"radio\"$described>"
-    echo "        <label for=\"photo-$i\" class=\"$print_class\">$(photo_img "$file" "${widths[i]}" "${heights[i]}" "${alts[i]}" "(max-width: 599px) 160px, 320px")</label>"
-    echo '        <div class="focus">'
-    echo '          <figure>'
-    echo "            $(photo_img "$file" "${widths[i]}" "${heights[i]}" "" "(max-width: 599px) 90vw, 640px")"
-    [[ -n $caption ]] && echo "            <figcaption id=\"caption-$i\">$caption</figcaption>"
-    echo '          </figure>'
+    if ((stacks[j] == 0)); then
+      photo_caption "$i" ""
+      echo "      <div class=\"item\" style=\"--i: $j; --ratio: $ratio; $lie\">"
+      echo "        <input type=\"radio\" name=\"photo\" id=\"photo-$i\" class=\"radio\"$described>"
+      echo "        <label for=\"photo-$i\" class=\"$print_class\">$(photo_img "${files[i]}" "${widths[i]}" "${heights[i]}" "${alts[i]}" "$print_sizes")</label>"
+      photo_focus "$i" "        "
+      echo '      </div>'
+      continue
+    fi
+
+    # A stack: a print with the next two photos askew behind the first.
+    # Picked, it fans all its photos out over the sheet, each one to pick.
+    stack_caption="" described=""
+    if [[ -s $work/caption.${stacks[j]} ]]; then
+      stack_caption=$(cat "$work/caption.${stacks[j]}") described=" aria-describedby=\"caption-stack-$j\""
+    fi
+    echo "      <div class=\"item stack\" style=\"--i: $j; --ratio: $ratio; --n: $((end - i)); $lie\">"
+    echo "        <input type=\"radio\" name=\"photo\" id=\"stack-$j\" class=\"radio\"$described>"
+    echo "        <label for=\"stack-$j\" class=\"$print_class\">"
+    for ((k = (end - i > 3 ? i + 2 : end - 1); k > i; k--)); do
+      echo "          $(photo_img "${files[k]}" "${widths[k]}" "${heights[k]}" "" "$print_sizes")"
+    done
+    echo "          $(photo_img "${files[i]}" "${widths[i]}" "${heights[i]}" "${alts[i]}" "$print_sizes")"
+    echo '        </label>'
+    echo '        <div class="spread">'
+    echo '          <!-- Bare paper folds the photos back up, or puts a picked one back. -->'
+    echo '          <button type="reset" class="back" tabindex="-1" aria-hidden="true"></button>'
+    echo "          <label for=\"stack-$j\" class=\"back\" aria-hidden=\"true\"></label>"
+    echo '          <div class="hand">'
+    for ((k = i; k < end; k++)); do
+      ratio=$(awk -v w="${widths[k]}" -v h="${heights[k]}" 'BEGIN { printf "%.4f", w / h }')
+      photo_caption "$k" "$stack_caption"
+      # --k: where it lies in the fan, from -1 to 1 for three photos.
+      echo "            <div class=\"photo\" style=\"--k: $(awk -v k=$((2 * (k - i) - (end - i - 1))) 'BEGIN { print k / 2 }'); --ratio: $ratio\">"
+      echo "              <input type=\"radio\" name=\"photo\" id=\"photo-$k\" class=\"radio\"$described>"
+      echo "              <label for=\"photo-$k\" class=\"card\">$(photo_img "${files[k]}" "${widths[k]}" "${heights[k]}" "${alts[k]}" "$print_sizes")</label>"
+      photo_focus "$k" "              "
+      echo '            </div>'
+    done
+    echo '          </div>'
+    [[ -z $stack_caption ]] || echo "          <div class=\"slip\" id=\"caption-stack-$j\">$stack_caption</div>"
     echo '        </div>'
     echo '      </div>'
   done
   echo '    </form>'
   echo '  </dialog>'
+}
+
+# For photos(): sets caption to photo $1's caption, or to $2 if it has none,
+# and described to the attribute that points its radio button at it.
+photo_caption() {
+  caption=$2 described=""
+  [[ ! -s $work/caption.${headings[$1]} ]] || caption=$(cat "$work/caption.${headings[$1]}")
+  [[ -z $caption ]] || described=" aria-describedby=\"caption-$1\""
+}
+
+# For photos(): photo $1 brought forward, straight and large, with its caption
+# on a slip, indented by $2.
+photo_focus() {
+  echo "$2<div class=\"focus\">"
+  echo "$2  <figure>"
+  echo "$2    $(photo_img "${files[$1]}" "${widths[$1]}" "${heights[$1]}" "" "(max-width: 599px) 90vw, 640px")"
+  [[ -z $caption ]] || echo "$2    <figcaption id=\"caption-$1\">$caption</figcaption>"
+  echo "$2  </figure>"
+  echo "$2</div>"
 }
 
 # --- Pages ---------------------------------------------------------------------

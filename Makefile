@@ -4,7 +4,8 @@
 # make check      what CI runs: shellcheck, a syntax check of the functions in
 #                 api/, the docs check and a build
 # make daily      start today's Leetcode entry; DATE=2026-09-14 for another day
-# make photos     add photos to About: ADD="~/Pictures/IMG_1234.heic"
+# make photos     add photos to About: ADD="~/Pictures/IMG_1234.heic", or
+#                 STACK="..." to stack them with the last photo, for one event
 # make covers     ready the book covers saved in public/books/
 # make comments   approve or delete the comments waiting under blog posts;
 #                 PREVIEW=1 for the test ones
@@ -36,7 +37,7 @@ daily:
 	scripts/daily.sh $(DATE)
 
 photos:
-	scripts/photos.sh $(ADD)
+	scripts/photos.sh $(ADD) $(if $(STACK),--stack $(STACK))
 
 covers:
 	scripts/covers.sh
