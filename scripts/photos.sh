@@ -4,6 +4,9 @@
 # stripped of camera data, which can include where it was taken. A stub entry
 # goes at the end of content/photos.md, captioned with the month it was taken.
 # Its alt text is left blank, so the build stops until you describe the photo.
+# STACK="<image or folder> ..." adds photos the same way, but stacked with the
+# last photo listed, as "### " entries under a "## stack" (made from that
+# photo if it isn't in one), each with a blank caption.
 #
 # Then, for every photo, it makes the 320px and 640px wide copies the About
 # page shows (public/photos/320/ and public/photos/640/). `make photos` with
@@ -30,20 +33,41 @@ taken() {
   printf '%s %s' "${months[$((10#${BASH_REMATCH[2]} - 1))]}" "${BASH_REMATCH[1]}"
 }
 
+# Makes the last entry in the list a stack, if it isn't one: its heading
+# becomes "## stack", whose caption it keeps, and its photo goes under it.
+stack_last() {
+  local at heading
+  at=$(awk '/^## / { at = NR } END { print at }' "$list")
+  [[ -n $at ]] || {
+    echo "add a photo before stacking others with it" >&2
+    exit 1
+  }
+  heading=$(sed -n "${at}p" "$list")
+  [[ $heading == "## stack" ]] && return
+  awk -v at="$at" 'NR == at { print "## stack"; next } { print }' "$list" >"$list.new"
+  printf '\n### %s\n' "${heading#"## "}" >>"$list.new"
+  mv "$list.new" "$list"
+}
+
 # The images to add: each file named, and the images in each folder named.
-files=()
+# The Makefile puts --stack before the ones to stack.
+files=() stacked=()
+stack=""
 shopt -s nocasematch nullglob
 images='\.(heic|heif|jpe?g|png|webp)$'
 for input in "$@"; do
-  if [[ -d $input ]]; then
-    for file in "$input"/*; do [[ $file =~ $images ]] && files+=("$file"); done
+  if [[ $input == --stack ]]; then
+    stack=1
+  elif [[ -d $input ]]; then
+    for file in "$input"/*; do [[ $file =~ $images ]] && files+=("$file") stacked+=("$stack"); done
   else
-    files+=("$input")
+    files+=("$input") stacked+=("$stack")
   fi
 done
 shopt -u nocasematch
 
-for file in ${files[@]+"${files[@]}"}; do
+for ((i = 0; i < ${#files[@]}; i++)); do
+  file=${files[i]}
   name=${file##*/}
   name=${name%.*}.jpg
   if grep -qF "## $name |" "$list"; then
@@ -52,8 +76,14 @@ for file in ${files[@]+"${files[@]}"}; do
   fi
   # "+profile !icc,*" keeps only the colour profile: EXIF and XMP go.
   magick "$file" -auto-orient -resize '1600x1600>' +profile '!icc,*' -quality 80 "$folder/$name"
-  printf '\n## %s |\n\n%s\n' "$name" "$(taken "$file")" >>"$list"
-  echo "added $name"
+  if [[ -n ${stacked[i]} ]]; then
+    stack_last
+    printf '\n### %s |\n' "$name" >>"$list"
+    echo "added $name, stacked with the last photo"
+  else
+    printf '\n## %s |\n\n%s\n' "$name" "$(taken "$file")" >>"$list"
+    echo "added $name"
+  fi
 done
 
 # The smaller copies, for photos that don't have them yet.

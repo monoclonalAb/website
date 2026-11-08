@@ -276,6 +276,33 @@ main.about {
 .me {
   z-index: 2;
 }
+/* A stack, photos of one event: the next two lie askew behind the first,
+   turned on their middles one each way, so they show on every side of it;
+   a little further on hover. Its margin keeps them off the photos round it. */
+.stack {
+  margin: 24px;
+}
+.stack .print img {
+  position: relative;
+}
+.stack .print img:not(:last-child) {
+  position: absolute;
+  inset: 0;
+  rotate: var(--angle);
+  box-shadow: var(--shadow);
+}
+.stack .print :nth-last-child(2) {
+  --angle: -10deg;
+}
+.stack .print :nth-last-child(3) {
+  --angle: 10deg;
+}
+.stack .print:hover :nth-last-child(2) {
+  --angle: -12deg;
+}
+.stack .print:hover :nth-last-child(3) {
+  --angle: 12deg;
+}
 .print:hover {
   z-index: 3;
   rotate: 0deg;
@@ -322,10 +349,8 @@ main.about {
     0 2px 4px rgb(22 23 27 / 10%),
     0 32px 64px -20px rgb(22 23 27 / 45%);
 }
-.focus figcaption {
-  position: absolute;
-  right: -40px;
-  bottom: -28px;
+.focus figcaption,
+.slip {
   width: max-content;
   max-width: min(300px, 90%);
   padding: 16px 20px 18px;
@@ -337,6 +362,85 @@ main.about {
   font-size: 16px;
   font-style: italic;
   line-height: 25px;
+}
+.focus figcaption {
+  position: absolute;
+  right: -40px;
+  bottom: -28px;
+}
+
+/* A picked stack fans all its photos out over the sheet, evenly along a
+   gentle arc, with its caption on a slip across their foot; bare paper folds
+   them back up. A photo picked from the fan comes forward like any other,
+   and bare paper then puts it back in the fan. */
+.spread {
+  --step: 0.62; /* from one photo to the next, in photo heights */
+  --room: 128px;
+  --h: min(400px, 100svh - 280px, (100vw - var(--room)) / (0.75 + (var(--n) - 1) * var(--step)));
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: none;
+  place-content: center;
+  justify-items: center;
+}
+.stack:has(:checked) .spread {
+  display: grid;
+}
+.back {
+  position: fixed;
+  inset: 0;
+  background: none;
+}
+.spread:has(.hand :checked) button.back,
+.spread:not(:has(.hand :checked)) label.back {
+  display: none;
+}
+.hand {
+  display: grid;
+}
+.hand .photo {
+  display: contents;
+}
+.card {
+  position: relative;
+  z-index: 1;
+  grid-area: 1 / 1;
+  height: var(--h);
+  aspect-ratio: var(--ratio);
+  translate: calc(var(--k) * var(--step) * var(--h)) calc(var(--k) * var(--k) * var(--h) / 20);
+  rotate: calc(var(--k) * 6deg);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.card:hover {
+  z-index: 2;
+  rotate: 0deg;
+  box-shadow:
+    0 1px 2px rgb(22 23 27 / 12%),
+    0 20px 36px -12px rgb(22 23 27 / 38%);
+}
+.radio:focus-visible + .card,
+.stack:has(> .radio:focus-visible) .card {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.hand:has(:checked) .card img {
+  opacity: 0.3;
+}
+.slip {
+  position: relative;
+  z-index: 3;
+  max-width: min(300px, 100vw - 48px);
+  margin-top: -24px;
+}
+.spread:has(.hand :checked) .slip {
+  visibility: hidden;
 }
 
 @media (max-width: 599px) {
@@ -376,15 +480,25 @@ main.about {
     translate: calc(var(--x) * 10px) calc(var(--y) * 10px);
     rotate: calc(var(--turn) * 7deg);
   }
+  .stack {
+    margin: 16px;
+  }
   .focus {
     padding: 72px 24px;
   }
   .focus img {
     width: min(100vw - 48px, (100svh - 200px) * var(--ratio));
   }
+  .spread {
+    --step: 0.45;
+    --room: 48px;
+  }
   .focus figcaption {
     right: -8px;
     bottom: -32px;
+  }
+  .focus figcaption,
+  .slip {
     padding: 14px 18px 16px;
     font-size: 15px;
     line-height: 23px;
@@ -423,11 +537,37 @@ main.about {
       rotate 160ms ease-out,
       box-shadow 160ms ease-out;
   }
-  .print img {
+  .print img,
+  .card img {
     transition: opacity 200ms ease-out;
   }
-  .focus {
+  .stack .print img {
+    transition:
+      opacity 200ms ease-out,
+      rotate 220ms ease-out;
+  }
+  .focus,
+  .spread {
     transition: display 220ms allow-discrete;
+  }
+  /* A stack's fan opens out of a pile in the middle, and folds back into
+     it. */
+  .card {
+    transition:
+      opacity 220ms ease-out,
+      translate 300ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      rotate 300ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 160ms ease-out;
+  }
+  .slip {
+    transition: opacity 220ms ease-out;
+  }
+  .stack:not(:has(:checked)) :is(.card, .slip) {
+    opacity: 0;
+  }
+  .stack:not(:has(:checked)) .card {
+    translate: 0 0;
+    rotate: 0deg;
   }
   .focus figure {
     transition:
@@ -450,6 +590,13 @@ main.about {
     .radio:checked ~ .focus figure {
       opacity: 0;
       scale: 0.94;
+    }
+    .stack:has(:checked) :is(.card, .slip) {
+      opacity: 0;
+    }
+    .stack:has(:checked) .card {
+      translate: 0 0;
+      rotate: 0deg;
     }
   }
 }
