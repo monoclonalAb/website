@@ -247,8 +247,12 @@ main.about {
   display: none;
 }
 
+/* A photo is nudged and tilted off its box, so the box's bare corners pass
+   clicks through to the paper; only the photo, or an opened stack, takes
+   them. */
 .item {
   position: relative;
+  pointer-events: none;
 }
 .radio {
   position: absolute;
@@ -268,6 +272,7 @@ main.about {
   rotate: calc(var(--turn) * 8deg);
   box-shadow: var(--shadow);
   cursor: pointer;
+  pointer-events: auto;
 }
 .print img {
   width: 100%;
@@ -384,6 +389,7 @@ main.about {
   display: none;
   place-content: center;
   justify-items: center;
+  pointer-events: auto;
 }
 .stack:has(:checked) .spread {
   display: grid;
