@@ -84,7 +84,8 @@
 .prose ol {
   list-style: decimal;
 }
-.prose li + li {
+.prose li + li,
+.prose li > :is(ul, ol) {
   margin-top: 8px;
 }
 .prose li > p + p {
