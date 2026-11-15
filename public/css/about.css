@@ -236,10 +236,13 @@ main.about {
 
 /* Behind the photos: bare paper closes the sheet, or puts a picked photo
    back once one is picked. It lies on the pile rather than fixed to the
-   window, so the wheel over it scrolls the sheet. */
+   window, so the wheel over it scrolls the sheet. It lies over the photos'
+   boxes and under the photos, which are nudged and tilted off their boxes,
+   so a click beside a photo lands on paper. */
 .paper {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background: none;
 }
 .pile:has(:checked) .paper[type="button"],
@@ -247,12 +250,8 @@ main.about {
   display: none;
 }
 
-/* A photo is nudged and tilted off its box, so the box's bare corners pass
-   clicks through to the paper; only the photo, or an opened stack, takes
-   them. */
 .item {
   position: relative;
-  pointer-events: none;
 }
 .radio {
   position: absolute;
@@ -272,7 +271,6 @@ main.about {
   rotate: calc(var(--turn) * 8deg);
   box-shadow: var(--shadow);
   cursor: pointer;
-  pointer-events: auto;
 }
 .print img {
   width: 100%;
@@ -389,7 +387,6 @@ main.about {
   display: none;
   place-content: center;
   justify-items: center;
-  pointer-events: auto;
 }
 .stack:has(:checked) .spread {
   display: grid;
