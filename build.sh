@@ -31,13 +31,18 @@ SEP=$'\037' # separates the fields of a post's line in posts.tsv
 new=out.new.$$
 out=$new
 work=$(mktemp -d)
-checking='' # the Markdown check, while it runs
 locked=''   # set while this build holds out.lock
 writing=''  # set once an update has begun to change out/
 finish() {
   local status=$?
+  # Nothing interrupts the tidying up, and nothing may still be writing to
+  # the folders it removes: whatever is running in the background (the
+  # Markdown check, posts or indexes being built) is stopped first.
+  trap '' INT TERM
+  # shellcheck disable=SC2046 # a word for each process
+  kill $(jobs -p) 2>/dev/null || true
+  wait
   rm -rf "$work" "$new"
-  if [[ -n $checking ]]; then kill "$checking" 2>/dev/null || true; fi
   # Stopped between the two renames at the end: put the last site back.
   if [[ ! -d out && -d out.old.$$ ]]; then mv "out.old.$$" out || true; fi
   # An update that failed partway may have left out/ half done. Forgetting
@@ -1559,7 +1564,6 @@ books
 static_pages
 sitemap
 wait "$checking" || exit 1
-checking=''
 # Two renames, so make serve never shows half a site (finish puts the last one
 # back if this is stopped between them). A build that fails stops before
 # this and leaves the last site that built.
