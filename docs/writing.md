@@ -4,7 +4,7 @@ A post is published when it's committed to `main`. Keep work in progress uncommi
 
 To see your changes first, run `make serve` and open http://localhost:4000. If a `make serve` is already running in another terminal, it stops that one first. Each time you save a file it redoes the pages that show it, in under a second, and reloading the page shows the change. If a file breaks a rule, the terminal names it, and the page keeps showing the last version that built.
 
-**Leetcode:** `make daily` creates `content/leetcode/<today>.md` with the problem's title, number, link and difficulty filled in from LeetCode. The date is today in UTC, when the daily rolls over. Pass a date for an older one: `make daily DATE=2026-09-14`.
+**Leetcode:** `make daily` creates `content/leetcode/<today>.md` with the problem's title, number, link and difficulty filled in from LeetCode. The date is today in UTC, when the daily rolls over. Pass a date for an older one: `make daily DATE=2026-09-14`. Once it's committed, the entry fills its day's square above the list on /leetcode and counts towards the streak: the days in a row up to the newest entry, worked out when the site is built.
 
 **Blog:** create `content/blog/<slug>/index.md` by hand (and, optionally, a changelog entry):
 
