@@ -524,7 +524,7 @@ read_posts() {
         if (value["problemId"] !~ /^[0-9]+$/ || quoted["problemId"]) fail("problemId: use a number")
         if (value["problemUrl"] !~ /^https?:\/\/[^ ]+$/) fail("problemUrl: use a link")
         if (value["difficulty"] !~ /^(Easy|Medium|Hard)$/) fail("difficulty: use Easy, Medium or Hard")
-        if (slug ~ /^(easy|medium|hard|page)$/) fail("/leetcode/" slug " is one of the list'\''s pages; name it by its date")
+        if (slug ~ /^(easy|medium|hard|page|[0-9][0-9][0-9][0-9])$/) fail("/leetcode/" slug " is one of the list'\''s pages; name it by its date")
       }
       print collection sep slug sep value["date"] sep value["title"] sep value["summary"] sep value["problemId"] sep value["problemUrl"] sep value["difficulty"]
     }
@@ -808,11 +808,16 @@ EOF
 # public/js/page-fit.js can show as many as fit on the screen.
 index_page() {
   local collection=$1 page=$2 pages=$3 list=$4 js=${5:-}
-  local source=pages/${collection%%/*}.html path title dir
+  local source=pages/${collection%%/*}.html path title dir year month level
   path=$(page_path "$collection" "$page")
   page_fields "$source"
   title=$page_title
-  [[ $collection != */* ]] || title="$title, ${collection#*/}"
+  # A Leetcode view: "Leetcode, July 2025, hard" for leetcode/2025/07/hard.
+  if [[ $collection =~ ^[a-z]+/?([0-9]{4})?/?([0-9]{2})?/?([a-z]*)$ ]]; then
+    year=${BASH_REMATCH[1]:-} month=${BASH_REMATCH[2]:-} level=${BASH_REMATCH[3]:-}
+    [[ -z $year ]] || title="$title, ${month:+${months[$((10#$month - 1))]} }$year"
+    [[ -z $level ]] || title="$title, $level"
+  fi
   ((page > 1)) && title="$title, page $page"
   ((pages > 1)) && js="$js page-fit page-jump"
   dir=$out${path}
@@ -835,67 +840,166 @@ drop_pages_after() {
   rmdir "$out/$1/page" 2>/dev/null || true # if no pages are left in it
 }
 
-# The indexes of the collections named, /blog and /leetcode, PAGE_SIZE posts a
-# page.
+# The indexes of the collections named, PAGE_SIZE posts a page: /blog, and
+# /leetcode with its views. A view is every solution (/leetcode), a year's
+# (/leetcode/2025) or a month's (/leetcode/2025/07), and each of those by
+# difficulty (/leetcode/2025/07/hard). Only views with solutions are built.
+# Above each view's list are the dailies: the streak, and a square for each
+# day of the year shown. /leetcode shows the newest year, so that year has no
+# page of its own.
 post_indexes() {
-  local collection view level count pages page list
+  local collection views view count pages page list jobs job n pid pids
   for collection in "$@"; do
-    for view in "$collection" $([[ $collection != leetcode ]] || echo leetcode/easy leetcode/medium leetcode/hard); do
-      level=${view#"$collection"} level=${level#/}
-      # Every page's list in one go: the whole collection (or the posts of one
-      # difficulty), with the entries not on that page hidden. Prints how many
-      # entries there are.
-      count=$(awk -F "$SEP" -v c="$collection" -v name="${view//\//.}" -v d="$level" -v size="$PAGE_SIZE" -v dir="$work" '
-        function esc(s) { gsub(/&/, "\\&amp;", s); gsub(/</, "\\&lt;", s); gsub(/>/, "\\&gt;", s); gsub(/"/, "\\&quot;", s); return s }
-        function long_date(d,   months) {
-          split("January February March April May June July August September October November December", months, " ")
-          return (substr(d, 9, 2) + 0) " " months[substr(d, 6, 2) + 0] " " substr(d, 1, 4)
-        }
-        # Leetcode: a link to each difficulty above the list, the one shown marked.
-        function difficulties(   out, i, name, label) {
-          out = "<nav class=\"difficulties\" aria-label=\"Difficulty\">\n"
-          for (i = 0; i <= 3; i++) {
-            name = i ? level[i] : ""; label = i ? tolower(name) : "all"
-            out = out "  <a href=\"/" c (i ? "/" label : "") "\"" (i ? " data-difficulty=\"" name "\"" : "") \
-              (label == (d == "" ? "all" : d) ? " aria-current=\"page\"" : "") ">" label " <span>" (i ? per[name] : all) + 0 "</span></a>\n"
+    # The views come and go (a month's first solution, a year's last), so an
+    # update starts them afresh.
+    [[ $collection != leetcode ]] || rm -rf "$out"/leetcode/{page,easy,medium,hard,[0-9][0-9][0-9][0-9]}
+    # Every page's list in one go, each with the entries not on that page
+    # hidden. Prints each view's path and how many entries it has.
+    views=$(awk -F "$SEP" -v c="$collection" -v size="$PAGE_SIZE" -v dir="$work" '
+      function esc(s) { gsub(/&/, "\\&amp;", s); gsub(/</, "\\&lt;", s); gsub(/>/, "\\&gt;", s); gsub(/"/, "\\&quot;", s); return s }
+      function long_date(d) { return (substr(d, 9, 2) + 0) " " names[substr(d, 6, 2) + 0] " " substr(d, 1, 4) }
+      # The days from 1 January 1970, a Thursday, to a date.
+      function day_number(y, m, d) {
+        if (m <= 2) { y--; m += 12 }
+        return 365 * y + int(y / 4) - int(y / 100) + int(y / 400) + int((153 * (m - 3) + 2) / 5) + d - 719469
+      }
+      function day_of(s) { return day_number(substr(s, 1, 4), substr(s, 6, 2) + 0, substr(s, 9, 2) + 0) }
+      # A link to the view of span s ("" for every solution, a year or a
+      # year/month) and difficulty d, or only its words when that view would
+      # be empty.
+      function link(s, d, attributes, words) {
+        return "<a" (count[s "|" d] ? " href=\"/" c (s == "" ? "" : "/" s) (d == "" ? "" : "/" d) "\"" : "") attributes ">" words "</a>"
+      }
+      # Leetcode: a link to each difficulty above the list, the one shown marked.
+      function difficulties(s, d,   out, i) {
+        out = "<nav class=\"difficulties\" aria-label=\"Difficulty\">\n"
+        out = out "  " link(s, "", d == "" ? " aria-current=\"page\"" : "", "all <span>" (count[s "|"] + 0) "</span>") "\n"
+        for (i = 1; i <= 3; i++)
+          out = out "  " link(s, tolower(levels[i]), " data-difficulty=\"" levels[i] "\"" (d == tolower(levels[i]) ? " aria-current=\"page\"" : ""), tolower(levels[i]) " <span>" (count[s "|" tolower(levels[i])] + 0) "</span>") "\n"
+        return out "</nav>"
+      }
+      # Leetcode: the streak, a link to each year, and the year shown as two
+      # halves, a column a week from Monday down, the second from the week 1
+      # July is in. A day with a solution links
+      # to it, in its colour unless another difficulty is picked; the days of
+      # a picked month are marked. The squares are for a mouse: the keyboard
+      # and screen readers skip them, as the months and the list lead to the
+      # same solutions. Under each half are its months, each a link to its
+      # view, from the week of its first day as far as the next month.
+      function dailies(s, d,   y, picked, out, i, jan1, off, weeks, first, m, n, day, key, place, half, cells, at, until, labels, words) {
+        y = s == "" ? newest : substr(s, 1, 4); picked = substr(s, 6, 2) + 0
+        out = "<section class=\"dailies\" aria-labelledby=\"streak\">\n  <header>\n"
+        out = out "    <h2 id=\"streak\">streak<span>:</span> " streak (streak == 1 ? " day" : " days") "</h2>\n"
+        out = out "    <p class=\"run\">" run "</p>\n    <nav class=\"years\" aria-label=\"Year\">\n"
+        for (i = nyears; i >= 1; i--) out = out "      " link(years[i] == newest ? "" : years[i], d, years[i] == y ? " aria-current=\"true\"" : "", years[i]) "\n"
+        out = out "    </nav>\n  </header>\n"
+        jan1 = day_number(y, 1, 1); off = (jan1 + 3) % 7
+        weeks = int((off + day_number(y + 1, 1, 1) - jan1 + 6) / 7); first = int((off + day_number(y, 7, 1) - jan1) / 7)
+        for (m = 1; m <= 12; m++) {
+          at[m] = int((off + n) / 7) - (m < 7 ? 0 : first) + 1
+          for (day = 1; day <= day_number(y, m + 1, 1) - day_number(y, m, 1); day++) {
+            key = sprintf("%s-%02d-%02d", y, m, day)
+            place = n == 0 && off ? " style=\"grid-row:" (off + 1) "\"" : ""
+            half = int((off + n++) / 7) < first ? 1 : 2
+            if (key in on) {
+              i = on[key]
+              cells[half] = cells[half] "        <a href=\"/" c "/" slug[i] "\" tabindex=\"-1\"" (d == "" || tolower(level[i]) == d ? " data-difficulty=\"" level[i] "\"" : "") (m == picked ? " class=\"in\"" : "") place "><span><small>" long_date(key) " &middot; " level[i] "</small> " title[i] "</span></a>\n"
+            } else cells[half] = cells[half] "        <i" (key > date[1] ? " class=\"later\"" : "") place "></i>\n"
           }
-          return out "</nav>"
         }
-        $1 == c && $8 != "" { per[$8]++; all++ }
-        $1 == c && (d == "" || tolower($8) == d) {
-          n++
-          if ($8 != "") {
-            start[n] = "  <li data-difficulty=\"" $8 "\""
-            title = $6 ". " esc($4); summary = $8
-          } else {
-            start[n] = "  <li"
-            title = esc($4); summary = esc($5)
-          }
-          rest[n] = "    <time datetime=\"" $3 "\">" long_date($3) "</time>\n    <div>\n      <h2><a href=\"/" c "/" $2 "\">" title "</a></h2>\n"
-          if (summary != "") rest[n] = rest[n] "      <p class=\"summary\">" summary "</p>\n"
-          rest[n] = rest[n] "    </div>\n  </li>"
+        for (m = 12; m >= 1; m--) {
+          half = m < 7 ? 1 : 2
+          place = " style=\"grid-column:" at[m] "/" (until[half] ? until[half] : -1) "\""
+          until[half] = at[m]
+          words = "<span>" tolower(substr(names[m], 1, 3))
+          # A picked month leads back to its year.
+          if (m == picked) words = link(y == newest ? "" : y, d, " aria-current=\"true\"" place, words "<span aria-hidden=\"true\"> &times;</span><span class=\"sr-only\"> (show all of " y ")</span></span>")
+          else words = link(y "/" sprintf("%02d", m), d, place, words "</span>")
+          labels[half] = "      " words "\n" labels[half]
         }
-        END {
-          split("Easy Medium Hard", level, " ")
-          pages = n ? int((n + size - 1) / size) : 1
-          for (page = 1; page <= pages; page++) {
-            file = dir "/list." name "." page
-            if (c == "leetcode") print difficulties() > file
-            print "<ul class=\"entries\">" > file
-            for (i = 1; i <= n; i++) print start[i] (i > (page - 1) * size && i <= page * size ? "" : " hidden") ">\n" rest[i] > file
-            print "</ul>" > file
-            close(file)
-          }
-          print n + 0
-        }' "$work/posts.tsv")
-      pages=$(page_count "$count")
-      for ((page = 1; page <= pages; page++)); do
-        list="$work/list.${view//\//.}.$page"
-        pagination "$view" "$page" "$pages" >>"$list"
-        index_page "$view" "$page" "$pages" "$list"
-      done
-      drop_pages_after "$view" "$pages"
+        out = out "  <div class=\"year\" style=\"--widest:" (first > weeks - first ? first : weeks - first) "\">\n"
+        for (half = 1; half <= 2; half++)
+          out = out "    <div class=\"half\" style=\"--weeks:" (half == 1 ? first : weeks - first) "\">\n      <div class=\"days\" aria-hidden=\"true\">\n" cells[half] "      </div>\n" labels[half] "    </div>\n"
+        return out "  </div>\n</section>"
+      }
+      # Writes the list for every page of a view, and prints its path and size.
+      function view(s, d,   from, name, head, shown, n, i, k, pages, page, file) {
+        from = s; sub(/\//, "-", from)
+        for (i = 1; i <= total; i++) if ((s == "" || index(date[i], from) == 1) && (d == "" || tolower(level[i]) == d)) shown[++n] = i
+        name = c (s == "" ? "" : "/" s) (d == "" ? "" : "/" d)
+        if (nyears) head = dailies(s, d) "\n" difficulties(s, d) "\n"
+        pages = n ? int((n + size - 1) / size) : 1
+        for (page = 1; page <= pages; page++) {
+          file = name; gsub(/\//, ".", file); file = dir "/list." file "." page
+          printf "%s", head > file
+          print "<ul class=\"entries\">" > file
+          for (k = 1; k <= n; k++) { i = shown[k]; print start[i] (k > (page - 1) * size && k <= page * size ? "" : " hidden") ">\n" rest[i] > file }
+          print "</ul>" > file
+          close(file)
+        }
+        print name, n + 0
+      }
+      # A span on its own, then by each difficulty it has.
+      function views(s,   i) {
+        view(s, "")
+        for (i = 1; i <= 3; i++) if (count[s "|" tolower(levels[i])]) view(s, tolower(levels[i]))
+      }
+      BEGIN {
+        split("January February March April May June July August September October November December", names, " ")
+        split("Easy Medium Hard", levels, " ")
+      }
+      $1 != c { next }
+      {
+        i = ++total; slug[i] = $2; date[i] = $3; level[i] = $8
+        if ($8 != "") {
+          start[i] = "  <li data-difficulty=\"" $8 "\""
+          title[i] = $6 ". " esc($4); summary = $8
+          # Leetcode: the square of a day opens the first of its solutions.
+          if (!($3 in on)) on[$3] = i
+          year = substr($3, 1, 4); month = year "/" substr($3, 6, 2); lower = tolower($8)
+          if (!(year in seen)) { seen[year] = 1; years[++nyears] = year }
+          if (!(month in seen)) { seen[month] = 1; months[++nmonths] = month }
+          count["|"]++; count["|" lower]++; count[year "|"]++; count[year "|" lower]++; count[month "|"]++; count[month "|" lower]++
+        } else {
+          start[i] = "  <li"
+          title[i] = esc($4); summary = esc($5)
+        }
+        rest[i] = "    <time datetime=\"" $3 "\">" long_date($3) "</time>\n    <div>\n      <h2><a href=\"/" c "/" $2 "\">" title[i] "</a></h2>\n"
+        if (summary != "") rest[i] = rest[i] "      <p class=\"summary\">" summary "</p>\n"
+        rest[i] = rest[i] "    </div>\n  </li>"
+      }
+      END {
+        if (!nyears) { view("", ""); exit }
+        # The streak: the days in a row up to the newest solution, and when
+        # they ran from, without the year if it is the same.
+        newest = years[1]; streak = 1; from = date[1]
+        for (i = 2; i <= total && day_of(date[i]) >= day_of(from) - 1; i++) if (date[i] != from) { streak++; from = date[i] }
+        run = long_date(date[1])
+        if (streak > 1) run = (substr(from, 1, 4) == newest ? substr(long_date(from), 1, length(long_date(from)) - 5) : long_date(from)) " &ndash; " run
+        views("")
+        for (i = 2; i <= nyears; i++) views(years[i])
+        for (i = 1; i <= nmonths; i++) views(months[i])
+      }' "$work/posts.tsv")
+    # The pages, a few views at a time.
+    jobs=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
+    pids=()
+    for ((job = 0; job < jobs; job++)); do
+      (
+        n=0
+        while read -r view count; do
+          ((n++ % jobs == job)) || continue
+          pages=$(page_count "$count")
+          for ((page = 1; page <= pages; page++)); do
+            list="$work/list.${view//\//.}.$page"
+            pagination "$view" "$page" "$pages" >>"$list"
+            index_page "$view" "$page" "$pages" "$list"
+          done
+          drop_pages_after "$view" "$pages"
+        done <<<"$views"
+      ) &
+      pids+=($!)
     done
+    for pid in "${pids[@]}"; do wait "$pid" || fail "build.sh: an index failed to build (above)"; done
   done
 }
 
@@ -1384,6 +1488,7 @@ sitemap() {
     echo '<?xml version="1.0" encoding="UTF-8"?>'
     echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     for path in "" /about /blog /contents /changelog /leetcode /leetcode/easy /leetcode/medium /leetcode/hard /friends /books; do
+      [[ -f $out$path/index.html ]] || continue # a difficulty with no solutions has no page
       printf '<url>\n<loc>%s</loc>\n</url>\n' "$SITE_URL$path"
     done
     for collection in blog leetcode; do
